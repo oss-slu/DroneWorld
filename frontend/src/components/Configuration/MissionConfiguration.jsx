@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react'; 
 import Box from '@mui/material/Box';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
@@ -6,104 +6,108 @@ import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
-import { ExpandMore } from '@mui/icons-material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { makeStyles } from '@mui/styles';
 import DroneConfiguration from './DroneConfiguration';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Grid from '@mui/material/Grid';
-import { useState } from 'react';
-import TextField from '@mui/material/TextField';
+import TextField from '@mui/material/TextField'; 
+import PropTypes from 'prop-types';
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    width: '100%',
-    padding: '5px',
-  },
-}));
-
-export default function MissionConfiguration(mission) {
-  const [magnetometer, setMagnetometer] = useState({
-    noiseSigma: 0.005,
-    scaleFactor: 1,
-    noiseBias: 0,
-    updateLatency: 0,
-    updateFrequency: 50,
-    startupDelay: 0,
-  });
-
-  const classes = useStyles();
-  const [droneCount, setDroneCount] = React.useState(
-    mission.mainJsonValue.Drones != null
-      ? mission.mainJsonValue.Drones.length
-      : 1
-  );
-  const [droneArray, setDroneArray] = React.useState(
-    mission.mainJsonValue.Drones != null
-      ? mission.mainJsonValue.Drones
-      : [
-          {
-            id: droneCount - 1,
-            droneName: "Drone " + droneCount,
-            VehicleType: "SimpleFlight",
-            DefaultVehicleState: "Armed",
-            PawnPath: "",
-            EnableCollisionPassthrogh: false,
-            EnableCollisions: true,
-            AllowAPIAlways: true,
-            EnableTrace: false,
-            Name: "Drone " + droneCount,
-            X:
-              mission.mainJsonValue.environment != null
-                ? mission.mainJsonValue.environment.Origin.Latitude
-                : 0,
-            Y:
-              mission.mainJsonValue.environment != null
-                ? mission.mainJsonValue.environment.Origin.Longitude
-                : 0,
-            Z:
-              mission.mainJsonValue.environment != null
-                ? mission.mainJsonValue.environment.Origin.Height
-                : 0,
-            Pitch: 0,
-            Roll: 0,
-            Yaw: 0,
-            Sensors: null,
-            MissionValue: null,
-            Mission: {
-              name: "fly_to_points",
-              param: [],
+    root: {
+      width: '100%',
+      padding: '5px',
+    },
+  }));
+  
+  export default function MissionConfiguration(props) {
+    const [magnetometer, setMagnetometer] = useState({
+      noiseSigma: 0.005,
+      scaleFactor: 1,
+      noiseBias: 0,
+      updateLatency: 0,
+      updateFrequency: 50,
+      startupDelay: 0,
+    });
+    const missionData = props.mission || {};
+    const mainJsonValue = missionData.mainJsonValue || {};
+  
+    const classes = useStyles();
+    const [droneCount, setDroneCount] = useState(
+      props.mission?.mainJsonValue?.Drones != null
+        ? props.mission.mainJsonValue.Drones.length
+        : 1
+    );
+    const [droneArray, setDroneArray] = useState(
+      props.mission?.mainJsonValue.Drones != null
+        ? props.mission.mainJsonValue.Drones
+        : [
+            {
+              id: droneCount - 1,
+              droneName: "Drone " + droneCount,
+              VehicleType: "SimpleFlight",
+              DefaultVehicleState: "Armed",
+              PawnPath: "",
+              EnableCollisionPassthrogh: false,
+              EnableCollisions: true,
+              AllowAPIAlways: true,
+              EnableTrace: false,
+              Name: "Drone " + droneCount,
+              X:
+                props.mission?.mainJsonValue.environment != null
+                  ? props.mission?.mainJsonValue.environment.Origin.Latitude
+                  : 0,
+              Y:
+                props.mission?.mainJsonValue.environment != null
+                  ? props.mission?.mainJsonValue.environment.Origin.Longitude
+                  : 0,
+              Z:
+                props.mission?.mainJsonValue.environment != null
+                  ? props.mission?.mainJsonValue.environment.Origin.Height
+                  : 0,
+              Pitch: 0,
+              Roll: 0,
+              Yaw: 0,
+              Sensors: null,
+              MissionValue: null,
+              Mission: {
+                name: "fly_to_points",
+                param: [],
+              },
             },
-          },
         ]
-  );
+    );
 
   const setDrone = () => {
-    droneArray.push({
-      id: droneCount,
-      droneName: "Drone " + (droneCount + 1),
-      VehicleType: "SimpleFlight",
-      DefaultVehicleState: "Armed",
-      PawnPath: "",
-      EnableCollisionPassthrogh: false,
-      EnableCollisions: true,
-      AllowAPIAlways: true,
-      EnableTrace: false,
-      Name: "Drone " + (droneCount + 1),
+    setDroneArray((droneArray) => [
+      ...droneArray,
+      {
+        id: droneCount,
+        droneName: "Drone " + (droneCount + 1),
+        VehicleType: "SimpleFlight",
+        DefaultVehicleState: "Armed",
+        PawnPath: "",
+        EnableCollisionPassthrogh: false,
+        EnableCollisions: true,
+        AllowAPIAlways: true,
+        EnableTrace: false,
+        Name: "Drone " + (droneCount + 1),
       X:
-        mission.mainJsonValue.environment != null
+        props.mission.mainJsonValue.environment != null
           ? droneCount > 0
-            ? mission.mainJsonValue.environment.Origin.Latitude +
+            ? props.mission.mainJsonValue.environment.Origin.Latitude +
               0.0001 * droneCount
-            : mission.mainJsonValue.environment.Origin.Latitude
+            : props.mission.mainJsonValue.environment.Origin.Latitude
           : 0,
       Y:
-        mission.mainJsonValue.environment != null
-          ? mission.mainJsonValue.environment.Origin.Longitude
+        props.mission.mainJsonValue.environment != null
+          ? props.mission.mainJsonValue.environment.Origin.Longitude
           : 0,
       Z:
-        mission.mainJsonValue.environment != null
-          ? mission.mainJsonValue.environment.Origin.Height
+        props.mission.mainJsonValue.environment != null
+          ? props.mission.mainJsonValue.environment.Origin.Height
           : 0,
       Pitch: 0,
       Roll: 0,
@@ -114,7 +118,7 @@ export default function MissionConfiguration(mission) {
         name: "fly_to_points",
         param: [],
       },
-    });
+    }]);
   };
 
   const handleMagnetometerChange = (e) => {
@@ -125,7 +129,7 @@ export default function MissionConfiguration(mission) {
   };
 
   const popDrone = () => {
-    droneArray.pop();
+    setDroneArray((droneArray) => droneArray.slice(0, -1));
   };
 
   const handleIncrement = () => {
@@ -147,31 +151,37 @@ export default function MissionConfiguration(mission) {
   };
 
   const setDroneName = (e, index) => {
-    setDroneArray((objs) => {
-      return objs.map((obj, i) => {
-        if (index === obj.id) {
-          obj = {
-            ...obj,
-            droneName: e,
-          };
-        }
-        return obj;
-      });
-    });
+    setDroneArray((droneArray) =>
+      droneArray.map((obj) =>
+        obj.id === index ? { ...obj, droneName: e } : obj
+      )
+    );
   };
 
-  React.useEffect(() => {
-    mission.droneArrayJson(droneArray, mission.id);
-  }, [droneArray]);
+  useEffect(() => {
+    if (props.mission) {
+      props.mission.droneArrayJson(droneArray, props.mission.id);
+    }
+  }, [droneArray, props.mission]);
 
   const setDroneJson = (json, index) => {
-    const target = droneArray.find((obj) => obj.id === index);
+    const updatedArray = [...droneArray];
+    const target = updatedArray.find((obj) => obj.id === index);
     Object.assign(target, json);
-    console.log('droneArray----Mission Config', droneArray);
-  };
+    setDroneArray(updatedArray);
+    console.log('droneArray----Mission Config', updatedArray);
+  }; 
 
   return (
-    <Box sx={{ border: 1, borderRadius: 3, maxHeight: mission.windowHeight - 200, overflow: 'scroll', padding: 3 }}>
+    <Box
+      sx={{
+        border: 1,
+        borderRadius: 3,
+        maxHeight: props.mission?.windowHeight - 200,
+        overflow: 'scroll',
+        padding: 3,
+      }}
+    >
       <Grid container direction="row" style={{ padding: '12px' }}>
         <strong>Configure sUAS (small unmanned aircraft system) or drone characteristics in your scenario</strong>
       </Grid>
@@ -193,72 +203,92 @@ export default function MissionConfiguration(mission) {
             <div>
               <div className={classes.root}>
                 <Accordion>
-                <AccordionSummary 
-                expandIcon={<ExpandMore />} 
-                aria-controls="panel1a-content" 
-                id="panel1a-header" 
-                > 
-                  <Typography className={classes.heading}>{drone.droneName}</Typography>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1a-content"
+                    id="panel1a-header"
+                  >
+                    <Typography className={classes.heading}>
+                      {drone?.droneName || "Default"}
+                    </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
-                    <Typography> 
+                    <Typography>
                       <DroneConfiguration
+                        name={drone?.droneName || "Default"}
                         id={drone.id}
                         resetName={setDroneName}
                         droneJson={setDroneJson}
-                        droneObject={droneArray[(drone.id)]}
+                        droneObject={droneArray[drone.id] || {}}
                       />
+
                       <DroneConfiguration
+                        name="Default"
                         magnetometer={magnetometer}
                         handleChange={handleChange}
-                      />
-                      <TextField
-                        label="Noise Sigma"
-                        name="noiseSigma"
-                        value={magnetometer.noiseSigma}
-                        onChange={(e) => handleMagnetometerChange(e)}
-                      />
-                      <TextField
-                        label="Scale Factor"
-                        name="scaleFactor"
-                        value={magnetometer.scaleFactor}
-                        onChange={(e) => handleMagnetometerChange(e)}
-                      />
-                      <TextField
-                        label="Noise Bias"
-                        name="noiseBias"
-                        value={magnetometer.noiseBias}
-                        onChange={(e) => handleMagnetometerChange(e)}
-                      />
-                      <TextField
-                        label="Update Latency"
-                        name="updateLatency"
-                        value={magnetometer.updateLatency}
-                        onChange={(e) => handleMagnetometerChange(e)}
-                      />
-                      <TextField
-                        label="Update Frequency"
-                        name="updateFrequency"
-                        value={magnetometer.updateFrequency}
-                        onChange={(e) => handleMagnetometerChange(e)}
-                      />
-                      <TextField
-                        label="Startup Delay"
-                        name="startupDelay"
-                        value={magnetometer.startupDelay}
-                        onChange={(e) => handleMagnetometerChange(e)}
-                      />
-                      <DroneConfiguration
-                        magnetometer={magnetometer}
-                      />
-                    </Typography>
-                  </AccordionDetails>
-                </Accordion>
+                      /> 
+                        <TextField
+                          label="Noise Sigma"
+                          name="noiseSigma"
+                          value={magnetometer.noiseSigma}
+                          onChange={(e) => handleMagnetometerChange(e)}
+                        />
+                        <TextField
+                          label="Scale Factor"
+                          name="scaleFactor"
+                          value={magnetometer.scaleFactor}
+                          onChange={(e) => handleMagnetometerChange(e)}
+                        />
+                        <TextField
+                          label="Noise Bias"
+                          name="noiseBias"
+                          value={magnetometer.noiseBias}
+                          onChange={(e) => handleMagnetometerChange(e)}
+                        />
+                        <TextField
+                          label="Update Latency"
+                          name="updateLatency"
+                          value={magnetometer.updateLatency}
+                          onChange={(e) => handleMagnetometerChange(e)}
+                        />
+                        <TextField
+                          label="Update Frequency"
+                          name="updateFrequency"
+                          value={magnetometer.updateFrequency}
+                          onChange={(e) => handleMagnetometerChange(e)}
+                        />
+                        <TextField
+                          label="Startup Delay"
+                          name="startupDelay"
+                          value={magnetometer.startupDelay}
+                          onChange={(e) => handleMagnetometerChange(e)}
+                        />
+                        <DroneConfiguration magnetometer={magnetometer} />
+                      </Typography>
+                    </AccordionDetails>
+                  </Accordion>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
     </Box>
   );
 }
+
+MissionConfiguration.propTypes = {
+  mission: PropTypes.shape({
+    mainJsonValue: PropTypes.shape({
+      Drones: PropTypes.array,
+      environment: PropTypes.shape({
+        Origin: PropTypes.shape({
+          Latitude: PropTypes.number,
+          Longitude: PropTypes.number,
+          Height: PropTypes.number,
+        }),
+      }),
+    }),
+    droneArrayJson: PropTypes.array,
+    id: PropTypes.string,
+    windowHeight: PropTypes.number,
+  },)}
