@@ -7,7 +7,17 @@ import Button from '@mui/material/Button';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import Tooltip from '@mui/material/Tooltip';
+import Tooltip from '@mui/material/Tooltip'; 
+
+
+const defaultMagnetometer = {
+    NoiseSigma: 0.005,
+    ScaleFactor: 1,
+    NoiseBias: 0, 
+    UpdateLatency: 0,
+    StartupDelay: 0,
+   
+  };
 
 export default function Magnetometer (sensor) {
     const [magnetometer, setMagnetometer]  = React.useState(sensor.magnetometerObj)
@@ -63,9 +73,11 @@ export default function Magnetometer (sensor) {
                         <Grid item xs={3}>
                             <TextField id="UpdateLatency" onChange={handleChange} label="UpdateLatency" variant="standard" value={magnetometer.UpdateLatency}/>
                         </Grid> */}
+                        
+                        
                         <Tooltip title="The frequency at which the compass should send readings to the flight controller.">
                         <Grid item xs={3}>
-                            <TextField id="UpdateFrequency" onChange={handleChange} label="Update Frequency (Hz)" type="number" variant="standard" value={magnetometer.UpdateFrequency}/>
+                            <TextField id="UpdateFrequency" onChange={handleChange} label="Update Frequency (Hz)" type="number" variant="standard" value={defaultMagnetometer.UpdateFrequency}/>
                         </Grid>
                         </Tooltip>
                         {/* <Grid item xs={3}>
