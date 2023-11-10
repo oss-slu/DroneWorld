@@ -30,7 +30,9 @@ export default function Magnetometer (sensor) {
     }
 
     React.useEffect(() => {
-        sensor.updateJson(magnetometer, sensor.name)
+        if (sensor.updateJson) {
+            sensor.updateJson(magnetometer, sensor.name);
+        }
     }, [magnetometer])
 
     
