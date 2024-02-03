@@ -10,30 +10,52 @@ import Switch from '@mui/material/Switch';
 import tooltip from '@mui/material/Tooltip';
 import Tooltip from '@mui/material/Tooltip';
 
-export default function Barometer (sensor) {
-    console.log('In barometer')
-    const [barometer, setBarometer] = React.useState({
-        ...sensor.barometerObj,
+const defaultBarometer = {   
         PressureFactorSigma: '0.001825',
         PressureFactorTau: '3600',
         UncorrelatedNoiseSigma: '2.7',
         UpdateLatency: '0',
         UpdateFrequency: '50',
         StartupDelay: '0'
+
+}  
+
+export default function Barometer (sensor) {
+    console.log('In barometer')
+    const [barometer, setBarometer] = React.useState(sensor.barometerObj);
+
+    //    ...sensor.barometerObj,
+    //    PressureFactorSigma: '0.001825',
+    //    PressureFactorTau: '3600',
+    //    UncorrelatedNoiseSigma: '2.7',
+    //    UpdateLatency: '0',
+    //    UpdateFrequency: '50',
+    //    StartupDelay: '0'
+   //   });
+
+   React.useEffect(() => {
+    sensor.updateJson(barometer, sensor.name) 
+   }, [barometer])
+
+
+   React.useEffect(() => {
+    setBarometer({
+      ...barometer, 
+      ...defaultBarometer
     });
-    
+  }, []); 
 
-    React.useEffect(() => {
-        console.log('use effect in barometer')
-        sensor.updateJson(barometer, sensor.name)
-    }, [barometer])
+   // React.useEffect(() => {
+    //    console.log('use effect in barometer')
+      //  sensor.updateJson(barometer, sensor.name)
+ //   }, [barometer])
 
-    const handleChangeSwitch = (val) => {
-        setBarometer(prevState => ({
-                ...prevState,
-                Enabled: val.target.checked
-        }))
-    }
+  //  const handleChangeSwitch = (val) => {
+   //     setBarometer(prevState => ({
+         //       ...prevState,
+       //         Enabled: val.target.checked
+      //  }))
+   // }
 
     const closeModal = () => {
         sensor.closeModal(barometer, sensor.name)
