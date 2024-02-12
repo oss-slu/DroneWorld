@@ -179,11 +179,20 @@ class SimulationTaskManager:
                 drone_name, drone_x, drone_y, drone_z = self.__handle_mission_settings(single_drone_setting_copy)
 
             diff_dict = self.__find_diff(single_drone_setting_copy, self.__DEFAULT_DRONE_FULL_LENGTH)
-
             
-            #If GPS settings exist in the input JSON, add them to the drone configuration
-            if "Sensors" in single_drone_setting and "GPS" in single_drone_setting["Sensors"]:
-                gps_settings = {
+
+            # If Barometer settings exist in the input JSON, directly use them.
+            if "Sensors" in single_drone_setting and "Barometer" in single_drone_setting["Sensors"]:
+                diff_dict["Sensors"] = diff_dict.get("Sensors", {})
+                diff_dict["Sensors"]["Barometer"] = single_drone_setting["Sensors"]["Barometer"]
+
+            new_one_drone_json = {
+                drone_name: dict(FlightController="SimpleFlight", X=drone_x, Y=drone_y, Z=drone_z)
+            }
+
+            # GPS settings
+            if "GPS" in single_drone_setting["Sensors"]:
+                diff_dict["Sensors"]["GPS"] = {
                     "EphTimeConstant": single_drone_setting["Sensors"]["GPS"].get("EphTimeConstant", 0.9),
                     "EpvTimeConstant": single_drone_setting["Sensors"]["GPS"].get("EpvTimeConstant", 0.9),
                     "EphInitial": single_drone_setting["Sensors"]["GPS"].get("EphInitial", 25),
@@ -196,19 +205,6 @@ class SimulationTaskManager:
                     "UpdateFrequency": single_drone_setting["Sensors"]["GPS"].get("UpdateFrequency", 50),
                     "StartupDelay": single_drone_setting["Sensors"]["GPS"].get("StartupDelay", 1),
                 }
-
-                if "Sensors" not in diff_dict:
-                    diff_dict["Sensors"] = {}
-                diff_dict["Sensors"]["GPS"] = gps_settings
-
-            # If Barometer settings exist in the input JSON, directly use them.
-            if "Sensors" in single_drone_setting and "Barometer" in single_drone_setting["Sensors"]:
-                diff_dict["Sensors"] = diff_dict.get("Sensors", {})
-                diff_dict["Sensors"]["Barometer"] = single_drone_setting["Sensors"]["Barometer"]
-
-            new_one_drone_json = {
-                drone_name: dict(FlightController="SimpleFlight", X=drone_x, Y=drone_y, Z=drone_z)
-            }
 
             new_one_drone_json[drone_name].update(diff_dict)
             new_setting_dot_json['Vehicles'].update(new_one_drone_json)
