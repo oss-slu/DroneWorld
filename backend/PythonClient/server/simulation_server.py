@@ -34,48 +34,75 @@ def list_reports():
     reports_path = os.path.join(os.path.expanduser("~"), "Documents", "AirSim", "report")
     if not os.path.exists(reports_path) or not os.path.isdir(reports_path):
         return 'Reports directory not found', 404
-    
-    report_files = []
-    pass_count = 0
-    fail_count = 0
 
+    def find_and_count_in_log(directory):
+        pass_count = fail_count = 0
+        for root, dirs, files in os.walk(directory):
+            if 'GlobalMonitors' in dirs:
+                log_file_path = os.path.join(root, 'GlobalMonitors', 'log.txt')
+                if os.path.isfile(log_file_path):
+                    with open(log_file_path, 'r') as log_file:
+                        for line in log_file:
+                            if 'PASS' in line:
+                                try:
+                                    items_list = eval(line.split(';')[2])
+                                    pass_count += len(items_list)
+                                except SyntaxError:
+                                    pass  # Handle potential eval errors safely
+                            elif 'FAIL' in line:
+                                try:
+                                    items_list = eval(line.split(';')[2])
+                                    fail_count += len(items_list)
+                                except SyntaxError:
+                                    pass
+                    break  # Stop searching once log.txt is found and processed
+        return pass_count, fail_count
+
+    report_files = []
     for file in os.listdir(reports_path):
         if 'store' in file.lower():
-            continue  # skip ds store files entirely, we don't want them
+            continue  # skip ds store files entirely
 
         file_path = os.path.join(reports_path, file)
 
         if os.path.isdir(file_path):
-            # Check for GlobalMonitors directory and process log.txt if found
-            if 'globalmonitors' in map(str.lower, os.listdir(file_path)):
-                global_monitors_path = os.path.join(file_path, 'GlobalMonitors')
-                log_path = os.path.join(global_monitors_path, 'log.txt')
-                if os.path.exists(log_path):
-                    with open(log_path, 'r') as log_file:
-                        for line in log_file:
-                            if 'PASS' in line:
-                                pass_count += len(eval(line.split(';')[2]))
-                            elif 'FAIL' in line:
-                                fail_count += len(eval(line.split(';')[2]))
-
-            # Find 'Fuzzy' files and count Drones as before
+            # Find 'Fuzzy' files
             fuzzy_files = [f for f in os.listdir(file_path) if 'fuzzy' in f.lower()]
             contains_fuzzy = len(fuzzy_files) > 0
-            drone_count = 0
-            if contains_fuzzy:
-                fuzzy_path = os.path.join(file_path, fuzzy_files[0] if os.path.isdir(os.path.join(file_path, fuzzy_files[0])) else '')
-                flytopoints_path = os.path.join(fuzzy_path, 'FlyToPoints') if fuzzy_path else os.path.join(file_path, 'FlyToPoints')
-            else:
-                flytopoints_path = os.path.join(file_path, 'FlyToPoints')
 
+            # Determine the path to count Drone files
+            if contains_fuzzy:
+                first_fuzzy_path = os.path.join(file_path, fuzzy_files[0])
+                flytopoints_path = first_fuzzy_path if os.path.isdir(first_fuzzy_path) else file_path
+            else:
+                flytopoints_path = file_path
+            flytopoints_path = os.path.join(flytopoints_path, 'FlyToPoints')
+
+            # Count Drones
+            drone_count = 0
             if os.path.exists(flytopoints_path) and os.path.isdir(flytopoints_path):
                 drone_count = sum(1 for f in os.listdir(flytopoints_path) if f.startswith('FlyToPoints_Drone'))
-            
-            report_files.append({'filename': file, 'contains_fuzzy': contains_fuzzy, 'drone_count': drone_count})
-        else:
-            report_files.append({'filename': file, 'contains_fuzzy': False, 'drone_count': 0})
 
-    return {'reports': report_files, 'pass_count': pass_count, 'fail_count': fail_count}
+            # Find and count PASS and FAIL in log.txt
+            pass_count, fail_count = find_and_count_in_log(file_path)
+
+            report_files.append({
+                'filename': file,
+                'contains_fuzzy': contains_fuzzy,
+                'drone_count': drone_count,
+                'pass': pass_count,
+                'fail': fail_count
+            })
+        else:
+            report_files.append({
+                'filename': file,
+                'contains_fuzzy': False,
+                'drone_count': 0,
+                'pass': 0,
+                'fail': 0
+            })
+
+    return {'reports': report_files}
 """
 #old version without the pass fails
 def list_reports():
