@@ -31,7 +31,7 @@ task_number = 1
 @app.route('/list-reports', methods=['GET'])
 def list_reports():
     # Reports file
-    reports_path = "C:/Users/Kaleb/Desktop/jsTest/report"
+    reports_path = os.path.join(os.path.expanduser("~"), "Documents", "AirSim", "report")
 
     if not os.path.exists(reports_path) or not os.path.isdir(reports_path):
         return 'Reports directory not found', 404
