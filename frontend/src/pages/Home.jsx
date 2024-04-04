@@ -167,25 +167,44 @@ const Home = () => {
       </StyledButton>
     </StyledLink>
     
+
+    {/*Remove this code when implementing the header About us*/}
     {/* Button to open Modal */}
-    <Button onClick={() => setOpen(true)} style={{ marginTop: 20, marginBottom: 20 }}>About Us</Button>
+    <Button onClick={() => setOpen(true)} style={{ marginTop: 20, marginBottom: 20 }}>About Us (Move this to Nav Bar later)</Button>
 
     {/* Modal Component */}
-    <Modal
-      open={open}
-      onClose={() => setOpen(false)}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <Box sx={modalStyle}>
-        <Typography id="modal-modal-title" variant="h6" component="h2">
-          About Us
-        </Typography>
-        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          DroneWorld is a Drone simulation program that is WIP
-        </Typography>
-      </Box>
-    </Modal>
+<Modal
+  open={open}
+  onClose={() => setOpen(false)}
+  aria-labelledby="modal-modal-title"
+  aria-describedby="modal-modal-description"
+>
+  <Box sx={{ ...modalStyle, maxWidth: '500vw' }}>
+    <Typography id="modal-modal-title" variant="h6" component="h2">
+      
+    </Typography>
+    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+      <p>
+        <strong>About Drone World</strong>
+      </p>
+      <p>
+        Drone World is revolutionizing sUAS (small Uncrewed Aerial Systems) testing. In the dynamic world
+        of sUAS, safety and reliability are paramount. Traditional field testing across diverse environments is costly
+        and challenging.
+      </p>
+      <p>
+        Drone World offers an innovative sUAV simulation ecosystem that generates high-fidelity, realistic environments
+        mimicking real-world complexities like adverse weather and wireless interference. Our automated solution allows
+        developers to specify constraints and generate tailored test environments.
+      </p>
+      <p>
+        The program monitors sUAV activities against predefined safety parameters and generates detailed acceptance test
+        reports. This approach provides actionable insights for effective debugging and analysis, enhancing the safety,
+        reliability, and efficiency of sUAS applications.
+      </p>
+    </Typography>
+  </Box>
+</Modal>
   </Box>
 </React.Fragment>
 );
