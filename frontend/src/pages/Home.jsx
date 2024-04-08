@@ -99,7 +99,8 @@ const Home = () => {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
+    width: 800, // Increase the width
+    height: 400, // Increase the height
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
@@ -168,43 +169,52 @@ const Home = () => {
     </StyledLink>
     
 
-    {/*Remove this code when implementing the header About us*/}
+    {/*Remove this code when implementing the header About us. Widen the component. Add a close button.*/}
     {/* Button to open Modal */}
     <Button onClick={() => setOpen(true)} style={{ marginTop: 20, marginBottom: 20 }}>About Us (Move this to Nav Bar later)</Button>
 
     {/* Modal Component */}
-<Modal
+    <Modal
   open={open}
   onClose={() => setOpen(false)}
   aria-labelledby="modal-modal-title"
   aria-describedby="modal-modal-description"
 >
-  <Box sx={{ ...modalStyle, maxWidth: '500vw' }}>
+  <Box sx={modalStyle}>
+    {/* Close Button */}
+    <Button 
+      onClick={() => setOpen(false)} 
+      style={{ position: 'absolute', top: 16, right: 16 }}>
+      Close
+    </Button>
+
     <Typography id="modal-modal-title" variant="h6" component="h2">
-      
+      {/* Title Content */}
     </Typography>
+
     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-      <p>
-        <strong>About Drone World</strong>
-      </p>
-      <p>
-        Drone World is revolutionizing sUAS (small Uncrewed Aerial Systems) testing. In the dynamic world
-        of sUAS, safety and reliability are paramount. Traditional field testing across diverse environments is costly
-        and challenging.
-      </p>
-      <p>
-        Drone World offers an innovative sUAV simulation ecosystem that generates high-fidelity, realistic environments
-        mimicking real-world complexities like adverse weather and wireless interference. Our automated solution allows
-        developers to specify constraints and generate tailored test environments.
-      </p>
-      <p>
-        The program monitors sUAV activities against predefined safety parameters and generates detailed acceptance test
-        reports. This approach provides actionable insights for effective debugging and analysis, enhancing the safety,
-        reliability, and efficiency of sUAS applications.
-      </p>
+    <p>
+<strong>About Drone World</strong>
+</p>
+<p>
+Drone World is revolutionizing sUAS (small Uncrewed Aerial Systems) testing. In the dynamic world
+of sUAS, safety and reliability are paramount. Traditional field testing across diverse environments is costly
+and challenging.
+</p>
+<p>
+Drone World offers an innovative sUAV simulation ecosystem that generates high-fidelity, realistic environments
+mimicking real-world complexities like adverse weather and wireless interference. Our automated solution allows
+developers to specify constraints and generate tailored test environments.
+</p>
+<p>
+The program monitors sUAV activities against predefined safety parameters and generates detailed acceptance test
+reports. This approach provides actionable insights for effective debugging and analysis, enhancing the safety,
+reliability, and efficiency of sUAS applications.
+</p>
     </Typography>
   </Box>
 </Modal>
+
   </Box>
 </React.Fragment>
 );
