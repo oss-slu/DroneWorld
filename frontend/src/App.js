@@ -7,7 +7,8 @@ import FuzzyDashboard from './components/FuzzyDashboard';
 import ReportDashboard from './components/ReportDashboard'; 
 import LandingPage from './LandingPage'; 
 import AboutUs from './components/AboutUs'; 
-import "./styles.css"
+import "./styles.css" 
+
 
 
 function App() {

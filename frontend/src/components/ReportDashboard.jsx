@@ -1,4 +1,3 @@
-import CardMedia from '@mui/material/CardMedia'
 import Box from '@mui/material/Box';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -119,7 +118,6 @@ const useStyles = makeStyles((theme) => ({
             return res.json();
           })
           .then((data) => {
-            // 'data.reports' containing filename and fuzzy info
             console.log('Report Files:', data.reports);
             setReportFiles(data.reports);
           })
@@ -128,10 +126,8 @@ const useStyles = makeStyles((theme) => ({
           });
       };
     
-      // Set the sample data initially
-      //setReportFiles(sampleData);
+  
     
-      // Fetch data after setting the sample data 
       setReportFiles([]); 
 
       fetchData();
@@ -164,7 +160,6 @@ const useStyles = makeStyles((theme) => ({
       </Tooltip>
     </Typography>
   );
-  
    
   return ( 
    <>         
@@ -290,36 +285,37 @@ const useStyles = makeStyles((theme) => ({
 
         </Grid>
       </Grid>
-    </AccordionSummary>
+    </AccordionSummary> 
+    
     <AccordionDetails>
-    <Table style={{ width: '30%' }} aria-label="simple table" >
-  <TableBody>
-    <TableRow style={{ borderBottomWidth: '2px' }}>
-      {/* <TableCell align="center"></TableCell>  */}
-      <TableCell  style={{ fontWeight: 'bold', color: 'blue' }}>Drone Count</TableCell>
-      <TableCell  style={{ fontWeight: 'bold', color: 'green' }}>Pass</TableCell>
-      <TableCell  style={{ fontWeight: 'bold', color: 'red' }}>Fail</TableCell>
-    </TableRow>
-    <TableRow> 
-      
-      {/* <TableCell align="right"></TableCell>  */}
-      <TableCell >{file.drone_count}</TableCell>
-      <TableCell >{file.pass}</TableCell>
-      <TableCell >{file.fail}</TableCell>
-    </TableRow>
-  </TableBody>
-</Table>
-          {file.contains_fuzzy && ( 
-          <Typography style={{ marginLeft: 'auto' }}> 
-          <p>Fuzzy Testing {file.contains_fuzzy}</p> 
-          </Typography> 
-          )} 
-          {!file.contains_fuzzy && ( 
-          <Typography style={{ marginLeft: 'auto' }}> 
-          <p>Simulation Testing</p> 
-          </Typography> 
-          )} 
-          </AccordionDetails> 
+    <Table style={{ width: '30%' }} aria-label="simple table">
+        <TableBody>
+            <TableRow style={{ borderBottomWidth: '2px' }}>
+                {/* Headers */}
+                <TableCell style={{ fontWeight: 'bold', color: 'blue' }}>Drone Count</TableCell>
+                <TableCell style={{ fontWeight: 'bold', color: 'green' }}>Pass</TableCell>
+                <TableCell style={{ fontWeight: 'bold', color: 'red' }}>Fail</TableCell>
+            </TableRow>
+            <TableRow>
+                {/* Data */}
+                <TableCell>{file.drone_count}</TableCell>
+                <TableCell>{file.pass}</TableCell>
+                <TableCell>{file.fail}</TableCell>
+            </TableRow>
+        </TableBody>
+    </Table>
+    {file.contains_fuzzy ? (
+        <Typography style={{ marginLeft: 'auto' }}>
+            <p>Fuzzy Testing {file.contains_fuzzy}</p>
+        </Typography>
+    ) : (
+        <Typography style={{ marginLeft: 'auto' }}>
+            <p>Simulation Testing</p>
+        </Typography>
+    )}
+   
+</AccordionDetails>
+ 
           </Accordion> 
           </Grid>
         );
