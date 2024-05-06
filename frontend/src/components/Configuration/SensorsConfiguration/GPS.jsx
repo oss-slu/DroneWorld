@@ -55,14 +55,15 @@ export default function GPS (sensor) {
         EpvTimeConstant: "Tooltip text...",
       }
 
-      const handleChange = (event) => {
+    const handleChange = (event) => {
         const { id, value } = event.target;
-      
+        const parsedValue = event.target.type === 'number' ? parseFloat(value) : value;
+        
         setGps((prevGps) => ({
-          ...prevGps,
-          [id]: value,
+            ...prevGps,
+            [id]: parsedValue,
         }));
-      };
+    };
 
 
     const handleReset = () => {  

@@ -1,25 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react'; 
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import ReportDashboard from './components/ReportDashboard';
-import { Link } from 'react-router-dom';
+import Modal from '@mui/material/Modal';
+import Typography from '@mui/material/Typography'; 
+import ReportDashboard from './components/ReportDashboard'; 
 
 const useStyles = makeStyles((theme) => ({
   landingPage: {
     fontFamily: 'Roboto, sans-serif',
     color: '#fff',
     display: 'flex',
-    flexDirection: 'column', 
-    alignItems: 'center', 
-    minHeight: '100vh', 
+    flexDirection: 'column',
+    alignItems: 'center',
+    minHeight: '100vh',
   },
   nav: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '1.5rem',
-    backgroundColor: '#0000CD',
+    //backgroundColor: '#0000CD',
     fontFamily: 'Arial, sans-serif',
     width: '100%',
   },
@@ -31,14 +34,13 @@ const useStyles = makeStyles((theme) => ({
     fontFamily: 'Arial, sans-serif',
   },
   mainContent: {
-    padding: '2rem', 
-    marginTop: '7rem'
-    //textAlign: 'center', 
+    padding: '1rem',
+    // marginTop: '3rem',
   },
   buttonContainer: {
-    position: 'absolute', 
-    top: '8rem', 
-    right: '4rem', 
+    position: 'absolute',
+    top: '6rem',
+    right: '2rem',
     display: 'flex',
     justifyContent: 'flex-end',
     marginTop: '1rem',
@@ -58,37 +60,50 @@ const useStyles = makeStyles((theme) => ({
     color: '#fff',
     padding: '0.5rem 1rem',
     borderRadius: '30px',
-    cursor: 'pointer', 
+    cursor: 'pointer',
   },
   acceptanceReportLink: {
     textDecoration: 'underline',
-    color: '#800080', 
-    cursor: 'pointer', 
-    fontWeight: 'bold', 
-    display: 'block', 
-    marginBottom: '1rem', 
+    color: '#800080',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    display: 'block',
+    marginBottom: '1rem',
   },
   reportDashboardTitle: {
-    textDecoration: 'underline', 
-    color: '#800080', 
+    textDecoration: 'underline',
+    color: '#800080',
     fontWeight: 'bold',
-    fontSize: '1.5rem', 
-    marginBottom: '1rem', 
-    cursor: 'pointer', 
-    textAlign: 'center',  
-  }, 
-
+    fontSize: '1.5rem',
+    marginBottom: '1rem',
+    cursor: 'pointer',
+    textAlign: 'center',
+  },
   createSimulationLink: {
-    textDecoration: 'none', 
-    display: 'block', 
+    textDecoration: 'none',
+    display: 'block',
     width: 'fit-content',
-},
-
+  },
 }));
+
+const modalStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 800,
+  height: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  padding: '4',
+};
 
 export default function LandingPage() {
   const classes = useStyles();
-  const [filesPresent, setFilesPresent] = useState(false);
+  const [filesPresent, setFilesPresent] = useState(false); 
+  const [open, setOpen] = useState(false);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -113,50 +128,72 @@ export default function LandingPage() {
   return (
     <div className={classes.landingPage}>
       <nav className={classes.nav}>
-        <a href="/" className={classes.siteTitle}>
-          Drone World
-        </a>
+        <Link to="/" className={classes.siteTitle}>
+        </Link>
         <ul className={classes.navList}>
           <li className={classes.navListItem}>
-            <Box component="span" onClick={handleAccordionToggle}>
-              About Us
+            <Box component="span" onClick={handleAccordionToggle}></Box>
+
+            <Box component="span">
+              <Button
+                className={classes.aboutLink}
+                onClick={() => setOpen(true)}
+                style={{ color: '#fff' }}
+              >
+              </Button>
             </Box>
           </li>
         </ul>
       </nav>
-      <div className={classes.mainContent}>
-  <Link to="/" div className={classes.buttonContainer} style = {{textDecoration: 'none', 
-    }}>
-    <Button
-      variant="contained"
-      sx={{
-        color: 'white',
-        padding: '15px 30px',
-        borderRadius: '10px',
-      }}
-    > 
-   
-      Create Simulation 
-    </Button>
-  </Link>
-  {filesPresent ? (
-    <div onClick={handleAccordionToggle}>
-      <h2 className={classes.reportDashboardTitle}>
-        <Link to="/report-dashboard" className={classes.reportDashboardTitle}>
-          <div style={{ textAlign: 'center' }}>
-            {/* Content here */}
-          </div>
-        </Link>
-      </h2>
-      <ReportDashboard />
-    </div>
-  ) : (
-    <div style={{ textAlign: 'center' }}>
-      <h2>No batch files present in the report dashboard</h2>
-    </div>
-  )}
-</div>
 
+      <div className={classes.mainContent}>
+        <Link to="/" className={classes.buttonContainer} style={{ textDecoration: 'none' }}>
+          <Button
+            variant="contained"
+            sx={{
+              color: 'white',
+              padding: '15px 30px',
+              borderRadius: '10px',
+            }}
+          >
+            Create Simulation
+          </Button>
+        </Link>
+
+        {filesPresent ? (
+          <div onClick={handleAccordionToggle}>
+            <h2 className={classes.reportDashboardTitle}>
+              <Link to="/report-dashboard" className={classes.reportDashboardTitle}>
+                <div style={{ textAlign: 'center' }}>
+                  {/* Content here */}
+                </div>
+              </Link>
+            </h2>
+            <ReportDashboard />
+          </div>
+        ) : (
+          <div style={{ textAlign: 'center', color: '#4d4d4d' }}>
+            <h2 style={{ fontSize: '2em' }}>Welcome to Drone World!</h2>
+          </div>
+        )}
+      </div>
+
+      <div className={classes.mainContent} style={{ paddingTop: '9rem' }}>
+        <div className={classes.buttonContainer}>
+          <Link to="/">
+            <Button
+              variant="contained"
+              sx={{
+                color: 'white',
+                padding: '15px 30px',
+                borderRadius: '10px',
+              }}
+            >
+              Create Simulation
+            </Button>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

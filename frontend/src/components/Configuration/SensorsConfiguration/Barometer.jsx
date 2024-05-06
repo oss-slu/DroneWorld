@@ -78,10 +78,10 @@ export default function Barometer (sensor) {
 
    const handleChange = (event) => {
     const { id, value } = event.target;
-  
+    const parsedValue = event.target.type === "number" ? parseFloat(value) : value;
     setBarometer((prevBarometer) => ({
       ...prevBarometer,
-      [id]: value,
+      [id]: parsedValue,
     }));
   };
   

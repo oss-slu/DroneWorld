@@ -7,3 +7,14 @@
 # ignore all png and jpg files
 *.png
 *.jpg
+
+# NO pycache files
+
+# pycache 
+/PythonClient/__pycache__/
+/PythonClient/multirotor/__pycache__/
+/PythonClient/airsim/__pycache__/
+/PythonClient/multirotor/control/__pycache__/
+/PythonClient/multirotor/util/__pycache__/
+/PythonClient/multirotor/util/geo/__pycache__/
+/PythonClient/multirotor/socket/__pycache__/

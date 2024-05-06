@@ -24,16 +24,6 @@ const droneTypes = [
     {value:'MultiRotor', label:'Multi Rotor'}
 ]
 
-{/* Old stuff from draft PR
-
-const droneModels = [
-    {value: 'ParrotANAFI', label: 'Parrot ANAFI'},
-    {value: 'DJI', label: 'DJI'},
-    {value: 'StreamLineDesignX189', label: 'StreamLineDesign X189'}
-]
-
-*/}
-
 //{/*            
 const droneModels = {
     FixedWing: [
@@ -313,7 +303,7 @@ export default function DroneConfiguration (droneData)  {
                                         <TextField id="Y" label="Longitude" variant="standard" type="number" inputProps={{ step: ".0001" }} value={drone.Y} onChange={handleChange}/>
                                     </Grid>
                                     </Tooltip>
-                                    <Tooltip title="Stepping distance of 0.0001, equivalent to 1m" placement='bottom'>
+                                    <Tooltip title="Drone Spawning Height above ground (meters)" placement='bottom'>
                                     <Grid item xs={3}>
                                         <TextField id="Z" label="Height" variant="standard" type="number" inputProps={{ step: "1" }} value={drone.Z} onChange={handleChange}/>
                                     </Grid>

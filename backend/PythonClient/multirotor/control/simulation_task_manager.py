@@ -187,10 +187,29 @@ class SimulationTaskManager:
                     diff_dict["Sensors"]["Barometer"] = single_drone_setting["Sensors"]["Barometer"]
                 if "Magnetometer" in single_drone_setting["Sensors"]:
                     diff_dict["Sensors"]["Magnetometer"] = single_drone_setting["Sensors"]["Magnetometer"]
+                if "GPS" in single_drone_setting["Sensors"]:
+                    diff_dict["Sensors"]["GPS"] = single_drone_setting["Sensors"]["GPS"]
 
             new_one_drone_json = {
                 drone_name: dict(FlightController="SimpleFlight", X=drone_x, Y=drone_y, Z=drone_z)
             }
+
+            # # GPS settings
+            # if "GPS" in single_drone_setting["Sensors"]:
+            #     diff_dict["Sensors"]["GPS"] = {
+            #         "EphTimeConstant": single_drone_setting["Sensors"]["GPS"].get("EphTimeConstant", 0.9),
+            #         "EpvTimeConstant": single_drone_setting["Sensors"]["GPS"].get("EpvTimeConstant", 0.9),
+            #         "EphInitial": single_drone_setting["Sensors"]["GPS"].get("EphInitial", 25),
+            #         "EpvInitial": single_drone_setting["Sensors"]["GPS"].get("EpvInitial", 25),
+            #         "EphFinal": single_drone_setting["Sensors"]["GPS"].get("EphFinal", 0.1),
+            #         "EpvFinal": single_drone_setting["Sensors"]["GPS"].get("EpvFinal", 0.1),
+            #         "EphMin3d": single_drone_setting["Sensors"]["GPS"].get("EphMin3d", 3),
+            #         "EphMin2d": single_drone_setting["Sensors"]["GPS"].get("EphMin2d", 4),
+            #         "UpdateLatency": single_drone_setting["Sensors"]["GPS"].get("UpdateLatency", 0.2),
+            #         "UpdateFrequency": single_drone_setting["Sensors"]["GPS"].get("UpdateFrequency", 50),
+            #         "StartupDelay": single_drone_setting["Sensors"]["GPS"].get("StartupDelay", 1),
+            #     }
+
 
             new_one_drone_json[drone_name].update(diff_dict)
             new_setting_dot_json['Vehicles'].update(new_one_drone_json)

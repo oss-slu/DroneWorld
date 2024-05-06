@@ -33,10 +33,10 @@ export default function Magnetometer (sensor) {
 
     const handleChange = (event) => {
         const { id, value } = event.target;
-      
+        const parsedValue = event.target.type === 'number' ? parseFloat(value) : value;
         setMagnetometer((prevMagnetometer) => ({
           ...prevMagnetometer,
-          [id]: value,
+          [id]: parsedValue,
         }));
       }; 
 
@@ -56,7 +56,7 @@ export default function Magnetometer (sensor) {
 
     return(
         <div>
-            <Snackbar open={snackBarState.open} 
+            {/* <Snackbar open={snackBarState.open} 
         anchorOrigin={{
             vertical: 'top',
             horizontal: 'right'
@@ -65,7 +65,7 @@ export default function Magnetometer (sensor) {
         <Alert onClose={e => handleSnackBarVisibility(false)} severity="info" sx={{ width: '100%' }}>
              {"Magnetometer Changes is under Developement !"}
         </Alert>
-    </Snackbar>
+    </Snackbar> */}
             <Box>
                 <Typography variant="h6" component="h2">
                     {magnetometer.Key || ""}
