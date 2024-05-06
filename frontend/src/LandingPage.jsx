@@ -108,8 +108,7 @@ export default function LandingPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/list-reports', { method: 'GET' });
-      
+        const response = await fetch('http://localhost:5000/list-reports', { method: 'GET' })
         const data = await response.json();
         const batchFiles = data.reports.filter(file => file.filename.includes('Batch'));
         setFilesPresent(batchFiles.length > 0);
@@ -147,7 +146,7 @@ export default function LandingPage() {
       </nav>
 
       <div className={classes.mainContent}>
-        <Link to="/" className={classes.buttonContainer} style={{ textDecoration: 'none' }}>
+        <Link to="/home" className={classes.buttonContainer} style={{ textDecoration: 'none' }}>
           <Button
             variant="contained"
             sx={{
@@ -180,7 +179,7 @@ export default function LandingPage() {
 
       <div className={classes.mainContent} style={{ paddingTop: '9rem' }}>
         <div className={classes.buttonContainer}>
-          <Link to="/">
+          <Link to="/home">
             <Button
               variant="contained"
               sx={{
