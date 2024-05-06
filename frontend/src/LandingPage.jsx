@@ -6,7 +6,9 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography'; 
-import ReportDashboard from './components/ReportDashboard'; 
+import ReportDashboard from './components/ReportDashboard';  
+import Card from '@mui/material/Card';
+import CardMedia from '@mui/material/CardMedia';
 
 const useStyles = makeStyles((theme) => ({
   landingPage: {

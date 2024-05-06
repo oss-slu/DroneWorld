@@ -7,13 +7,8 @@ import FuzzyDashboard from './components/FuzzyDashboard';
 import ReportDashboard from './components/ReportDashboard'; 
 import LandingPage from './LandingPage'; 
 import AboutUs from './components/AboutUs'; 
-<<<<<<< HEAD
-import "./styles.css" 
-
-=======
 import NavigationBar from './pages/NavigationBar';
 import "./styles.css"
->>>>>>> 62cd971bc8728b9be276e2e76a44aff2dfc2a52a
 
 
 function App() {
