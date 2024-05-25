@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from '@emotion/styled';
 import { Button } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import { Link } from 'react-router-dom';
 
 const NotFoundContainer = styled.div`
