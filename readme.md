@@ -8,10 +8,17 @@ DroneWis is a CFD-based wind simulation component that is integrated with DroneR
 
 ## DRV + DroneWis
 
-use the docker compose.yaml file to run the complete system. 
+Instruction for ASE 2024 reviewers:
+
+Use the docker compose.yaml file to run the complete system. 
 ```bash
 docker-compose up
 ```
+Then download DRV_1.0.0 from the [link](https://sluedu-my.sharepoint.com/:f:/g/personal/ankit_agrawal_1_slu_edu/ElbD1q-O8fBFgGDqov6Mh5EBsJ90YyPj2fzsIznTP6AX-w?e=XZaPiX)
+
+Unzip and run the Blocks.exe file to start the simulation.
+
+now you can interface the ecosystem using the UI at http://localhost:3000
 
 
 ## Demo
