@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react'; 
+import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
-import Typography from '@mui/material/Typography'; 
-import ReportDashboard from './components/ReportDashboard'; 
+import Typography from '@mui/material/Typography';
+import ReportDashboard from './components/ReportDashboard';
+import Loading from './components/Loading';
 
 const useStyles = makeStyles((theme) => ({
   landingPage: {
@@ -101,19 +102,22 @@ const modalStyle = {
 
 export default function LandingPage() {
   const classes = useStyles();
-  const [filesPresent, setFilesPresent] = useState(false); 
+  const [filesPresent, setFilesPresent] = useState(false);
   const [open, setOpen] = useState(false);
-
+  const [isLoading, setIsloading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsloading(true);
       try {
-        const response = await fetch('http://localhost:5000/list-reports', { method: 'GET' })
+        const response = await fetch('http://localhost:5000/list-reports', { method: 'GET' });
         const data = await response.json();
-        const batchFiles = data.reports.filter(file => file.filename.includes('Batch'));
+        const batchFiles = data.reports.filter((file) => file.filename.includes('Batch'));
         setFilesPresent(batchFiles.length > 0);
       } catch (error) {
         console.error('Error fetching report data:', error);
+      } finally {
+        setIsloading(false);
       }
     };
 
@@ -127,61 +131,61 @@ export default function LandingPage() {
   return (
     <div className={classes.landingPage}>
       <nav className={classes.nav}>
-        <Link to="/" className={classes.siteTitle}>
-        </Link>
+        <Link to='/' className={classes.siteTitle}></Link>
         <ul className={classes.navList}>
           <li className={classes.navListItem}>
-            <Box component="span" onClick={handleAccordionToggle}></Box>
+            <Box component='span' onClick={handleAccordionToggle}></Box>
 
-            <Box component="span">
+            <Box component='span'>
               <Button
                 className={classes.aboutLink}
                 onClick={() => setOpen(true)}
                 style={{ color: '#fff' }}
-              >
-              </Button>
+              ></Button>
             </Box>
           </li>
         </ul>
       </nav>
 
-      <div className={classes.mainContent}>
-        <Link to="/home" className={classes.buttonContainer} style={{ textDecoration: 'none' }}>
-          <Button
-            variant="contained"
-            sx={{
-              color: 'white',
-              padding: '15px 30px',
-              borderRadius: '10px',
-            }}
-          >
-            Create Simulation
-          </Button>
-        </Link>
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <div className={classes.mainContent}>
+          <Link to='/home' className={classes.buttonContainer} style={{ textDecoration: 'none' }}>
+            <Button
+              variant='contained'
+              sx={{
+                color: 'white',
+                padding: '15px 30px',
+                borderRadius: '10px',
+              }}
+            >
+              Create Simulation
+            </Button>
+          </Link>
 
-        {filesPresent ? (
-          <div onClick={handleAccordionToggle}>
-            <h2 className={classes.reportDashboardTitle}>
-              <Link to="/report-dashboard" className={classes.reportDashboardTitle}>
-                <div style={{ textAlign: 'center' }}>
-                  {/* Content here */}
-                </div>
-              </Link>
-            </h2>
-            <ReportDashboard />
-          </div>
-        ) : (
-          <div style={{ textAlign: 'center', color: '#4d4d4d' }}>
-            <h2 style={{ fontSize: '2em' }}>Welcome to Drone World!</h2>
-          </div>
-        )}
-      </div>
+          {filesPresent ? (
+            <div onClick={handleAccordionToggle}>
+              <h2 className={classes.reportDashboardTitle}>
+                <Link to='/report-dashboard' className={classes.reportDashboardTitle}>
+                  <div style={{ textAlign: 'center' }}>{/* Content here */}</div>
+                </Link>
+              </h2>
+              <ReportDashboard />
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', color: '#4d4d4d' }}>
+              <h2 style={{ fontSize: '2em' }}>Welcome to Drone World!</h2>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className={classes.mainContent} style={{ paddingTop: '9rem' }}>
         <div className={classes.buttonContainer}>
-          <Link to="/home">
+          <Link to='/home'>
             <Button
-              variant="contained"
+              variant='contained'
               sx={{
                 color: 'white',
                 padding: '15px 30px',
