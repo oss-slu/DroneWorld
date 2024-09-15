@@ -169,7 +169,7 @@ export default function EnvironmentConfiguration (env) {
         setEnvConf(prevState => ({
             ...prevState,
             time: val,
-            TimeOfDay: val.$H + ':' + val.$m + ':' + val.$s
+            TimeOfDay: dayjs(val).format('HH:mm:ss')
         }))
     }
     /*
