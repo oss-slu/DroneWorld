@@ -17,6 +17,7 @@ import MonitorTabels from './MonitorTabels';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 import EnvironmentConfiguration from './EnvironmentConfiguration';
 import dayjs from 'dayjs';
 
@@ -122,14 +123,19 @@ export default function MonitorControl (monJson) {
     React.useEffect(() => {
         environmentJson(envConf)
     }, [envConf])
-    const handleBatteryMonitor = (val) => {
+    const handleBatteryMonitor = (val, index) => {
         setMonitor(prevState => ({
             ...prevState,
             battery_monitor: {
-                ...monitor.battery_monitor,
-                param: [
-                    parseFloat(val.target.value)
-                ]
+                // ...monitor.battery_monitor,
+                ...prevState.battery_monitor,
+                param: prevState.battery_monitor.param.map((item, i) =>
+                    i === index ? parseFloat(val.target.value) : item
+                )
+                // param: {
+                //     ...monitor.battery_monitor.param,
+                //     [field]: parseFloat(val.target.value)
+                // }
             }
         }))
     }
@@ -618,12 +624,25 @@ export default function MonitorControl (monJson) {
                 <Grid item xs={12}>
                     <Grid item xs={12} style={{paddingBottom:20}}><strong>Configure the current battery capacity </strong></Grid>
                     <FormGroup>
+                        {/* Input for current battery capacity */}
                         <Tooltip title="Input the current battery capacity of the drone as % (0-100)" placement='bottom'>
-                            <Grid item xs={6}>
-                                <TextField id="standard-basic" label="Battery Capacity (%)" type="number" step="0.1" variant="standard" style={{width:'160px'}} inputProps={{min:0, max:100}} onChange={handleBatteryMonitor} value={monitor.battery_monitor.param[0]}></TextField>
+                            <Grid item xs={6} style={{marginBottom: '20px'}}>
+                                <TextField id="battery-capacity" label="Battery Capacity (%)" type="number" step="0.1" variant="standard" style={{width: '190px'}} inputProps={{min:0, max:100}} onChange={(val) => handleBatteryMonitor(val, 0)} value={monitor.battery_monitor.param[0]}></TextField>
                             </Grid>
                         </Tooltip>
+                        {/* Input for target failure battery percentage */}
+                        <Tooltip title="Input the target failure battery percentage for testing" placement='bottom'>
+                            <Grid item xs={6}>
+                                <TextField id="target-failure" label="Target Failure Percentage (%)" type="number" step="0.1" variant="standard" style={{width: '190px'}} inputProps={{min:0, max:100}} onChange={(val) => handleBatteryMonitor(val, 1)} value={monitor.battery_monitor.param[0]}></TextField>
+                            </Grid>                         
+                        </Tooltip>
                     </FormGroup>
+                    <Grid item xs={12} style={{paddingTop:50}}>
+                     <Alert severity="info">
+                        <AlertTitle>Info</AlertTitle>
+                        This feature is still in development.
+                    </Alert>
+                    </Grid>
                 </Grid>
                 : null}</React.Fragment>,
             images: null,
