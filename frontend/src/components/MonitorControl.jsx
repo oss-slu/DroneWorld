@@ -92,7 +92,7 @@ export default function MonitorControl (monJson) {
         },
         battery_monitor:{
             enable:false,
-            param:[1]
+            param:[1,1]
         }
     })
 
@@ -127,15 +127,10 @@ export default function MonitorControl (monJson) {
         setMonitor(prevState => ({
             ...prevState,
             battery_monitor: {
-                // ...monitor.battery_monitor,
                 ...prevState.battery_monitor,
                 param: prevState.battery_monitor.param.map((item, i) =>
                     i === index ? parseFloat(val.target.value) : item
                 )
-                // param: {
-                //     ...monitor.battery_monitor.param,
-                //     [field]: parseFloat(val.target.value)
-                // }
             }
         }))
     }
@@ -633,7 +628,7 @@ export default function MonitorControl (monJson) {
                         {/* Input for target failure battery percentage */}
                         <Tooltip title="Input the target failure battery percentage for testing" placement='bottom'>
                             <Grid item xs={6}>
-                                <TextField id="target-failure" label="Target Failure Percentage (%)" type="number" step="0.1" variant="standard" style={{width: '190px'}} inputProps={{min:0, max:100}} onChange={(val) => handleBatteryMonitor(val, 1)} value={monitor.battery_monitor.param[0]}></TextField>
+                                <TextField id="target-failure" label="Target Failure Percentage (%)" type="number" step="0.1" variant="standard" style={{width: '190px'}} inputProps={{min:0, max:100}} onChange={(val) => handleBatteryMonitor(val, 1)} value={monitor.battery_monitor.param[1]}></TextField>
                             </Grid>                         
                         </Tooltip>
                     </FormGroup>
