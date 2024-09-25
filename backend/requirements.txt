@@ -13,3 +13,4 @@ requests==2.31.0
 pandas==2.0.2
 plotly==5.15.0
 Ofpp~=0.11
+pymongo==4.9.1
