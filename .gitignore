@@ -1,0 +1,12 @@
+# Ignore Visual Studio files
+.vs/
+
+# Ignore virtual environments
+backend/venv/
+
+# Ignore Node.js dependencies
+node_modules/
+
+# Ignore Python bytecode files
+*.pyc
+__pycache__/

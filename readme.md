@@ -7,7 +7,7 @@ DroneReqValidator (DRV) is a complete Drone simulation ecosystem that automatica
 - [Demo Video Available Here](https://www.youtube.com/watch?v=Fd9ft55gbO8)
 
 
-## System requirement
+## System Requirements
 - Windows 10/11
 - Unreal engine 5.0 (optional)
 - Python 3.10
@@ -22,9 +22,8 @@ DroneReqValidator has 3 main components:
 2. Python backend
 3. React frontend
 
-To use the DroneReqValidator, follow the steps based on which OS you are working with:
-#### [Windows](windowsinstallation.md)
-#### [macOS](macinstallation.md)
+To use the DroneReqValidator, follow these steps:
+#### [Installation](installation.md)
 
 ## Contributing
 
