@@ -7,6 +7,38 @@ backend/venv/
 # Ignore Node.js dependencies
 node_modules/
 
-# Ignore Python bytecode files
+# Ignore Python bytecode files and __pycache__ directories globally
 *.pyc
 __pycache__/
+
+# Ignore backend-specific files
+backend/*.csv
+backend/*.html
+backend/*.png
+backend/*.jpg
+
+# Frontend ignores
+# dependencies
+frontend/node_modules
+frontend/.pnp
+frontend/.pnp.js
+
+# testing
+frontend/coverage
+
+# production
+frontend/build
+
+# misc
+frontend/.DS_Store
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# Ignore frontend package-lock.json
+frontend/package-lock.json
