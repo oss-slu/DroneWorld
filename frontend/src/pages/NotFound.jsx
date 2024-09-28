@@ -74,8 +74,8 @@ function NotFound() {
       </NotFoundImgContainer>
       <NotFoundMessage>
         <NotFoundChild>
-          <h2 style={{ fontSize: '3em', ...RemoveMarginPadding }}>Something is not right...</h2>
-          <p style={{ fontSize: '1.5em' }}>
+          <h2 style={{ fontSize: '2em', ...RemoveMarginPadding }}>Something is not right...</h2>
+          <p style={{ fontSize: '16px' }}>
             Page you are trying to open does not exist. You may have mistyped the address, or the
             page has been moved to another URL. If you think this is an error contact support.
           </p>
