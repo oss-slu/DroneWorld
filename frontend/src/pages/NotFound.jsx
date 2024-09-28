@@ -76,8 +76,9 @@ function NotFound() {
         <NotFoundChild>
           <h2 style={{ fontSize: '2em', ...RemoveMarginPadding }}>Something is not right...</h2>
           <p style={{ fontSize: '16px' }}>
-            Page you are trying to open does not exist. You may have mistyped the address, or the
-            page has been moved to another URL. If you think this is an error contact support.
+            The page you are trying to open does not exist. You may have mistyped the address, or
+            the page may have been moved to a different URL. If you believe this is an error, please
+            contact support.
           </p>
           <Link to='/' style={{ textDecoration: 'none' }}>
             <Button
