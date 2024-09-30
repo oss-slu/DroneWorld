@@ -100,15 +100,26 @@ class AirSimApplication:
 
     #give a recording_id of a file uploaded, output file will be written
     def retreive_pic(self,recording_id):
-        picture_data = self.fs.get(recording_id).read()
-        with open(f"{recording_id}.jpg", "wb") as output_file:
-            output_file.write(picture_data)
+
+        try:
+            # Attempt to get the file by ID
+            picture_data = self.fs.get(recording_id).read()
+            with open(f"{recording_id}.jpg", "wb") as output_file:
+                output_file.write(picture_data)
+        except Exception:
+            print("File with the given ID does not exist.")
+        
+   
+     
 
     def retreive_recording(self,recording_id):
-        recording_data = self.fs.get(recording_id).read()
-        with open(f"{recording_id}.mp3", "wb") as output_file:
-           output_file.write(recording_data)
-
+        try:
+            recording_data = self.fs.get(recording_id).read()
+            with open(f"{recording_id}.mp3", "wb") as output_file:
+                output_file.write(recording_data)
+        except Exception:
+            print("File with the given ID does not exist.")
+        
 
     @staticmethod
     def get_current_time_string():
