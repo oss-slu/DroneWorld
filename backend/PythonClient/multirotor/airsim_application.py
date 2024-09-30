@@ -64,7 +64,7 @@ class AirSimApplication:
     def save_report(self):
         pass
     
-    #give either a binary file or filepath, and recordingid will be returned, or error out
+    #give either a binary file or filepath, and fileid will be returned, or error out
     def save_pic(self, picture):
         try:
             if isinstance(picture, (bytes, bytearray)):
