@@ -2,14 +2,18 @@ import json
 import math
 import os
 import time
+from pymongo import MongoClient
+from gridfs import GridFS
 from abc import abstractmethod
-
 from PythonClient import airsim
 
 
 class AirSimApplication:
     # Parent class for all airsim client side mission and monitors
     def __init__(self):
+        self.client = MongoClient("mongodb+srv://<db_username>:<db_password>@dronereports.lkmgn.mongodb.net/?retryWrites=true&w=majority&appName=DroneReports")
+        self.db = self.client["mydatabase"]
+        self.fs = GridFS(self.db)
         self.circular_mission_names = {"FlyInCircle"}
         self.polygon_mission_names = {"FlyToPoints", "FlyToPointsGeo"}
         self.point_mission_names = {"FlyStraight"}
@@ -30,6 +34,7 @@ class AirSimApplication:
         if not os.path.exists(report_root_path):
             os.mkdir(report_root_path)
         self.dir_path = report_root_path
+        
 
     @staticmethod
     def load_airsim_setting():
@@ -60,10 +65,25 @@ class AirSimApplication:
         pass
 
     def save_pic(self, picture):
+        self.fs.put(picture, filename="my_image.jpg")
         self.snap_shots.append(picture)
 
     def save_recording(self, recording):
+        self.fs.put(recording, filename="my_recording.mp3")
         self.video_recordings.append(recording)
+
+    #could clean this up but unsure of file format at the moment so this
+    #should work for now
+    def retreive_pic(self,fileName):
+        picture_data = self.fs.get(fileName).read()
+        with open("retrieved_picture.jpg", "wb") as output_file:
+            output_file.write(picture_data)
+
+    def retreive_recording(self,fileName):
+        recording_data = self.fs.get(fileName).read()
+        with open("retrieved_recording.mp3", "wb") as output_file:
+            output_file.write(recording_data)
+
 
     @staticmethod
     def get_current_time_string():
