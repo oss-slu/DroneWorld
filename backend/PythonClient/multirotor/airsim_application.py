@@ -2,7 +2,10 @@ import json
 import math
 import os
 import time
+import pymongo
 from abc import abstractmethod
+from pymongo import MongoClient
+from pymongo.errors import PyMongoError
 
 from PythonClient import airsim
 
@@ -26,10 +29,15 @@ class AirSimApplication:
         self.graph_dir = os.path.join("Debug")
         self.current_time_string = ""
         self.cesium_origin = self.get_cesium_origin()
-        report_root_path = os.path.join(os.path.expanduser("~"), "Documents", "AirSim", "report")
-        if not os.path.exists(report_root_path):
-            os.mkdir(report_root_path)
-        self.dir_path = report_root_path
+        # report_root_path = os.path.join(os.path.expanduser("~"), "Documents", "AirSim", "report")
+        # if not os.path.exists(report_root_path):
+        #     os.mkdir(report_root_path)
+        # self.dir_path = report_root_path
+
+        # MongoDB setup
+        self.mongo_client = MongoClient("your_mongo_connection_string") # replace MongoDB connection string
+        self.db = self.mongo_client["your_database_name"] # replace with database name
+        self.collection = self.db["your_collection_name"] # replace with collection name
 
     @staticmethod
     def load_airsim_setting():
@@ -56,8 +64,15 @@ class AirSimApplication:
         self.log_text += "PASS;" + self.get_current_time_string() + ";" + new_log_string + "\n"
 
     @abstractmethod
-    def save_report(self):
-        pass
+    def save_report(self, report_data):
+        try:
+            result = self.collection.insert_one(report_data) # insert report into MongoDB collection
+
+            self.append_pass_to_log(f"Report uploaded successfully with ID: {result.inserted_id}")
+            return {"success": True, "report_id": str(result.inserted_id)}
+        except PyMongoError as e:
+            self.append_fail_to_log(f"Failed to upload report: {e}")
+            return {"success": False, "error": str(e)}
 
     def save_pic(self, picture):
         self.snap_shots.append(picture)
