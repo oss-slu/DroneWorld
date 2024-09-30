@@ -1,9 +1,9 @@
 # Ignore Visual Studio files
 .vs/
-
+.vscode/
 # Ignore virtual environments
 backend/venv/
-
+venv/
 # Ignore Node.js dependencies
 node_modules/
 
