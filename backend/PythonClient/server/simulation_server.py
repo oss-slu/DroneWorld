@@ -1,4 +1,5 @@
 import logging
+from multiprocessing import Value
 import os #I changed it from os.path to just os. Revert is needed
 import threading
 import time
@@ -18,6 +19,19 @@ app = Flask(__name__, template_folder="./templates")
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 CORS(app)
+
+#Code for Log upload 
+log_directory = 'path/to/your/log/directory'  # Specify your log directory
+if not os.path.exists(log_directory):
+    os.makedirs(log_directory)
+
+log_file_path = os.path.join(log_directory, 'app.log')  # Log file name
+logging.basicConfig(
+    filename=log_file_path,
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s:%(message)s'
+)
+logger = logging.getLogger(__name__)
 
 task_dispatcher = SimulationTaskManager()
 threading.Thread(target=task_dispatcher.start).start()
@@ -280,14 +294,36 @@ def stream(drone_name, camera_name):
             return "Error"
 
 
-# @app.route('/uploadMission', methods=['POST'])
-# def upload_file():
-#     file = request.files['file']
-#     filename = file.filename
-#     custom_mission_dir = '../multirotor/mission/custom'
-#     path = os.path.join(custom_mission_dir, filename)
-#     file.save(path)
-#     return 'File uploaded'
+
+@app.route('/uploadMission', methods=['POST'])
+def upload_file():
+    log_text = ""  
+    try:
+      file = request.files['file']
+      filename = file.filename
+      if not filename: 
+          raise ValueError("No file Provided");
+
+      custom_mission_dir = '../multirotor/mission/custom'
+      path = os.path.join(custom_mission_dir, filename)
+      file.save(path)
+      #Code for Log success
+      log_text = f"Report '{filename}' successfully uploaded at {path}."
+      logger.info(log_text)  # Log to file
+      print(log_text)  # Print to console for visibility
+
+      # Return success response to the frontend
+      return jsonify({'message': log_text, 'status': 'success'}), 200
+  
+    except Exception as e:
+            # Handle errors and log failure message
+            log_text = f"Failed to upload report: {str(e)}"
+            logger.error(log_text)  # Log error
+            print(log_text)  # Print error to console
+
+            # Return failure response to the frontend
+            return jsonify({'message': log_text, 'status': 'failure'}), 500
+
 
 
 # def update_settings_json(drone_number, separation_distance):
