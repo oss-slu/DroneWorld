@@ -1,12 +1,14 @@
 import logging
 from multiprocessing import Value
-import os #I changed it from os.path to just os. Revert is needed
+import os.path
+from socket import fromfd #I changed it from os.path to just os. Revert is needed
 import threading
 import time
 import base64
 import json
 import mimetypes
 import sys
+from multirotor.airsim_application import AirSimApplication
 from flask import Flask, request, abort, send_file, render_template, Response, jsonify
 from flask_cors import CORS
 
@@ -293,11 +295,11 @@ def stream(drone_name, camera_name):
             print(e)
             return "Error"
 
-
-
 @app.route('/uploadMission', methods=['POST'])
 def upload_file():
-    log_text = ""  
+    log_text = "" 
+    airsim_app = AirSimApplication()  # Create an instance of AirSimApplication
+
     try:
       file = request.files['file']
       filename = file.filename
@@ -307,8 +309,11 @@ def upload_file():
       custom_mission_dir = '../multirotor/mission/custom'
       path = os.path.join(custom_mission_dir, filename)
       file.save(path)
+      
       #Code for Log success
-      log_text = f"Report '{filename}' successfully uploaded at {path}."
+
+      airsim_app.append_pass_to_log(f"Report '{filename}' successfully uploaded at {path}.")
+      log_text = airsim_app.log_text  # Get the updated log text
       logger.info(log_text)  # Log to file
       print(log_text)  # Print to console for visibility
 
@@ -317,7 +322,8 @@ def upload_file():
   
     except Exception as e:
             # Handle errors and log failure message
-            log_text = f"Failed to upload report: {str(e)}"
+            airsim_app.append_fail_to_log(f"Failed to upload report: {str(e)}")
+            log_text = airsim_app.log_text  # Get the updated log text
             logger.error(log_text)  # Log error
             print(log_text)  # Print error to console
 
