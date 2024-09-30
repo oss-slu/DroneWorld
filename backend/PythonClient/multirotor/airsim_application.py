@@ -63,26 +63,51 @@ class AirSimApplication:
     @abstractmethod
     def save_report(self):
         pass
-
+    
+    #give either a binary file or filepath, and recordingid will be returned, or error out
     def save_pic(self, picture):
-        self.fs.put(picture, filename="my_image.jpg")
-        self.snap_shots.append(picture)
+        try:
+            if isinstance(picture, (bytes, bytearray)):
+                recording_id = self.fs.put(picture, filename="my_image.jpg")
 
+            elif isinstance(picture, str) and os.path.isfile(picture):
+                with open(picture, "rb") as pic_file:
+                    recording_id = self.fs.put(pic_file, filename="my_image.jpg")
+        
+            self.snap_shots.append(picture)
+        except Exception:
+            return "Picture not in right format"
+        
+        
+        return recording_id
+    
+      #give either a binary file or filepath, and recordingid will be returned, or error out
     def save_recording(self, recording):
-        self.fs.put(recording, filename="my_recording.mp3")
-        self.video_recordings.append(recording)
+        try:
+            if isinstance(recording, (bytes, bytearray)):
+                recording_id = self.fs.put(recording, filename="my_image.jpg")
 
-    #could clean this up but unsure of file format at the moment so this
-    #should work for now
-    def retreive_pic(self,fileName):
-        picture_data = self.fs.get(fileName).read()
-        with open("retrieved_picture.jpg", "wb") as output_file:
+            elif isinstance(recording, str) and os.path.isfile(recording):
+                with open(recording, "rb") as rec_file:
+                    recording_id = self.fs.put(rec_file, filename="my_image.jpg")
+        
+            self.video_recordings.append(recording)
+        except Exception:
+            return "Recording not in right format"
+        
+        
+        return recording_id
+
+    #give a recording_id of a file uploaded, output file will be written
+    def retreive_pic(self,recording_id):
+        picture_data = self.fs.get(recording_id).read()
+        with open(f"{recording_id}.jpg", "wb") as output_file:
             output_file.write(picture_data)
 
-    def retreive_recording(self,fileName):
-        recording_data = self.fs.get(fileName).read()
-        with open("retrieved_recording.mp3", "wb") as output_file:
-            output_file.write(recording_data)
+    def retreive_recording(self,recording_id):
+        recording_data = self.fs.get(recording_id).read()
+        with open(f"{recording_id}.mp3", "wb") as output_file:
+           output_file.write(recording_data)
 
 
     @staticmethod
