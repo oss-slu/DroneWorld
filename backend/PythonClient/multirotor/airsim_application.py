@@ -54,7 +54,7 @@ class AirSimApplication:
 
     def append_pass_to_log(self, new_log_string):
         self.log_text += "PASS;" + self.get_current_time_string() + ";" + new_log_string + "\n"
-
+    
     @abstractmethod
     def save_report(self):
         pass
@@ -105,3 +105,39 @@ class AirSimApplication:
         lon = data["longitude"]
         height = data["height"]
         return [lat, lon, height]
+    
+@app.route('/uploadMission', methods=['POST'])
+def upload_file():
+    log_text = "" 
+    airsim_app = AirSimApplication()  # Create an instance of AirSimApplication
+
+    try:
+      file = request.files['file']
+      filename = file.filename
+      if not filename: 
+          raise ValueError("No file Provided");
+
+      custom_mission_dir = '../multirotor/mission/custom'
+      path = os.path.join(custom_mission_dir, filename)
+      file.save(path)
+      
+      #Code for Log success
+
+      airsim_app.append_pass_to_log(f"Report '{filename}' successfully uploaded at {path}.")
+      log_text = airsim_app.log_text  # Get the updated log text
+      logger.info(log_text)  # Log to file
+      print(log_text)  # Print to console for visibility
+
+      # Return success response to the frontend
+      return jsonify({'message': log_text, 'status': 'success'}), 200
+  
+    except Exception as e:
+            # Handle errors and log failure message
+            airsim_app.append_fail_to_log(f"Failed to upload report: {str(e)}")
+            log_text = airsim_app.log_text  # Get the updated log text
+            logger.error(log_text)  # Log error
+            print(log_text)  # Print error to console
+
+            # Return failure response to the frontend
+            return jsonify({'message': log_text, 'status': 'failure'}), 500
+
