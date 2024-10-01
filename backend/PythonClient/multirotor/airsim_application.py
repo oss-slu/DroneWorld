@@ -5,11 +5,15 @@ import time
 from abc import abstractmethod
 
 from PythonClient import airsim
+from google.cloud import storage
 
 
 class AirSimApplication:
     # Parent class for all airsim client side mission and monitors
     def __init__(self):
+        self.bucket_name = 'droneworld'  # The bucket created in GCS
+        self.storage_client = storage.Client()  # Initializes the GCS client
+        self.bucket = self.storage_client.bucket(self.bucket_name)  # Points to the GCS bucket
         self.circular_mission_names = {"FlyInCircle"}
         self.polygon_mission_names = {"FlyToPoints", "FlyToPointsGeo"}
         self.point_mission_names = {"FlyStraight"}
@@ -57,6 +61,10 @@ class AirSimApplication:
 
     @abstractmethod
     def save_report(self):
+        pass
+
+    @abstractmethod
+    def upload_to_gcs(self, file_name, content):
         pass
 
     def save_pic(self, picture):
