@@ -46,3 +46,13 @@ jobs:
       run: |
         pip install black
         black backend/
+
+    - name: Check for Security Vulnerabilities
+      run: |
+        pip install bandit
+        bandit -r backend/
+
+    - name: Perform Dependency Audit
+      run: |
+        pip install safety
+        safety check -r backend/requirements.txt
