@@ -53,10 +53,3 @@ jobs:
       run: |
         cd frontend
         npm audit --omit=dev --audit-level=critical || true
-
-    - name: Run Lighthouse Audit (Performance Check)
-      run: |
-        cd frontend
-        npm install -g lighthouse
-        lighthouse http://localhost:3000 --output=json --output-path=./lighthouse-report.json
-        cat ./lighthouse-report.json
