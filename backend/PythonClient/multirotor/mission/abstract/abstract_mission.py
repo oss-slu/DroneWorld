@@ -1,6 +1,7 @@
 import datetime
 import os
 import threading
+from google.cloud import storage
 from enum import Enum
 
 from PythonClient.multirotor.airsim_application import AirSimApplication
@@ -15,7 +16,7 @@ class GenericMission(AirSimApplication):
         RUNNING = 1
         END = -1
 
-    def __init__(self, target_drone="Default"):
+    def __init__(self, target_drone="Default", gcs_bucket_name="New_Bucket_Name", location="US"):
         self.flight_time_in_seconds = None
         super().__init__()
         self.target_drone = target_drone
@@ -25,6 +26,26 @@ class GenericMission(AirSimApplication):
         self.objects = [self.client.simGetObjectPose(i) for i in self.all_drone_names]
         self.states = [self.client.getMultirotorState(i) for i in self.all_drone_names]
         self.client.enableApiControl(True, vehicle_name=target_drone)
+        
+        #Initialize a google cloud client and bucket
+        self.gcs_client = storage.Client()
+        self.gcs_bucket_name = gcs_bucket_name
+        
+        self.create_bucket_if_not_exists(location)
+        
+    def create_bucket_if_not_exists(self, location="US"):
+        try:
+            # Check if the bucket already exists
+            bucket = self.gcs_client.lookup_bucket(self.gcs_bucket_name)
+            if bucket is None:
+                print(f"Bucket '{self.gcs_bucket_name}' does not exist. Creating it now...")
+                # Create the bucket
+                bucket = self.gcs_client.create_bucket(self.gcs_bucket_name, location=location)
+                print(f"Bucket '{self.gcs_bucket_name}' created in location '{location}'.")
+            else:
+                print(f"Bucket '{self.gcs_bucket_name}' already exists.")
+        except Exception as e:
+            print(f"Error creating bucket: {str(e)}")
 
     def takeoff(self, drone_name):
         self.client.takeoffAsync(vehicle_name=drone_name).join()
@@ -34,16 +55,17 @@ class GenericMission(AirSimApplication):
 
     def save_report(self):
         with lock:
-            log_dir = os.path.join(self.dir_path, self.log_subdir, self.__class__.__name__)
-            # print("DEBUG:" + log_dir)
-            if not os.path.exists(log_dir):
                 try:
-                    os.makedirs(log_dir)
-                except:
-                    print("Folder exist, thread unsafe")
+                    bucket = self.gcs_client.get_bucket(self.gcs_bucket_name)
+                    gcs_path = f"logs/{self.__class__.__name__}/{self.__class__.__name__}_{self.target_drone}_log.txt"
 
-            with open(log_dir + os.sep + self.__class__.__name__ + "_" + self.target_drone + "_log.txt", 'w') as outfile:
-                outfile.write(self.log_text)
+                    blob = bucket.blob(gcs_path)
+                    blob.upload_from_string(self.log_text)
+                    
+                    print(f"Report successfully uploaded to {gcs_path} in GCS.")
+
+                except Exception as e:
+                    print(f"Failed to upload to GCS. Error: {str(e)}")
 
     def kill_mission(self):
         self.state = self.State.END
@@ -54,4 +76,4 @@ class GenericMission(AirSimApplication):
 
 
 if __name__ == '__main__':
-    mission = GenericMission()
+    mission = GenericMission(gcs_bucket_name="New_Bucket_Name", location="US")
