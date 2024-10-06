@@ -40,7 +40,7 @@ jobs:
     - name: Lint backend code
       run: |
         pip install flake8
-        flake8 backend/ --max-line-length 160 --ignore E127,E128,E251,E501,E302,E261,E262,F401,F405,W293,W291,W391,F841,F403,E265,E303,E231,E211,W292,E722,F523,W191,E306,E305,E712,E402
+        flake8 backend/ --max-line-length 160 --ignore E111,E117,E301,E125,E222,E226,E201,E203,E202,E721,W503,W504,E272,E126,E225
 
     - name: Format backend code with Black
       run: |
