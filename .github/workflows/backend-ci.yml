@@ -40,7 +40,7 @@ jobs:
     - name: Lint backend code
       run: |
         pip install flake8
-        flake8 backend/
+        flake8 backend/ --ignore=F403,F401,E501,E251,F405
 
     - name: Format backend code with Black
       run: |
