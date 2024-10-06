@@ -5,11 +5,15 @@ import time
 from abc import abstractmethod
 
 from PythonClient import airsim
+from google.cloud import storage
 
 
 class AirSimApplication:
     # Parent class for all airsim client side mission and monitors
     def __init__(self):
+        self.bucket_name = 'droneworld'  # The bucket created in GCS
+        self.storage_client = storage.Client.from_service_account_json('key.json')  # Initializes the GCS client
+        self.bucket = self.storage_client.bucket(self.bucket_name)  # Points to the GCS bucket
         self.circular_mission_names = {"FlyInCircle"}
         self.polygon_mission_names = {"FlyToPoints", "FlyToPointsGeo"}
         self.point_mission_names = {"FlyStraight"}
@@ -54,10 +58,16 @@ class AirSimApplication:
 
     def append_pass_to_log(self, new_log_string):
         self.log_text += "PASS;" + self.get_current_time_string() + ";" + new_log_string + "\n"
-    
+
     @abstractmethod
     def save_report(self):
         pass
+
+    def upload_to_gcs(self, file_name, content):
+        """Uploads a file to the GCS bucket."""
+        blob = self.bucket.blob(f'reports/{file_name}')
+        blob.upload_from_string(content)
+        print(f"File {file_name} uploaded to GCS.")
 
     def save_pic(self, picture):
         self.snap_shots.append(picture)
@@ -105,39 +115,3 @@ class AirSimApplication:
         lon = data["longitude"]
         height = data["height"]
         return [lat, lon, height]
-    
-@app.route('/uploadMission', methods=['POST'])
-def upload_file():
-    log_text = "" 
-    airsim_app = AirSimApplication()  # Create an instance of AirSimApplication
-
-    try:
-      file = request.files['file']
-      filename = file.filename
-      if not filename: 
-          raise ValueError("No file Provided");
-
-      custom_mission_dir = '../multirotor/mission/custom'
-      path = os.path.join(custom_mission_dir, filename)
-      file.save(path)
-      
-      #Code for Log success
-
-      airsim_app.append_pass_to_log(f"Report '{filename}' successfully uploaded at {path}.")
-      log_text = airsim_app.log_text  # Get the updated log text
-      logger.info(log_text)  # Log to file
-      print(log_text)  # Print to console for visibility
-
-      # Return success response to the frontend
-      return jsonify({'message': log_text, 'status': 'success'}), 200
-  
-    except Exception as e:
-            # Handle errors and log failure message
-            airsim_app.append_fail_to_log(f"Failed to upload report: {str(e)}")
-            log_text = airsim_app.log_text  # Get the updated log text
-            logger.error(log_text)  # Log error
-            print(log_text)  # Print error to console
-
-            # Return failure response to the frontend
-            return jsonify({'message': log_text, 'status': 'failure'}), 500
-
