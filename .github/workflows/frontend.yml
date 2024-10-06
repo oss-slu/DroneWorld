@@ -1,0 +1,50 @@
+name: Frontend CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  frontend-setup:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Cache Node.js modules
+      uses: actions/cache@v2
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-npm-
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm install
+
+    - name: Lint frontend code
+      run: |
+        cd frontend
+        npm run lint
+
+    - name: Format frontend code with Prettier
+      run: |
+        cd frontend
+        npm run prettier
+
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm run build
