@@ -1,14 +1,11 @@
 import logging
-from multiprocessing import Value
-import os.path
-from socket import fromfd #I changed it from os.path to just os. Revert is needed
+import os #I changed it from os.path to just os. Revert is needed
 import threading
 import time
 import base64
 import json
 import mimetypes
 import sys
-from multirotor.airsim_application import AirSimApplication
 from flask import Flask, request, abort, send_file, render_template, Response, jsonify
 from flask_cors import CORS
 
@@ -21,19 +18,6 @@ app = Flask(__name__, template_folder="./templates")
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 CORS(app)
-
-#Code for Log upload 
-log_directory = 'path/to/your/log/directory'  # Specify your log directory
-if not os.path.exists(log_directory):
-    os.makedirs(log_directory)
-
-log_file_path = os.path.join(log_directory, 'app.log')  # Log file name
-logging.basicConfig(
-    filename=log_file_path,
-    level=logging.INFO,
-    format='%(asctime)s %(levelname)s:%(message)s'
-)
-logger = logging.getLogger(__name__)
 
 task_dispatcher = SimulationTaskManager()
 threading.Thread(target=task_dispatcher.start).start()
@@ -295,41 +279,15 @@ def stream(drone_name, camera_name):
             print(e)
             return "Error"
 
-@app.route('/uploadMission', methods=['POST'])
-def upload_file():
-    log_text = "" 
-    airsim_app = AirSimApplication()  # Create an instance of AirSimApplication
 
-    try:
-      file = request.files['file']
-      filename = file.filename
-      if not filename: 
-          raise ValueError("No file Provided");
-
-      custom_mission_dir = '../multirotor/mission/custom'
-      path = os.path.join(custom_mission_dir, filename)
-      file.save(path)
-      
-      #Code for Log success
-
-      airsim_app.append_pass_to_log(f"Report '{filename}' successfully uploaded at {path}.")
-      log_text = airsim_app.log_text  # Get the updated log text
-      logger.info(log_text)  # Log to file
-      print(log_text)  # Print to console for visibility
-
-      # Return success response to the frontend
-      return jsonify({'message': log_text, 'status': 'success'}), 200
-  
-    except Exception as e:
-            # Handle errors and log failure message
-            airsim_app.append_fail_to_log(f"Failed to upload report: {str(e)}")
-            log_text = airsim_app.log_text  # Get the updated log text
-            logger.error(log_text)  # Log error
-            print(log_text)  # Print error to console
-
-            # Return failure response to the frontend
-            return jsonify({'message': log_text, 'status': 'failure'}), 500
-
+# @app.route('/uploadMission', methods=['POST'])
+# def upload_file():
+#     file = request.files['file']
+#     filename = file.filename
+#     custom_mission_dir = '../multirotor/mission/custom'
+#     path = os.path.join(custom_mission_dir, filename)
+#     file.save(path)
+#     return 'File uploaded'
 
 
 # def update_settings_json(drone_number, separation_distance):
