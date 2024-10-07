@@ -38,7 +38,7 @@ class GenericMission(AirSimApplication):
             gcs_path = f"reports/{self.__class__.__name__}/{self.__class__.__name__}_{self.target_drone}_log.txt"
             
             try:
-                self.upload_to_gcs(gcs_file_name, self.log_text)
+                self.upload_to_gcs(gcs_path, self.log_text)
                 print(f"Report successfully uploaded to {gcs_path} in GCS.")
 
             except Exception as e:
@@ -52,6 +52,6 @@ class GenericMission(AirSimApplication):
 
 
 
-if __name__ == '__main__':
-    mission = GenericMission(target_drone="Drone1")
-    mission.save_report() 
+    if __name__ == '__main__':
+        mission = GenericMission(target_drone="Drone1")
+        mission.save_report()
