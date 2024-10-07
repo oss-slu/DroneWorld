@@ -35,16 +35,11 @@ class SingleDroneMissionMonitor(AirSimApplication):
         return os.path.join(self.dir_path,
                             self.log_subdir) + os.sep + self.mission.__class__.__name__ + os.sep + self.__class__.__name__
 
-    def save_report(self):
+    def save_report(self): #refactor this part and upload mission reports directly to GCS w/o saving them locally
         with lock:
-            log_dir = os.path.join(self.dir_path,
-                                   self.log_subdir) + os.sep + self.mission.__class__.__name__ + os.sep + self.__class__.__name__
-            if not os.path.exists(log_dir):
-                os.makedirs(log_dir)
+            #Directly create the file name for GCS
+            file_name = f"{self.__class__.__name__}_{self.target_drone}_log.txt"
+            gcs_path = f"reports/{self.__class__.__name__}/{file_name}"
 
-            filename = log_dir + os.sep + self.mission.target_drone + "_log.txt"
-
-            with open(filename, 'w') as outfile:
-                outfile.write(self.log_text)
-
-            # print("DEBUG:" + log_dir)
+            #Upload directly to GCS (log_txt is uploaded as file content)
+            self.upload_to_gcs(gcs_path, self.log_text)
