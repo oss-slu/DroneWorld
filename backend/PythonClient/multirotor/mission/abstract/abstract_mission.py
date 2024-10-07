@@ -5,7 +5,7 @@ from enum import Enum
 
 from PythonClient.multirotor.airsim_application import AirSimApplication
 
-
+#
 lock = threading.Lock()
 
 
