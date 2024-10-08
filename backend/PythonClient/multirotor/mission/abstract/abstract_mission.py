@@ -2,9 +2,7 @@ import datetime
 import os
 import threading
 from enum import Enum
-
 from PythonClient.multirotor.airsim_application import AirSimApplication
-
 
 lock = threading.Lock()
 
@@ -33,23 +31,18 @@ class GenericMission(AirSimApplication):
         self.client.moveToPositionAsync(point[0], point[1], point[2], speed, vehicle_name=drone_name).join()
 
     def save_report(self):
-        with lock:                    
-            try:
-                gcs_path = f"{self.log_subdir}/{self.__class__.__name__}/{self.__class__.__name__}_{self.target_drone}_log.txt"
-                self.upload_to_gcs(gcs_path, self.log_text)
-                print(f"Report successfully uploaded to {gcs_path} in GCS.")
+        with lock:
+            # Directly create the file name for GCS
+            file_name = self.__class__.__name__ + "_" + self.target_drone + "_log.txt"
+            gcs_path = f"{self.log_subdir}/{self.__class__.__name__}/{file_name}"
 
-            except Exception as e:
-                print(f"Failed to upload to GCS. Error: {str(e)}")
+            # Upload directly to GCS (log_text is uploaded as file content)
+            self.upload_to_gcs(gcs_path, self.log_text)
 
     def kill_mission(self):
         self.state = self.State.END
         # kill all threads
 
 
-
-
-
-        if __name__ == '__main__':
-            mission = GenericMission()
-        
+if __name__ == '__main__':
+    mission = GenericMission()
