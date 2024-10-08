@@ -1,7 +1,6 @@
 import datetime
 import os
 import threading
-from google.cloud import storage
 from enum import Enum
 
 from PythonClient.multirotor.airsim_application import AirSimApplication
@@ -35,9 +34,8 @@ class GenericMission(AirSimApplication):
 
     def save_report(self):
         with lock:                    
-            gcs_path = f"reports/{self.__class__.__name__}/{self.__class__.__name__}_{self.target_drone}_log.txt"
-            
             try:
+                gcs_path = f"{self.log_subdir}/{self.__class__.__name__}/{self.__class__.__name__}_{self.target_drone}_log.txt"
                 self.upload_to_gcs(gcs_path, self.log_text)
                 print(f"Report successfully uploaded to {gcs_path} in GCS.")
 
@@ -52,6 +50,6 @@ class GenericMission(AirSimApplication):
 
 
 
-    if __name__ == '__main__':
-        mission = GenericMission(target_drone="Drone1")
-        mission.save_report()
+        if __name__ == '__main__':
+            mission = GenericMission(target_drone="Drone1")
+            mission.save_report()
