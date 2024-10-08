@@ -51,5 +51,5 @@ class GenericMission(AirSimApplication):
 
 
         if __name__ == '__main__':
-            mission = GenericMission(target_drone="Drone1")
-            mission.save_report()
+            mission = GenericMission()
+        
