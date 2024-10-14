@@ -8,6 +8,7 @@ import mimetypes
 import sys
 from flask import Flask, request, abort, send_file, render_template, Response, jsonify
 from flask_cors import CORS
+from google.cloud import storage
 
 ##UNCOMMENT LINE IF TESTING ON LOCAL MACHINE
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -23,6 +24,8 @@ task_dispatcher = SimulationTaskManager()
 threading.Thread(target=task_dispatcher.start).start()
 task_number = 1
 
+storage_client = storage.Client()
+bucket_name = 'droneworld'
 
 # For Frontend to fetch all missions available to use
 #@app.route('/mission', methods=['GET'])
@@ -33,90 +36,53 @@ task_number = 1
 
 @app.route('/list-reports', methods=['GET'])
 def list_reports():
-    # Reports file
-    reports_path = os.path.join(os.path.expanduser("~"), "Documents", "AirSim", "report")
-    if not os.path.exists(reports_path) or not os.path.isdir(reports_path):
-        return 'Reports directory not found', 404
-    def check_monitor_pass_fail(directory, monitor):
-        monitor_pass = True
-        monitor_path = os.path.join(directory, monitor)
-        if os.path.exists(monitor_path) and os.path.isdir(monitor_path):
-            for file_name in os.listdir(monitor_path):
-                if file_name.endswith('.txt'):
-                    log_path = os.path.join(monitor_path, file_name)
-                    with open(log_path, 'r') as file:
-                        for line in file:
-                            if 'FAIL' in line:
-                                monitor_pass = False
-                                break
-                    if not monitor_pass:
-                        break
-        return monitor_pass
-    def count_drone_files(directory):
-        flytopoints_path = os.path.join(directory, 'FlyToPoints')
-        if os.path.exists(flytopoints_path) and os.path.isdir(flytopoints_path):
-            collision_monitor_path = os.path.join(flytopoints_path, 'CollisionMonitor')
-            if os.path.exists(collision_monitor_path) and os.path.isdir(collision_monitor_path):
-                return len([f for f in os.listdir(collision_monitor_path) if f.endswith('.txt')])
-        return 0
+    # Fetch the list of reports from GCS bucket
+    bucket = storage_client.bucket(bucket_name)
+    blobs = bucket.list_blobs(prefix='reports/')
+
+    report_files = []
     monitors = ['CollisionMonitor', 'LandspaceMonitor', 'NoFlyZoneMonitor', 'PointDeviationMonitor']
     global_monitors = ['MinSepDistMonitor']
-    report_files = []
-    for file in os.listdir(reports_path):
-        file_path = os.path.join(reports_path, file)
-        if os.path.isdir(file_path):
-            pass_count = fail_count = 0
-            contains_fuzzy = any('fuzzy' in sub.lower() for sub in os.listdir(file_path))
-            paths_to_check = []
-            if contains_fuzzy:
-                # Check each fuzzy subdirectory
-                for subdir in os.listdir(file_path):
-                    if 'fuzzy' in subdir.lower():
-                        subdir_path = os.path.join(file_path, subdir)
-                        paths_to_check.append(subdir_path)
-            else:
-                # If no fuzzy subdirectory, check the main directory
-                paths_to_check.append(file_path)
-            drone_count = 0
-            for path in paths_to_check:
-                drone_count = max(drone_count, count_drone_files(path))
-            all_monitors_pass = True
-            for path in paths_to_check:
-                flytopoints_path = os.path.join(path, 'FlyToPoints')
-                if os.path.exists(flytopoints_path) and os.path.isdir(flytopoints_path):
-                    for monitor in monitors:
-                        if not check_monitor_pass_fail(flytopoints_path, monitor):
-                            all_monitors_pass = False
-                            break
-                    if not all_monitors_pass:
-                        break
-                global_monitors_path = os.path.join(path, 'GlobalMonitors')
-                if os.path.exists(global_monitors_path) and os.path.isdir(global_monitors_path):
-                    for monitor in global_monitors:
-                        if not check_monitor_pass_fail(global_monitors_path, monitor):
-                            all_monitors_pass = False
-                            break
-                    if not all_monitors_pass:
-                        break
-            if all_monitors_pass:
-                pass_count = drone_count
-            else:
-                fail_count = drone_count
+
+    for blob in blobs:
+        if blob.name.endswith('.txt'):
+            file_name = blob.name.split('/')[-1]
+            drone_count = count_drone_files(bucket, file_name)
+            all_monitors_pass = check_monitor_pass_fail(bucket, file_name, monitors)
             report_files.append({
-                'filename': file,
-                'contains_fuzzy': contains_fuzzy,
-                'drone_count': drone_count,
-                'pass': pass_count,
-                'fail': fail_count
-            })
-        else:
-            report_files.append({
-                'filename': file,
+                'filename': file_name,
                 'contains_fuzzy': False,
-                'drone_count': 0,
-                'pass': 0,
-                'fail': 0
+                'drone_count': drone_count,
+                'pass': drone_count if all_monitors_pass else 0,
+                'fail': 0 if all_monitors_pass else drone_count
             })
+    
+    # # Reports file
+    # reports_path = os.path.join(os.path.expanduser("~"), "Documents", "AirSim", "report")
+    # if not os.path.exists(reports_path) or not os.path.isdir(reports_path):
+    #     return 'Reports directory not found', 404
+    def check_monitor_pass_fail(bucket, file_name, monitors):
+        monitor_pass = True
+        blob = bucket.blob(f'reports/{file_name}')
+        content = blob.download_as_text()
+
+        for monitor in monitors:
+            if monitor in content:
+                if 'FAIL' in content:
+                    monitor_pass = False
+                    break
+        return monitor_pass
+        
+    def count_drone_files(bucket, report_file_name):
+        count = 0
+        flytopoints_prefix = f'reports/{report_file_name}/FlyToPoints/'
+        blobs = bucket.list_blobs(prefix=flytopoints_prefix)
+
+        for blob in blobs:
+            if 'CollisionMonitor' in blob.name and blob.name.endswith('.txt'):
+                count += 1
+        return count
+    
     return {'reports': report_files}
 #Folder content with base64
 @app.route('/list-folder-contents/<folder_name>', methods=['POST'])
