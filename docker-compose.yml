@@ -6,6 +6,7 @@ services:
       - "5000:5000"
     volumes:
       - ./backend:/app
+      - ./config/settings.json:/root/Documents/AirSim/settings.json
     depends_on:
       - frontend
 

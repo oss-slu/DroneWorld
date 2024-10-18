@@ -17,16 +17,13 @@ RUN apt-get update && apt-get install -y \
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the current directory contents into the container
+# Copy the backend code into the container
 COPY . .
-
-# Copy the settings.json file into the appropriate location
-COPY config/settings.json /root/Documents/AirSim/settings.json
 
 # Install the Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the port the backend server will use
+# Expose the port the backend will use
 EXPOSE 5000
 
 # Command to start the backend server
