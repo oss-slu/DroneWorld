@@ -1,0 +1,19 @@
+name: DroneWorld
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - frontend
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
