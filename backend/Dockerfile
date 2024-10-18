@@ -20,6 +20,9 @@ WORKDIR /app
 # Copy the current directory contents into the container
 COPY . .
 
+# Copy the settings.json file into the appropriate location
+COPY config/settings.json /root/Documents/AirSim/settings.json
+
 # Install the Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
