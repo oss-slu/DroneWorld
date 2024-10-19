@@ -1,17 +1,19 @@
 name: DroneWorld
 services:
   backend:
-    build: ./backend
+    build:
+      context: .  # Set the project root as the build context for backend
+      dockerfile: ./backend/Dockerfile  # Specify the Dockerfile location for backend
     ports:
       - "5000:5000"
     volumes:
-      - ./backend:C:/app  # Mount backend code
+      - ./backend:C:/app  # Mount backend code for live editing
       - ./config/settings.json:C:/Documents/AirSim/settings.json  # Mount settings.json for simulation
-    depends_on:
-      - frontend
 
   frontend:
-    build: ./frontend
+    build:
+      context: .  # Set the project root as the build context for frontend
+      dockerfile: ./frontend/Dockerfile  # Specify the Dockerfile location for frontend
     ports:
       - "3000:3000"
     volumes:
