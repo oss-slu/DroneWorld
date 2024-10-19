@@ -1,4 +1,68 @@
 {
-  "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/main/docs/settings.md",
-  "SettingsVersion": 1.2
+    "SettingsVersion": 1.2,
+    "SimMode": "Multirotor",
+    "ViewMode": "SpringArmChase",
+    "Vehicles": {
+        "Drone 1": {
+            "FlightController": "SimpleFlight",
+            "X": 0.0,
+            "Y": 0.0,
+            "Z": -200,
+            "droneType": "Multi Rotor",
+            "droneModel": "DJI",
+            "VehicleType": "SimpleFlight",
+            "Sensors": {
+                "Barometer": {
+                    "SensorType": 1,
+                    "Enabled": true,
+                    "PressureFactorSigma": 0.001825,
+                    "PressureFactorTau": 3600,
+                    "UncorrelatedNoiseSigma": 2.7,
+                    "UpdateLatency": 0,
+                    "StartupDelay": 0,
+                    "UpdateFrequency": 50
+                },
+                "Magnetometer": {
+                    "SensorType": 4,
+                    "Enabled": true,
+                    "NoiseSigma": 0.005,
+                    "ScaleFactor": 1,
+                    "NoiseBias": 0,
+                    "UpdateLatency": 0,
+                    "StartupDelay": 0,
+                    "UpdateFrequency": 50
+                },
+                "GPS": {
+                    "SensorType": 3,
+                    "Enabled": true,
+                    "EphTimeConstant": 0.9,
+                    "EpvTimeConstant": 0.9,
+                    "EphInitial": 25,
+                    "EpvInitial": 25,
+                    "EphFinal": 0.1,
+                    "EpvFinal": 0.1,
+                    "EphMin3d": 3,
+                    "EphMin2d": 4,
+                    "UpdateLatency": 0.2,
+                    "StartupDelay": 1,
+                    "UpdateFrequency": 50
+                }
+            },
+            "MissionValue": null
+        }
+    },
+    "OriginGeopoint": {
+        "Latitude": 41.980381,
+        "Longitude": -87.934524,
+        "Altitude": 216.2583312988281
+    },
+    "Wind": {
+        "X": 0.7071067811865475,
+        "Y": 0.7071067811865475,
+        "Z": 0
+    },
+    "TimeOfDay": {
+        "Enabled": true,
+        "StartDateTime": "2024-10-18 10:00:00"
+    }
 }

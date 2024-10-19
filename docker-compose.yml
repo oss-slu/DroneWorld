@@ -5,8 +5,8 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./backend:/app
-      - ./config/settings.json:/root/Documents/AirSim/settings.json
+      - ./backend:C:/app  # Mount backend code
+      - ./config/settings.json:C:/Documents/AirSim/settings.json  # Mount settings.json for simulation
     depends_on:
       - frontend
 
@@ -15,6 +15,15 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend:/app
+      - ./frontend:C:/app  # Mount frontend code for live editing
     environment:
-      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_USEPOLLING=true  # Necessary for live-reload in Docker
+
+  exe:
+    build:
+      context: "C:/Blocks"
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"  # Network access for the EXE
+    volumes:
+      - ./config:C:/Documents/AirSim  # Mount the same settings.json

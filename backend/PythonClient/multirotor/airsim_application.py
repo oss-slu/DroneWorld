@@ -16,10 +16,9 @@ class AirSimApplication:
         self.circular_mission_names = {"FlyInCircle"}
         self.polygon_mission_names = {"FlyToPoints", "FlyToPointsGeo"}
         self.point_mission_names = {"FlyStraight"}
-        self.client = airsim.MultirotorClient()
         # self.client.confirmConnection()
         self.setting_file = self.load_airsim_setting()
-        self.drone_number = len(self.setting_file['Vehicles'])  # only support name format of Drone1, Drone2...
+        self.drone_number = len(self.setting_file['Vehicles'])  # Only support name format of Drone1, Drone2...
         self.wind_speed_text = self.get_wind_speed_text()
         self.all_drone_names = list(self.load_airsim_setting()['Vehicles'].keys())
         self.log_text = ""
@@ -33,6 +32,23 @@ class AirSimApplication:
         if not os.path.exists(report_root_path):
             os.mkdir(report_root_path)
         self.dir_path = report_root_path
+
+    def fetch_droneworld_key(self):
+        """Fetch the dw-key from the projct-viewer bucket."""
+        client = storage.Client()  # Initialize a GCS client with the embedded projct-key.json
+        bucket = client.bucket(self.projct_viewer_bucket)
+        key_blob = bucket.blob('dw-key')  # Key to access the droneworld bucket
+        destination_path = '/app/.secret/dw-key.json'  # Path to store the key locally
+
+        # Create the destination directory if it doesn't exist
+        if not os.path.exists('/app/.secret'):
+            os.makedirs('/app/.secret')
+
+        # Download the key from projct-viewer bucket
+        key_blob.download_to_filename(destination_path)
+        print(f"Downloaded dw-key to {destination_path}")
+
+        return destination_path  # Return the path to the downloaded key
 
     @staticmethod
     def load_airsim_setting():
