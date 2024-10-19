@@ -1,30 +1,34 @@
-# Use the official Python 3.10 image
-FROM python:3.10-slim
+# Stage 1: Build Stage
+FROM droneworld/windows-base AS build
 
-# Install system-level dependencies required for the Python packages
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libasound-dev \
-    libportaudio2 \
-    libportaudiocpp0 \
-    portaudio19-dev \
-    libjpeg-dev \
-    zlib1g-dev \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Set the working directory in the container
-WORKDIR /app
+# Set the working directory
+WORKDIR C:/app
 
 # Copy the backend code into the container
-COPY . .
+COPY ./backend C:/app/backend
 
-# Install the Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy the service account key for accessing project-data (projct-key.json)
+COPY ./droneworld/config/projct-key.json C:/app/.gcp/projct-key.json
 
-# Expose the port the backend will use
+# Set the environment variable for the GCS service account
+ENV GOOGLE_APPLICATION_CREDENTIALS="C:/app/.gcp/projct-key.json"
+
+# Install pip and Python dependencies
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python get-pip.py
+RUN pip install --no-cache-dir -r C:/app/backend/requirements.txt
+
+# Stage 2: Production Stage
+FROM mcr.microsoft.com/windows/nanoserver:ltsc2022
+
+# Set the working directory in the final image
+WORKDIR C:/app
+
+# Copy only the necessary parts of the backend code and dependencies
+COPY --from=build C:/app/backend C:/app/backend
+COPY --from=build C:/app/.gcp/projct-key.json C:/app/.gcp/projct-key.json
+
+# Expose the backend port
 EXPOSE 5000
 
 # Command to start the backend server
-CMD ["python", "./PythonClient/server/simulation_server.py"]
+CMD ["python", "C:/app/backend/PythonClient/server/simulation_server.py"]
