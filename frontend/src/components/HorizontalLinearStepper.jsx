@@ -139,7 +139,7 @@ export default function HorizontalLinearStepper(data) {
       navigate('/report-dashboard', {
         state: {mainJson: mainJson}
       })
-      fetch('http://127.0.0.1:5000/addTask', { 
+      fetch('http://localhost:5000/addTask', { 
       method: 'POST',
       headers: {
         'Content-type': 'application/json',

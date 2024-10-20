@@ -48,3 +48,6 @@ desktop.ini
 
 # Ignore Google Cloud service account key
 key.json
+
+# Ignore config directory; so that changes wont be made to it 
+config/
