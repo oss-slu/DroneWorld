@@ -1,31 +1,24 @@
 name: DroneWorld
 services:
   backend:
-    build:
-      context: .  # Set the project root as the build context for backend
-      dockerfile: ./backend/Dockerfile  # Specify the Dockerfile location for backend
+    build: ./backend
     ports:
       - "5000:5000"
     volumes:
-      - ./backend:C:/app  # Mount backend code for live editing
-      - ./config/settings.json:C:/Documents/AirSim/settings.json  # Mount settings.json for simulation
+      - ./backend:/app  # Mount backend code
+      - ./config/projct-key.json:/app/.gcp/project-key.json  # Mount the specific key file
+      - ./config/airsim:/root/Documents/AirSim  # Mount the AirSim folder
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/.gcp/projct-key.json
+    network_mode: "host"  # Use the host network for direct communication
 
   frontend:
-    build:
-      context: .  # Set the project root as the build context for frontend
-      dockerfile: ./frontend/Dockerfile  # Specify the Dockerfile location for frontend
+    build: ./frontend
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend:C:/app  # Mount frontend code for live editing
+      - ./frontend:/app  # Mount frontend code for live editing
     environment:
       - CHOKIDAR_USEPOLLING=true  # Necessary for live-reload in Docker
-
-  exe:
-    build:
-      context: "C:/Blocks"
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"  # Network access for the EXE
-    volumes:
-      - ./config:C:/Documents/AirSim  # Mount the same settings.json
+    depends_on:
+      - backend
