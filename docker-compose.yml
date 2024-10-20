@@ -10,7 +10,6 @@ services:
       - ./config/airsim:/root/Documents/AirSim  # Mount the AirSim folder
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/app/.gcp/projct-key.json
-    network_mode: "host"  # Use the host network for direct communication
 
   frontend:
     build: ./frontend
