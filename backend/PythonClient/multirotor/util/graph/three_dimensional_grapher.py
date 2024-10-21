@@ -193,7 +193,6 @@ class ThreeDimensionalGrapher:
             #                   scene=dict(xaxis_range=[-max_val, max_val],
             #                              yaxis_range=[-max_val, max_val],
             #                              zaxis_range=[-max_val, max_val]))
-            setup_dir(full_target_directory)
-            file_name = os.path.join(full_target_directory, str(drone_name) + "_interactive.html")
-            fig.write_html(file_name)
-            plt.close()
+            html_content = fig.to_html(full_html=True)
+
+            return html_content

@@ -63,10 +63,10 @@ class AirSimApplication:
     def save_report(self):
         pass
 
-    def upload_to_gcs(self, file_name, content):
+    def upload_to_gcs(self, file_name, content,content_type ='text/plain'):
         """Uploads a file to the GCS bucket."""
         blob = self.bucket.blob(f'reports/{file_name}')
-        blob.upload_from_string(content)
+        blob.upload_from_string(content,content_type=content_type)
         print(f"File {file_name} uploaded to GCS.")
 
     def save_pic(self, picture):

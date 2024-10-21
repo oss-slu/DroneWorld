@@ -1,10 +1,12 @@
 # sUAS shall not deviate from their planned routes by more than [10%] of the total distance.
 from time import sleep
+import threading
 
 from PythonClient.multirotor.util.geo.geo_util import GeoUtil
 from PythonClient.multirotor.util.graph.three_dimensional_grapher import ThreeDimensionalGrapher
 from PythonClient.multirotor.monitor.abstract.single_drone_mission_monitor import SingleDroneMissionMonitor
 
+lock = threading.Lock()
 
 class PointDeviationMonitor(SingleDroneMissionMonitor):
 
@@ -125,6 +127,7 @@ class PointDeviationMonitor(SingleDroneMissionMonitor):
 
     def draw_trace_3d(self):
         graph_dir = self.get_graph_dir()
+
         if not self.breach_flag:
             title = f"{self.target_drone} Planned vs. Actual\nDrone speed: {self.mission.speed} m/s\nWind: {self.wind_speed_text}"
         else:
@@ -134,12 +137,21 @@ class PointDeviationMonitor(SingleDroneMissionMonitor):
                                       actual_position_list=self.est_position_array,
                                       full_target_directory=graph_dir,
                                       drone_name=self.target_drone,
-                                      title=title
-                                      )
+                                      title=title)
 
-        grapher.draw_interactive_trace_vs_planned(planed_position_list=self.mission.points,
+        interactive_html_content = grapher.draw_interactive_trace_vs_planned(planed_position_list=self.mission.points,
                                                   actual_position_list=self.est_position_array,
                                                   full_target_directory=graph_dir,
                                                   drone_name=self.target_drone,
-                                                  title=title
-                                                  )
+                                                  title=title)
+        
+        # Upload the HTML file directly to GCS
+        gcs_path = f"{self.log_subdir}/FlyToPoints/{self.__class__.__name__}/{self.target_drone}_interactive.html"
+        with lock:
+            try:        
+                self.upload_to_gcs(gcs_path, interactive_html_content, content_type='text/html')
+            except Exception as e:
+                print(f"Failed to upload html to GCS. Error: {str(e)}")
+
+        
+
