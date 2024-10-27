@@ -6,10 +6,7 @@ services:
       - "5000:5000"
     volumes:
       - ./backend:/app  # Mount backend code
-      - ./config/projct-key.json:/app/.gcp/project-key.json  # Mount the specific key file
       - ./config/airsim:/root/Documents/AirSim  # Mount the AirSim folder
-    environment:
-      - GOOGLE_APPLICATION_CREDENTIALS=/app/.gcp/projct-key.json
 
   frontend:
     build: ./frontend
@@ -17,6 +14,7 @@ services:
       - "3000:3000"
     volumes:
       - ./frontend:/app  # Mount frontend code for live editing
+      - /app/node_modules # Separate node_modules to avoid host overwrite
     environment:
       - CHOKIDAR_USEPOLLING=true  # Necessary for live-reload in Docker
     depends_on:
