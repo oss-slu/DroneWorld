@@ -1,6 +1,7 @@
 name: DroneWorld
 services:
   backend:
+    image: mohamdlog/droneworld-backend:v1.0.0
     build: ./backend
     ports:
       - "5000:5000"
@@ -9,6 +10,7 @@ services:
       - ./config/airsim:/root/Documents/AirSim  # Mount the AirSim folder
 
   frontend:
+    image: mohamdlog/droneworld-frontend:v1.0.0
     build: ./frontend
     ports:
       - "3000:3000"
