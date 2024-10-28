@@ -33,6 +33,6 @@ class GlobalMonitor(AirSimApplication):
             gcs_path = f"{self.log_subdir}/GlobalMonitors/{self.__class__.__name__}/{file_name}"
 
             # Upload directly to GCS (log_text is uploaded as file content)
-            self.upload_to_gcs(gcs_path, self.log_text)
+            self.save_report_to_storage(gcs_path, self.log_text)
 
             # print("DEBUG:" + log_dir)

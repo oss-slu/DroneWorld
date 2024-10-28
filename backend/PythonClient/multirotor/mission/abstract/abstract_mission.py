@@ -37,7 +37,7 @@ class GenericMission(AirSimApplication):
             gcs_path = f"{self.log_subdir}/{self.__class__.__name__}/{file_name}"
 
             # Upload directly to GCS (log_text is uploaded as file content)
-            self.upload_to_gcs(gcs_path, self.log_text)
+            self.save_report_to_storage(gcs_path, self.log_text)
 
     def kill_mission(self):
         self.state = self.State.END
