@@ -35,7 +35,8 @@ bucket = storage_client.bucket(bucket_name)  # Points to the GCS bucket
 #def mission():
 #     directory = '../multirotor/mission'
 #     return [file for file in os.listdir(directory) if os.path.isfile(os.path.join(directory, file))]
-
+#This here is where all of the reports are being routed
+# i have to go through these and make sure the errors are routed to front end
 @app.route('/list-reports', methods=['GET'])
 def list_reports():
     """
