@@ -83,8 +83,15 @@ def list_reports():
                 # Example:
                 # if monitor == 'CollisionMonitor':
                 #     # Parse collision monitor report to update pass/fail
-                pass_count += 2  # Placeholder
-                fail_count += 1  # Placeholder
+                
+                # Count 'PASS' and 'FAIL' directly in the blob content
+                if sub_blob.name.endswith('.txt'):
+                    # Download and read the text file contents
+                    file_contents = sub_blob.download_as_text()
+                    pass_count += file_contents.count("PASS")
+                    fail_count += file_contents.count("FAIL")
+                # pass_count += 2  # Placeholder
+                # fail_count += 1  # Placeholder
 
             report['contains_fuzzy'] = contains_fuzzy
             report['drone_count'] = drone_count
