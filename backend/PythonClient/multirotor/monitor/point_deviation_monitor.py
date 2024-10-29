@@ -149,7 +149,7 @@ class PointDeviationMonitor(SingleDroneMissionMonitor):
         gcs_path = f"{self.log_subdir}/FlyToPoints/{self.__class__.__name__}/{self.target_drone}_interactive.html"
         with lock:
             try:        
-                self.upload_to_gcs(gcs_path, interactive_html_content, content_type='text/html')
+                self.save_report_to_storage(gcs_path, interactive_html_content, content_type='text/html')
             except Exception as e:
                 print(f"Failed to upload html to GCS. Error: {str(e)}")
 
