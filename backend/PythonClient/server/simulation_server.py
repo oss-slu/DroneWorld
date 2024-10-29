@@ -11,7 +11,6 @@ from flask_cors import CORS
 
 from google.cloud import storage
 
-##UNCOMMENT LINE IF TESTING ON LOCAL MACHINE
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 from PythonClient.multirotor.control.simulation_task_manager import SimulationTaskManager
 
@@ -45,6 +44,7 @@ def list_reports():
         # List all blobs in the 'reports/' directory
         blobs = bucket.list_blobs(prefix='reports/')
         report_files = []
+
         for blob in blobs:
             # Extract the batch folder name
             parts = blob.name.split('/')
@@ -72,17 +72,15 @@ def list_reports():
 
             for sub_blob in sub_blobs:
                 sub_parts = sub_blob.name.split('/')
+
+                if len(sub_parts) == 4 and sub_blob.name.endswith('.txt'):
+                    drone_count += 1
+
                 if len(sub_parts) < 3:
                     continue  # Skip if not in a monitor subdirectory
                 monitor = sub_parts[2]
                 if 'fuzzy' in monitor.lower():
                     contains_fuzzy = True
-                # Here you can implement logic to parse pass/fail counts
-                # For simplicity, we'll set dummy values
-                # Ideally, you'd download and parse the report files to get accurate counts
-                # Example:
-                # if monitor == 'CollisionMonitor':
-                #     # Parse collision monitor report to update pass/fail
                 
                 # Count 'PASS' and 'FAIL' directly in the blob content
                 if sub_blob.name.endswith('.txt'):
@@ -90,8 +88,6 @@ def list_reports():
                     file_contents = sub_blob.download_as_text()
                     pass_count += file_contents.count("PASS")
                     fail_count += file_contents.count("FAIL")
-                # pass_count += 2  # Placeholder
-                # fail_count += 1  # Placeholder
 
             report['contains_fuzzy'] = contains_fuzzy
             report['drone_count'] = drone_count
@@ -301,17 +297,6 @@ def stream(drone_name, camera_name):
             print(e)
             return "Error"
 
-# @app.route('/uploadMission', methods=['POST'])
-# def upload_file():
-#     file = request.files['file']
-#     filename = file.filename
-#     custom_mission_dir = '../multirotor/mission/custom'
-#     path = os.path.join(custom_mission_dir, filename)
-#     file.save(path)
-#     return 'File uploaded'
-
-# def update_settings_json(drone_number, separation_distance):
-#     SettingGenerator(drone_number, separation_distance)
 
 @app.route('/state', methods=['GET'])
 def get_state():
