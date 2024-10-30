@@ -86,8 +86,10 @@ def list_reports():
                 if sub_blob.name.endswith('.txt'):
                     # Download and read the text file contents
                     file_contents = sub_blob.download_as_text()
-                    pass_count += file_contents.count("PASS")
-                    fail_count += file_contents.count("FAIL")
+                    if "FAIL" in file_contents:
+                        fail_count += 1
+                    elif "PASS" in file_contents:
+                        pass_count += 1
 
             report['contains_fuzzy'] = contains_fuzzy
             report['drone_count'] = drone_count
