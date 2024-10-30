@@ -80,7 +80,7 @@ def list_reports():
                     continue  # Skip if not in a monitor subdirectory
                 monitor = sub_parts[2]
                 if 'fuzzy' in monitor.lower():
-                    contains_fuzzy = Truegit 
+                    contains_fuzzy = True
                 
                 # Count 'PASS' and 'FAIL' directly in the blob content
                 if sub_blob.name.endswith('.txt'):
