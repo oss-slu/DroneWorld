@@ -14,5 +14,5 @@ pandas==2.0.2
 plotly==5.15.0
 Ofpp~=0.11
 google-cloud-storage==2.18.2
-google-auth==2.25.0
+google-auth==2.35.0
 google-api-python-client==2.149.0
