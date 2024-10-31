@@ -4,7 +4,7 @@ from google.cloud import storage
 class GCSStorageService(StorageServiceInterface):
     """Concrete class of StorageServiceInterface, used for uploading to GCS"""
 
-    def __init__(self, bucket_name: str):
+    def __init__(self, bucket_name='droneworld'):
         """Initializes the GCS client and bucket."""
         self.storage_client = storage.Client.from_service_account_json('key.json') 
         self.bucket = self.storage_client.bucket(bucket_name)  # Use the bucket_name parameter
