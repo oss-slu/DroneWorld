@@ -1,40 +1,37 @@
+# Overview
+**Drone World**, a key component of DRV, is an advanced simulation platform for testing small unmanned aerial systems (sUAS). It enables users to configure detailed test scenarios by specifying:
+
+- **Environmental Conditions:** Weather, terrain, and other environmental factors.
+- **sUAS Capabilities:** Sensors, hardware configurations, and other drone specifications.
+- **Mission Objectives:** Specific goals and tasks for each simulation.
+
+The platform generates a realistic 3D simulation environment, monitors data to ensure safety, detects issues, and produces comprehensive test reports with detailed analysis. By automating and streamlining the testing process, Drone World enhances safety, reliability, and efficiency for drone developers. It allows for comprehensive pre-flight testing in ultra-realistic environments, helping developers refine their systems and iterate more rapidly on complex missions. Our team at OSS is dedicated to continuously enhancing Drone World’s capabilities, including refining environmental settings, drone configurations, and integrating new features.
+
+### Wiki
+Check out our [Wiki](https://github.com/oss-slu/DroneWorld/wiki) for detailed and important information. It's constantly being updated to provide you with the latest resources and insights.
+
 # DroneReqValidator
-
-DroneReqValidator (DRV) is a complete Drone simulation ecosystem that automatically generates realistic environments, monitors Drone activities against predefined safety parameters, and generates detailed acceptance test reports for effective debugging and analysis of Drone software applications. 
-
-## Demo
-
-- [Demo Video Available Here](https://www.youtube.com/watch?v=Fd9ft55gbO8)
+**DroneReqValidator (DRV)** is a comprehensive drone simulation ecosystem that automatically creates realistic environments, monitors drone activity against predefined safety parameters, and produces detailed acceptance test reports for efficient debugging and analysis of drone software applications. Check out a [demo video](https://www.youtube.com/watch?v=Fd9ft55gbO8) showcasing DRV in action.
 
 
-## System Requirements
+# System Requirements
 - Windows 10/11
-- Unreal engine 5.0 (optional)
 - Python 3.10
-- node.js
-- npm
+- Node.js
 
 
-## Usage
-
+# Usage
 DroneReqValidator has 3 main components:
 1. Unreal application
 2. Python backend
 3. React frontend
 
-To use the DroneReqValidator, follow these steps:
-#### [Installation](installation.md)
+To begin using DroneReqValidator, refer to our [Getting Started](Getting-Started) guide.
 
-## Contributing
 
-We welcome contributions to this project. To contribute, please follow these steps:
+# Contributing
+Contributions to this project are welcome! For details on how to contribute, please follow our [Contributing Guide](Contributing-Guide).
 
-1. Fork the repository.
-2. Create a new branch for your feature or bug fix.
-3. Make your changes and commit them with a descriptive message.
-4. Push your changes to your fork.
-5. Submit a pull request to the main repository.
-6. We will review your changes and merge them if they align with the project's goals.
 
-## License
+# License
 This project is licensed under the MIT  license. See the LICENSE file for more information.
