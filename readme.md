@@ -26,11 +26,11 @@ DroneReqValidator has 3 main components:
 2. Python backend
 3. React frontend
 
-To begin using DroneReqValidator, refer to our [Getting Started](Getting-Started) guide.
+To begin using DroneReqValidator, refer to our [Getting Started](https://github.com/oss-slu/DroneWorld/wiki/Getting-Started) guide.
 
 
 # Contributing
-Contributions to this project are welcome! For details on how to contribute, please follow our [Contributing Guide](Contributing-Guide).
+Contributions to this project are welcome! For details on how to contribute, please follow our [Contributing Guide](https://github.com/oss-slu/DroneWorld/wiki/Contributing-Guide).
 
 
 # License
