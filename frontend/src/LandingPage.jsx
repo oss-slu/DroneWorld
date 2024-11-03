@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     fontFamily: 'Arial, sans-serif',
   },
   mainContent: {
-    padding: '1rem',
+    // padding: '1rem',
     // marginTop: '3rem',
   },
   buttonContainer: {
@@ -131,42 +131,45 @@ export default function LandingPage() {
   return (
     <div className={classes.landingPage}>
       <nav className={classes.nav}>
-        <Link to='/' className={classes.siteTitle}>
-        </Link>
+        <Link to='/' className={classes.siteTitle}></Link>
         <ul className={classes.navList}>
           <li className={classes.navListItem}>
-            <Box component="span" onClick={handleAccordionToggle}></Box>
+            <Box component='span' onClick={handleAccordionToggle}></Box>
 
-            <Box component="span">
+            <Box component='span'>
               <Button
                 className={classes.aboutLink}
                 onClick={() => setOpen(true)}
                 style={{ color: '#fff' }}
-              >               
-              </Button>
+              ></Button>
             </Box>
           </li>
         </ul>
       </nav>
 
+      <Link to='/home' className={classes.buttonContainer} style={{ textDecoration: 'none' }}>
+        <Button
+          variant='contained'
+          sx={{
+            color: 'white',
+            padding: '15px 30px',
+            borderRadius: '10px',
+          }}
+        >
+          Create Simulation
+        </Button>
+      </Link>
+
+      <div style={{ textAlign: 'center', color: '#4d4d4d' }}>
+        <h2 style={{ fontSize: '2em' }}>Welcome to Drone World!</h2>
+      </div>
+      
+
       {isLoading ? (
         <Loading />
       ) : (
         <div className={classes.mainContent}>
-          <Link to='/home' className={classes.buttonContainer} style={{ textDecoration: 'none' }}>
-            <Button
-              variant='contained'
-              sx={{
-                color: 'white',
-                padding: '15px 30px',
-                borderRadius: '10px',
-              }}
-            >
-              Create Simulation
-            </Button>
-          </Link>
-
-          {filesPresent ? (
+          {filesPresent && (
             <div onClick={handleAccordionToggle}>
               <h2 className={classes.reportDashboardTitle}>
                 <Link to='/report-dashboard' className={classes.reportDashboardTitle}>
@@ -175,30 +178,9 @@ export default function LandingPage() {
               </h2>
               <ReportDashboard />
             </div>
-          ) : (
-            <div style={{ textAlign: 'center', color: '#4d4d4d' }}>
-              <h2 style={{ fontSize: '2em' }}>Welcome to Drone World!</h2>
-            </div>
           )}
         </div>
       )}
-
-      <div className={classes.mainContent} style={{ paddingTop: '9rem' }}>
-        <div className={classes.buttonContainer}>
-          <Link to="/home">
-            <Button
-              variant="contained"
-              sx={{
-                color: 'white',
-                padding: '15px 30px',
-                borderRadius: '10px',
-              }}
-            >
-              Create Simulation
-            </Button>
-          </Link>
-        </div>
-      </div>
     </div>
   );
 }
