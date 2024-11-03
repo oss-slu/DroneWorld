@@ -102,7 +102,7 @@ const modalStyle = {
 
 export default function LandingPage() {
   const classes = useStyles();
-  const [filesPresent, setFilesPresent] = useState(true);
+  const [filesPresent, setFilesPresent] = useState(false);
   const [open, setOpen] = useState(false);
   const [isLoading, setIsloading] = useState(false);
 
