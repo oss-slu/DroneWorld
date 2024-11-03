@@ -108,11 +108,14 @@ const useStyles = makeStyles((theme) => ({
 //}
 //];
 
-export default function ReportDashboard(showTitle) {
+export default function ReportDashboard() {
   const [reportFiles, setReportFiles] = React.useState([]);
   const [isLoading, setIsloading] = React.useState(false);
   // const isFuzzy = file.filename.includes('Fuzzy');
   const classes = useStyles();
+  const location = useLocation();  
+
+  const isReportDashboard = location.pathname.includes('/report-dashboard');
 
   const navigate = useNavigate();
   const redirectToHome = () => {
@@ -202,12 +205,14 @@ export default function ReportDashboard(showTitle) {
       <Link to='/report-dashboard' style={{ textDecoration: 'none', color: '#000000' }}>
         Acceptance Report
       </Link>
-      <Tooltip title='Home' placement='bottom'>
-        <HomeIcon
-          style={{ float: 'right', cursor: 'pointer', fontSize: '35px' }}
-          onClick={redirectToHome}
-        />
-      </Tooltip>
+      {isReportDashboard && (
+        <Tooltip title='Home' placement='bottom'>
+          <HomeIcon
+            style={{ float: 'right', cursor: 'pointer', fontSize: '35px' }}
+            onClick={redirectToHome}
+          />
+        </Tooltip>
+      )}
     </Typography>
   );
 
@@ -490,3 +495,7 @@ export default function ReportDashboard(showTitle) {
     </>
   );
 }
+
+ReportDashboard.propTypes = {
+  isHomePage: PropTypes.bool,
+};

@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
     fontFamily: 'Arial, sans-serif',
   },
   mainContent: {
-    padding: '1rem',
+    // padding: '1rem',
     // marginTop: '3rem',
   },
   buttonContainer: {
@@ -102,7 +102,7 @@ const modalStyle = {
 
 export default function LandingPage() {
   const classes = useStyles();
-  const [filesPresent, setFilesPresent] = useState(false);
+  const [filesPresent, setFilesPresent] = useState(true);
   const [open, setOpen] = useState(false);
   const [isLoading, setIsloading] = useState(false);
 
@@ -163,6 +163,7 @@ export default function LandingPage() {
       <div style={{ textAlign: 'center', color: '#4d4d4d' }}>
         <h2 style={{ fontSize: '2em' }}>Welcome to Drone World!</h2>
       </div>
+      
 
       {isLoading ? (
         <Loading />
