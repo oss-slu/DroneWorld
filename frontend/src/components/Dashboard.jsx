@@ -56,7 +56,7 @@ export default function Dashboard(parameter) {
   const [open, setOpen] = React.useState(false);
   const [selectedImage, setSelectedImage] = React.useState();
   const [htmlLink, setHtmlLink] = React.useState();
-  const [voilation, setVoilation] = React.useState(false)
+  const [violation, setViolation] = React.useState(false)
 
   const handleOpen = (img) => {
     setOpen(true);
@@ -78,7 +78,7 @@ export default function Dashboard(parameter) {
       let content_split = content.split(";");
       if(content.includes(keyMatch) && content_split.length == 4) {
         if(keyMatch == "FAIL") {
-          setVoilation(true)
+          setViolation(true)
         }
         if(droneMap.get(content_split[2]) == null) {
           droneMap.set(content_split[2], [content_split[3]])
@@ -396,7 +396,7 @@ export default function Dashboard(parameter) {
       </Container>
       </Typography>
       </Box>
-      {voilation ? <Alert severity="warning">
+      {violation ? <Alert severity="warning">
                         <AlertTitle>Warning</AlertTitle>
                         <strong>Violation Detected</strong>
                     </Alert>  : null}
