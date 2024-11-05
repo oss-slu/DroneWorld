@@ -60,7 +60,7 @@ export default function FuzzyDashboard() {
   const [open, setOpen] = React.useState(false);
   const [selectedImage, setSelectedImage] = React.useState();
   const [htmlLink, setHtmlLink] = React.useState();
-  const [voilation, setVoilation] = React.useState(location.state.file.fail > 0 ? true : false)
+  const [violation, setViolation] = React.useState(location.state.file.fail > 0 ? true : false)
   const [isFuzzyList, setIsFuzzyList] = React.useState(location.state.file.fuzzy);
   const [fuzzyTest, setFuzzyTest] = React.useState([]);
   const [fileName, setFileName] = React.useState(location.state.file.fileName)
@@ -86,7 +86,7 @@ export default function FuzzyDashboard() {
   //     let content_split = content.split(";");
   //     if(content.includes(keyMatch) && content_split.length == 4) {
   //       if(keyMatch == "FAIL") {
-  //         setVoilation(true)
+  //         setViolation(true)
   //       }
   //       if(droneMap.get(content_split[2]) == null) {
   //         droneMap.set(content_split[2], [content_split[3]])
@@ -647,7 +647,7 @@ export default function FuzzyDashboard() {
         {/* </Container> */}
       </Typography>
       </Box>
-      {voilation ? <Alert severity="warning">
+      {violation ? <Alert severity="warning">
                         <AlertTitle>Warning</AlertTitle>
                         <strong>Violation Detected</strong>
                     </Alert>  : null}
