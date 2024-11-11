@@ -4,22 +4,34 @@ import matplotlib
 import plotly.express as px
 import os
 import threading
+from io import BytesIO
+from PythonClient.multirotor.airsim_application import AirSimApplication
 
 # create a lock object
 
 lock = threading.Lock()
 matplotlib.use('agg')
 
+class ThreeDimensionalGrapher(AirSimApplication):
 
-def setup_dir(dir):
-    if not os.path.exists(dir):
-        os.makedirs(dir)
+    def __init__(self):
+        super().__init__()
 
+    #Function to upload html files to GCS. 
+    def _upload_html(self, fig, file_name):
+        html_content = fig.to_html(full_html=True)
+        self.save_report_to_storage(file_name, html_content, content_type="text/html")
 
-class ThreeDimensionalGrapher:
+    #Function to upload png to GCS. 
+    def _upload_plot(self, fig, file_name):
+        img_bytes = BytesIO()
+        fig.savefig(img_bytes, format="png", dpi=200, bbox_inches='tight')
+        img_bytes.seek(0)
+        self.save_report_to_storage(file_name, img_bytes.getvalue(), content_type="image/png")
+        plt.close(fig)
 
-    @staticmethod
-    def draw_trace(actual_position_list, full_target_directory, drone_name, title):
+    
+    def draw_trace(self, actual_position_list, full_target_directory, drone_name, title):
         with lock:
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
@@ -36,17 +48,13 @@ class ThreeDimensionalGrapher:
             ax.set_xlabel('North (+X) axis')
             ax.set_ylabel('East (+Y) axis')
             ax.set_zlabel('Height (+Z) axis')
-            setup_dir(full_target_directory)
-            file_name = os.path.join(full_target_directory, str(drone_name) + "_plot.png")
-            # print(file_name)
-            plt.title(title)
-            plt.savefig(file_name, dpi=200, bbox_inches='tight')
-            plt.close()
-            fig.clf()
 
-    @staticmethod
-    def draw_trace_vs_planned(planed_position_list, actual_position_list, full_target_directory, drone_name,
-                              title):
+            file_name = f"{drone_name}_plot.png" 
+            full_target_directory = os.path.join(self.log_subdir, self.__class__.__name__, file_name)
+            self._upload_plot(full_target_directory ,fig)
+
+    def draw_trace_vs_planned(self, planed_position_list, full_target_directory, actual_position_list, drone_name,
+                            title):
         with lock:
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
@@ -70,16 +78,12 @@ class ThreeDimensionalGrapher:
             ax.set_ylabel('East (+Y) axis')
             ax.set_zlabel('Height (+Z) axis')
             ax.legend()
-            setup_dir(full_target_directory)
-            file_name = os.path.join(full_target_directory, str(drone_name) + "_plot.png")
-            # print(file_name)
-            plt.title(title)
-            plt.savefig(file_name, dpi=200, bbox_inches='tight')
-            plt.close()
-            fig.clf()
 
-    @staticmethod
-    def draw_trace_vs_point(destination_point, actual_position_list, full_target_directory, drone_name,
+            file_name = f"{drone_name}_plot.png"
+            full_target_directory = os.path.join(self.log_subdir, self.__class__.__name__, file_name)
+            self._upload_plot(fig, file_name)
+            
+    def draw_trace_vs_point(self, destination_point, full_target_directory ,actual_position_list, drone_name,
                             title):
         with lock:
             fig = plt.figure()
@@ -108,15 +112,12 @@ class ThreeDimensionalGrapher:
             ax.set_zlabel('Height (+Z) axis')
             ax.set_box_aspect([1, 1, 1])
             ax.legend()
-            setup_dir(full_target_directory)
-            file_name = os.path.join(full_target_directory, str(drone_name) + "_plot.png")
-            plt.title(title)
-            plt.savefig(file_name, dpi=200, bbox_inches='tight')
-            plt.close()
-            fig.clf()
-
-    @staticmethod
-    def draw_interactive_trace(actual_position, full_target_directory, drone_name,
+            
+            file_name = f"{drone_name}_plot.png"
+            full_target_directory = os.path.join(self.log_subdir, self.__class__.__name__, file_name)
+            self._upload_plot(fig, file_name)
+            
+    def draw_interactive_trace(self, actual_position, full_target_directory, drone_name,
                                title):
         with lock:
             actual = actual_position
@@ -132,17 +133,15 @@ class ThreeDimensionalGrapher:
             #                   scene=dict(xaxis_range=[-max_val, max_val],
             #                              yaxis_range=[-max_val, max_val],
             #                              zaxis_range=[-max_val, max_val]))
-            setup_dir(full_target_directory)
             ax.set_xlabel('North (+X) axis')
             ax.set_ylabel('East (+Y) axis')
             ax.set_zlabel('Height (+Z) axis')
-            file_name = os.path.join(full_target_directory, str(drone_name) + "_interactive.html")
-            fig.write_html(file_name)
-            plt.close()
 
-    @staticmethod
-    def draw_interactive_trace_vs_point(destination, actual_position, full_target_directory, drone_name,
-                                        title):
+            file_name = f"{drone_name}_interactive_trace.html"
+            self._upload_html(fig, file_name)
+            
+    def draw_interactive_trace_vs_point(self, destination, actual_position, full_target_directory, drone_name
+                                        ,title):
         with lock:
             actual = actual_position
             fig = plt.figure()
@@ -162,13 +161,13 @@ class ThreeDimensionalGrapher:
             # fig.update_layout(scene=dict(xaxis_range=[-max_val, max_val],
             #                              yaxis_range=[-max_val, max_val],
             #                              zaxis_range=[-max_val, max_val]))
-            setup_dir(full_target_directory)
-            file_name = os.path.join(full_target_directory, str(drone_name) + "_interactive.html")
-            fig.write_html(file_name)
-            plt.close()
-
-    @staticmethod
-    def draw_interactive_trace_vs_planned(planed_position_list, actual_position_list, full_target_directory,
+            
+            
+            file_name = f"{drone_name}_interactive_trace_vs_point.html"
+            full_target_directory = os.path.join(self.log_subdir, self.__class__.__name__, file_name)
+            self._upload_html(fig, file_name)
+            
+    def draw_interactive_trace_vs_planned(self, planed_position_list, actual_position_list, full_target_directory,
                                           drone_name,
                                           title):
         with lock:
@@ -193,7 +192,7 @@ class ThreeDimensionalGrapher:
             #                   scene=dict(xaxis_range=[-max_val, max_val],
             #                              yaxis_range=[-max_val, max_val],
             #                              zaxis_range=[-max_val, max_val]))
-            setup_dir(full_target_directory)
-            file_name = os.path.join(full_target_directory, str(drone_name) + "_interactive.html")
-            fig.write_html(file_name)
-            plt.close()
+
+            file_name = f"{drone_name}_interactive_trace_vs_planned.html"
+            full_target_directory = os.path.join(self.log_subdir, self.__class__.__name__, file_name)
+            self._upload_html(fig, file_name)
