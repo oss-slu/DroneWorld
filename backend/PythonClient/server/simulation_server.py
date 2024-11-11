@@ -156,16 +156,53 @@ def process_gcs_directory(prefix, result, fuzzy_path_value):
     blobs = bucket.list_blobs(prefix=prefix)
     for blob in blobs:
         file_name = os.path.basename(blob.name)
-        if blob.name.endswith('.txt'):
-            # Download the text content
-            file_contents = blob.download_as_text()
+        
+        if blob.name.endswith('.html'):
+            # Generate a public URL for the HTML file
+            html_url = blob.public_url
 
+            info_content = get_info_contents(html_url, "INFO", {})
+            pass_content = get_info_contents(html_url, "PASS", {})
+            fail_content = get_info_contents(html_url, "FAIL", {})
+
+            file_data = {
+                "name": file_name,
+                "type": "text/html",
+                "fuzzyPath": fuzzy_path_value,
+                "fuzzyValue": fuzzy_path_value.split("_")[-1] if fuzzy_path_value else "",
+                "content": html_url,
+                "infoContent": info_content,
+                "passContent": pass_content,
+                "failContent": fail_content
+            }
+
+            # Determine the monitor type and append the file data
+            if "UnorderedWaypointMonitor" in blob.name:
+                result["UnorderedWaypointMonitor"].append(file_data)
+            elif "CircularDeviationMonitor" in blob.name:
+                result["CircularDeviationMonitor"].append(file_data)
+            elif "CollisionMonitor" in blob.name:
+                result["CollisionMonitor"].append(file_data)
+            elif "LandspaceMonitor" in blob.name:
+                result["LandspaceMonitor"].append(file_data)
+            elif "OrderedWaypointMonitor" in blob.name:
+                result["OrderedWaypointMonitor"].append(file_data)
+            elif "PointDeviationMonitor" in blob.name:
+                result["PointDeviationMonitor"].append(file_data)
+            elif "MinSepDistMonitor" in blob.name:
+                result["MinSepDistMonitor"].append(file_data)
+            elif "NoFlyZoneMonitor" in blob.name:
+                result["NoFlyZoneMonitor"].append(file_data)
+
+        elif blob.name.endswith('.txt'):
+            file_contents = blob.download_as_text()
+            
             info_content = get_info_contents(file_contents, "INFO", {})
             pass_content = get_info_contents(file_contents, "PASS", {})
             fail_content = get_info_contents(file_contents, "FAIL", {})
 
             file_data = {
-                "name": file_name,
+                "name": file_name, 
                 "type": "text/plain",
                 "fuzzyPath": fuzzy_path_value,
                 "fuzzyValue": fuzzy_path_value.split("_")[-1] if fuzzy_path_value else "",
@@ -175,7 +212,6 @@ def process_gcs_directory(prefix, result, fuzzy_path_value):
                 "failContent": fail_content
             }
 
-            # Determine the monitor type and append the file data
             if "UnorderedWaypointMonitor" in blob.name:
                 result["UnorderedWaypointMonitor"].append(file_data)
             elif "CircularDeviationMonitor" in blob.name:
