@@ -24,6 +24,20 @@ class GoogleDriveStorageService(StorageServiceInterface):
 
     def upload_to_service(self, file_name, content, content_type='text/plain'):
         """
-        Uploads a file to the cloud storage service.
+        Uploads a file to the Google Drive.
         """
-        pass
+        
+        with self._lock:  # Prevent race conditions
+            try:
+                # Prepare file metadata and content
+                media = MediaInMemoryUpload(content.encode('utf-8'), mimetype=content_type)
+                metadata = {'name': file_name, 'parents': [self.folder_id]}
+
+                # Upload the file
+                file_id = self.service.files().create(body=metadata, media_body=media, fields='id').execute().get('id')
+                print(f"Uploaded '{file_name}' with ID: {file_id}")
+                return file_id
+
+            except Exception as e:
+                print(f"Upload error: {e}")
+                return None
