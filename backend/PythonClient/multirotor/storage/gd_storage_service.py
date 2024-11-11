@@ -21,3 +21,9 @@ class GoogleDriveStorageService(StorageServiceInterface):
             'key.json', scopes=SCOPES)
         self.service = build('drive', 'v3', credentials=self.credentials)
         self.folder_id = folder_id  # The ID of the shared root folder
+
+    def upload_to_service(self, file_name, content, content_type='text/plain'):
+        """
+        Uploads a file to the cloud storage service.
+        """
+        pass
