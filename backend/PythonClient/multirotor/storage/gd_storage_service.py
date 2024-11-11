@@ -1,4 +1,5 @@
-from PythonClient.multirotor.storage.abstract.storage_service import StorageServiceInterface
+from abstract.storage_service import StorageServiceInterface
+# backend.PythonClient.multirotor.storage.abstract.
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaInMemoryUpload
@@ -18,7 +19,7 @@ class GoogleDriveStorageService(StorageServiceInterface):
         """
         SCOPES = ['https://www.googleapis.com/auth/drive']
         self.credentials = service_account.Credentials.from_service_account_file(
-            'key.json', scopes=SCOPES)
+            'backend/key.json', scopes=SCOPES)
         self.service = build('drive', 'v3', credentials=self.credentials)
         self.folder_id = folder_id  # The ID of the shared root folder
 
@@ -26,7 +27,7 @@ class GoogleDriveStorageService(StorageServiceInterface):
         """
         Uploads a file to the Google Drive.
         """
-        
+
         with self._lock:  # Prevent race conditions
             try:
                 # Prepare file metadata and content
@@ -41,3 +42,24 @@ class GoogleDriveStorageService(StorageServiceInterface):
             except Exception as e:
                 print(f"Upload error: {e}")
                 return None
+
+
+def main():
+    # Initialize Google Drive storage service with default folder ID and credentials
+    drive_service = GoogleDriveStorageService()
+
+    # Sample file details
+    file_name = 'test_log.txt'
+    content = 'This is a test log file content with relative path.'
+
+    # Upload the file
+    file_id = drive_service.upload_to_service(file_name, content)
+
+    # Verify upload
+    if file_id:
+        print(f"File uploaded successfully with ID: {file_id}")
+    else:
+        print("File upload failed.")
+
+if __name__ == "__main__":
+    main()

@@ -48,3 +48,4 @@ desktop.ini
 
 # Ignore Google Cloud service account key
 key.json
+backend/key.json
