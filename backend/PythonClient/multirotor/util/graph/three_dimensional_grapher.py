@@ -4,6 +4,7 @@ import matplotlib
 import plotly.express as px
 import os
 import threading
+from datetime import datetime
 from io import BytesIO
 from PythonClient.multirotor.airsim_application import AirSimApplication
 
@@ -16,7 +17,7 @@ class ThreeDimensionalGrapher(AirSimApplication):
 
     def __init__(self):
         super().__init__()
-
+        self.timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     #Function to upload html files to GCS. 
     def _upload_html(self, fig, file_name):
         html_content = fig.to_html(full_html=True)
@@ -49,9 +50,8 @@ class ThreeDimensionalGrapher(AirSimApplication):
             ax.set_ylabel('East (+Y) axis')
             ax.set_zlabel('Height (+Z) axis')
 
-            file_name = f"{drone_name}_plot.png" 
-            full_target_directory = os.path.join(self.log_subdir, self.__class__.__name__, file_name)
-            self._upload_plot(full_target_directory ,fig)
+            full_target_directory = f"{self.timestamp}_Batch_1/FlyToPoints/{self.__class__.__name__}/{drone_name}_plot.png" 
+            self._upload_plot(fig, full_target_directory)
 
     def draw_trace_vs_planned(self, planed_position_list, full_target_directory, actual_position_list, drone_name,
                             title):
@@ -79,9 +79,8 @@ class ThreeDimensionalGrapher(AirSimApplication):
             ax.set_zlabel('Height (+Z) axis')
             ax.legend()
 
-            file_name = f"{drone_name}_plot.png"
-            full_target_directory = os.path.join(self.log_subdir, self.__class__.__name__, file_name)
-            self._upload_plot(fig, file_name)
+            full_target_directory = f"{self.timestamp}_Batch_1/FlyToPoints/{self.__class__.__name__}/{drone_name}_plot.png" 
+            self._upload_plot(fig, full_target_directory)
             
     def draw_trace_vs_point(self, destination_point, full_target_directory ,actual_position_list, drone_name,
                             title):
@@ -113,9 +112,8 @@ class ThreeDimensionalGrapher(AirSimApplication):
             ax.set_box_aspect([1, 1, 1])
             ax.legend()
             
-            file_name = f"{drone_name}_plot.png"
-            full_target_directory = os.path.join(self.log_subdir, self.__class__.__name__, file_name)
-            self._upload_plot(fig, file_name)
+            full_target_directory = f"{self.timestamp}_Batch_1/FlyToPoints/{self.__class__.__name__}/{drone_name}_plot.png" 
+            self._upload_plot(fig, full_target_directory)
             
     def draw_interactive_trace(self, actual_position, full_target_directory, drone_name,
                                title):
@@ -137,9 +135,9 @@ class ThreeDimensionalGrapher(AirSimApplication):
             ax.set_ylabel('East (+Y) axis')
             ax.set_zlabel('Height (+Z) axis')
 
-            file_name = f"{drone_name}_interactive_trace.html"
-            self._upload_html(fig, file_name)
-            
+            full_target_directory = f"{self.timestamp}_Batch_1/FlyToPoints/{self.__class__.__name__}/{drone_name}_interactive_trace.html"
+            self._upload_html(fig, full_target_directory)
+
     def draw_interactive_trace_vs_point(self, destination, actual_position, full_target_directory, drone_name
                                         ,title):
         with lock:
@@ -163,9 +161,9 @@ class ThreeDimensionalGrapher(AirSimApplication):
             #                              zaxis_range=[-max_val, max_val]))
             
             
-            file_name = f"{drone_name}_interactive_trace_vs_point.html"
-            full_target_directory = os.path.join(self.log_subdir, self.__class__.__name__, file_name)
-            self._upload_html(fig, file_name)
+            full_target_directory = f"{self.timestamp}_Batch_1/FlyToPoints/{self.__class__.__name__}/{drone_name}_interactive_trace_vs_point.html"
+            self._upload_html(fig, full_target_directory)
+ 
             
     def draw_interactive_trace_vs_planned(self, planed_position_list, actual_position_list, full_target_directory,
                                           drone_name,
@@ -193,6 +191,5 @@ class ThreeDimensionalGrapher(AirSimApplication):
             #                              yaxis_range=[-max_val, max_val],
             #                              zaxis_range=[-max_val, max_val]))
 
-            file_name = f"{drone_name}_interactive_trace_vs_planned.html"
-            full_target_directory = os.path.join(self.log_subdir, self.__class__.__name__, file_name)
-            self._upload_html(fig, file_name)
+            full_target_directory = f"{self.timestamp}_Batch_1/FlyToPoints/{self.__class__.__name__}/{drone_name}_interactive_trace_vs_planned.html"
+            self._upload_html(fig, full_target_directory)
