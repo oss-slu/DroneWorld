@@ -1,4 +1,4 @@
-from abstract.storage_service import StorageServiceInterface
+from PythonClient.multirotor.storage.abstract.storage_service import StorageServiceInterface
 # backend.PythonClient.multirotor.storage.abstract.
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -19,7 +19,7 @@ class GoogleDriveStorageService(StorageServiceInterface):
         """
         SCOPES = ['https://www.googleapis.com/auth/drive']
         self.credentials = service_account.Credentials.from_service_account_file(
-            'backend/key.json', scopes=SCOPES)
+            'key.json', scopes=SCOPES)
         self.service = build('drive', 'v3', credentials=self.credentials)
         self.folder_id = folder_id  # The ID of the shared root folder
 
