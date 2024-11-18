@@ -63,7 +63,7 @@ class DriftMonitor(SingleDroneMissionMonitor):
             title = f"(FAILED) Drift path\nDrone speed: {self.mission.speed} m/s\nWind: {self.wind_speed_text}\n" \
                     f"Closest distance: {round(self.closest,2)} meters"
         graph_dir = self.get_graph_dir()
-        grapher = ThreeDimensionalGrapher()
+        grapher = ThreeDimensionalGrapher(self.storage_service,self.log_subdir)
         grapher.draw_trace_vs_point(destination_point=dest,
                                     actual_position_list=actual,
                                     full_target_directory=graph_dir,

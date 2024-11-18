@@ -5,7 +5,6 @@ from PythonClient.multirotor.util.geo.geo_util import GeoUtil
 from PythonClient.multirotor.util.graph.three_dimensional_grapher import ThreeDimensionalGrapher
 from PythonClient.multirotor.monitor.abstract.single_drone_mission_monitor import SingleDroneMissionMonitor
 
-
 class PointDeviationMonitor(SingleDroneMissionMonitor):
 
     def __init__(self, mission, deviation_percentage=15):
@@ -129,7 +128,7 @@ class PointDeviationMonitor(SingleDroneMissionMonitor):
             title = f"{self.target_drone} Planned vs. Actual\nDrone speed: {self.mission.speed} m/s\nWind: {self.wind_speed_text}"
         else:
             title = f"(FAILED) {self.target_drone} Planned vs. Actual\nDrone speed: {self.mission.speed} m/s\nWind: {self.wind_speed_text}"
-        grapher = ThreeDimensionalGrapher()
+        grapher = ThreeDimensionalGrapher(self.storage_service, self.log_subdir)
         grapher.draw_trace_vs_planned(planed_position_list=self.mission.points,
                                       actual_position_list=self.est_position_array,
                                       full_target_directory=graph_dir,

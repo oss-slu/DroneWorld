@@ -141,12 +141,14 @@ class CircularDeviationMonitor(SingleDroneMissionMonitor):
         for i in range(len(x)):
             planned.append([x[i], y[i], -z[i]])
 
-        ThreeDimensionalGrapher.draw_trace_vs_planned(planed_position_list=planned,
+        grapher = ThreeDimensionalGrapher(self.storage_service,self.log_subdir)
+
+        grapher.draw_trace_vs_planned(planed_position_list=planned,
                                                       actual_position_list=est_actual,
                                                       full_target_directory=graph_dir,
                                                       drone_name=self.target_drone,
                                                       title=title)
-        ThreeDimensionalGrapher.draw_interactive_trace_vs_planned(planed_position_list=planned,
+        grapher.draw_interactive_trace_vs_planned(planed_position_list=planned,
                                                                   actual_position_list=est_actual,
                                                                   full_target_directory=graph_dir,
                                                                   drone_name=self.target_drone,
