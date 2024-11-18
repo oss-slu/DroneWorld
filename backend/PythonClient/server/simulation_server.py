@@ -154,80 +154,51 @@ def process_gcs_directory(prefix, result, fuzzy_path_value):
     Processes blobs in a GCS directory and populates the result dictionary.
     """
     blobs = bucket.list_blobs(prefix=prefix)
+
+    def extract_fuzzy_value(fuzzy_path):
+        return fuzzy_path.split("_")[-1] if fuzzy_path else ""
+    
+    def classify_and_append(blob_name, file_data):
+        for monitor_type in result.keys():
+            if monitor_type in blob_name:
+                result[monitor_type].append(file_data)
+                break
+    
     for blob in blobs:
         file_name = os.path.basename(blob.name)
+        fuzzy_value = extract_fuzzy_value(fuzzy_path_value)
         
         if blob.name.endswith('.html'):
             # Generate a public URL for the HTML file
             html_url = blob.public_url
 
-            info_content = get_info_contents(html_url, "INFO", {})
-            pass_content = get_info_contents(html_url, "PASS", {})
-            fail_content = get_info_contents(html_url, "FAIL", {})
-
             file_data = {
                 "name": file_name,
                 "type": "text/html",
                 "fuzzyPath": fuzzy_path_value,
-                "fuzzyValue": fuzzy_path_value.split("_")[-1] if fuzzy_path_value else "",
+                "fuzzyValue": fuzzy_value,
                 "content": html_url,
-                "infoContent": info_content,
-                "passContent": pass_content,
-                "failContent": fail_content
+                "infoContent": get_info_contents(html_url, "INFO", {}),
+                "passContent": get_info_contents(html_url, "PASS", {}),
+                "failContent": get_info_contents(html_url, "FAIL", {})
             }
+            classify_and_append(blob.name, file_data)
 
             # Determine the monitor type and append the file data
-            if "UnorderedWaypointMonitor" in blob.name:
-                result["UnorderedWaypointMonitor"].append(file_data)
-            elif "CircularDeviationMonitor" in blob.name:
-                result["CircularDeviationMonitor"].append(file_data)
-            elif "CollisionMonitor" in blob.name:
-                result["CollisionMonitor"].append(file_data)
-            elif "LandspaceMonitor" in blob.name:
-                result["LandspaceMonitor"].append(file_data)
-            elif "OrderedWaypointMonitor" in blob.name:
-                result["OrderedWaypointMonitor"].append(file_data)
-            elif "PointDeviationMonitor" in blob.name:
-                result["PointDeviationMonitor"].append(file_data)
-            elif "MinSepDistMonitor" in blob.name:
-                result["MinSepDistMonitor"].append(file_data)
-            elif "NoFlyZoneMonitor" in blob.name:
-                result["NoFlyZoneMonitor"].append(file_data)
-
         elif blob.name.endswith('.txt'):
             file_contents = blob.download_as_text()
-            
-            info_content = get_info_contents(file_contents, "INFO", {})
-            pass_content = get_info_contents(file_contents, "PASS", {})
-            fail_content = get_info_contents(file_contents, "FAIL", {})
-
+    
             file_data = {
                 "name": file_name, 
                 "type": "text/plain",
                 "fuzzyPath": fuzzy_path_value,
-                "fuzzyValue": fuzzy_path_value.split("_")[-1] if fuzzy_path_value else "",
+                "fuzzyValue": fuzzy_value,
                 "content": file_contents,
-                "infoContent": info_content,
-                "passContent": pass_content,
-                "failContent": fail_content
+                "infoContent": get_info_contents(html_url, "INFO", {}),
+                "passContent": get_info_contents(html_url, "PASS", {}),
+                "failContent": get_info_contents(html_url, "FAIL", {})
             }
-
-            if "UnorderedWaypointMonitor" in blob.name:
-                result["UnorderedWaypointMonitor"].append(file_data)
-            elif "CircularDeviationMonitor" in blob.name:
-                result["CircularDeviationMonitor"].append(file_data)
-            elif "CollisionMonitor" in blob.name:
-                result["CollisionMonitor"].append(file_data)
-            elif "LandspaceMonitor" in blob.name:
-                result["LandspaceMonitor"].append(file_data)
-            elif "OrderedWaypointMonitor" in blob.name:
-                result["OrderedWaypointMonitor"].append(file_data)
-            elif "PointDeviationMonitor" in blob.name:
-                result["PointDeviationMonitor"].append(file_data)
-            elif "MinSepDistMonitor" in blob.name:
-                result["MinSepDistMonitor"].append(file_data)
-            elif "NoFlyZoneMonitor" in blob.name:
-                result["NoFlyZoneMonitor"].append(file_data)
+            classify_and_append(blob.name, file_data)
 
         elif blob.name.endswith('.png'):
             # Download and encode the image in base64
@@ -241,28 +212,11 @@ def process_gcs_directory(prefix, result, fuzzy_path_value):
                 "name": file_name,
                 "type": "image/png",
                 "fuzzyPath": fuzzy_path_value,
-                "fuzzyValue": fuzzy_path_value.split("_")[-1] if fuzzy_path_value else "",
+                "fuzzyValue": fuzzy_value,
                 "imgContent": encoded_string,
                 "path": html_path
             }
-
-            # Determine the monitor type and append the file data
-            if "UnorderedWaypointMonitor" in blob.name:
-                result["UnorderedWaypointMonitor"].append(file_data)
-            elif "CircularDeviationMonitor" in blob.name:
-                result["CircularDeviationMonitor"].append(file_data)
-            elif "CollisionMonitor" in blob.name:
-                result["CollisionMonitor"].append(file_data)
-            elif "LandspaceMonitor" in blob.name:
-                result["LandspaceMonitor"].append(file_data)
-            elif "OrderedWaypointMonitor" in blob.name:
-                result["OrderedWaypointMonitor"].append(file_data)
-            elif "PointDeviationMonitor" in blob.name:
-                result["PointDeviationMonitor"].append(file_data)
-            elif "MinSepDistMonitor" in blob.name:
-                result["MinSepDistMonitor"].append(file_data)
-            elif "NoFlyZoneMonitor" in blob.name:
-                result["NoFlyZoneMonitor"].append(file_data)
+            classify_and_append(blob.name, file_data)            
 
 def get_info_contents(file_contents, keyword, drone_map):
     """
