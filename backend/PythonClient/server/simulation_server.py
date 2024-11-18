@@ -216,7 +216,7 @@ def process_gcs_directory(prefix, result, fuzzy_path_value):
                 "imgContent": encoded_string,
                 "path": html_path
             }
-            classify_and_append(blob.name, file_data)            
+            classify_and_append(blob.name, file_data)     
 
 def get_info_contents(file_contents, keyword, drone_map):
     """
