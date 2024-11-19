@@ -205,16 +205,12 @@ def process_gcs_directory(prefix, result, fuzzy_path_value):
             image_content = blob.download_as_bytes()
             encoded_string = base64.b64encode(image_content).decode('utf-8')
 
-            # Assume corresponding HTML exists
-            html_path = blob.name.replace("_plot.png", "_interactive.html")
-
             file_data = {
                 "name": file_name,
                 "type": "image/png",
                 "fuzzyPath": fuzzy_path_value,
                 "fuzzyValue": fuzzy_value,
                 "imgContent": encoded_string,
-                "path": html_path
             }
             classify_and_append(blob.name, file_data)     
 
