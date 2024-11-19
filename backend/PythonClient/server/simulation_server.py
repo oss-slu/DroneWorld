@@ -106,7 +106,8 @@ def list_reports():
 @app.route('/list-folder-contents/<folder_name>', methods=['POST'])
 def list_folder_contents(folder_name):
     """
-    Lists the contents of a specific report folder from GCS.
+    Lists the contents of a specific report folder from GCS,
+    including generating proxy URLs for HTML files.
     """
     try:
         # Define the prefix for the specific folder
@@ -124,7 +125,8 @@ def list_folder_contents(folder_name):
             "OrderedWaypointMonitor": [],
             "PointDeviationMonitor": [],
             "MinSepDistMonitor": [],
-            "NoFlyZoneMonitor": []
+            "NoFlyZoneMonitor": [],
+            "htmlFiles": []  # To store links to HTML files
         }
 
         fuzzy_folders = set()
@@ -143,6 +145,19 @@ def list_folder_contents(folder_name):
         else:
             process_gcs_directory(prefix, result, "")
 
+        # After processing all blobs, collect HTML files
+        html_blobs = bucket.list_blobs(prefix=prefix)
+        for html_blob in html_blobs:
+            if html_blob.name.endswith('.html'):
+                file_name = os.path.basename(html_blob.name)
+                # Create a proxy URL for the HTML file
+                proxy_url = f"/serve-html/{folder_name}/{file_name}"
+                result["htmlFiles"].append({
+                    "name": file_name,
+                    "url": proxy_url
+                })
+
+        print(json.dumps(result, indent=2))
         return jsonify(result)
 
     except Exception as e:
@@ -154,65 +169,79 @@ def process_gcs_directory(prefix, result, fuzzy_path_value):
     Processes blobs in a GCS directory and populates the result dictionary.
     """
     blobs = bucket.list_blobs(prefix=prefix)
-
-    def extract_fuzzy_value(fuzzy_path):
-        return fuzzy_path.split("_")[-1] if fuzzy_path else ""
-    
-    def classify_and_append(blob_name, file_data):
-        for monitor_type in result.keys():
-            if monitor_type in blob_name:
-                result[monitor_type].append(file_data)
-                break
-    
     for blob in blobs:
         file_name = os.path.basename(blob.name)
-        fuzzy_value = extract_fuzzy_value(fuzzy_path_value)
-        
-        if blob.name.endswith('.html'):
-            # Generate a public URL for the HTML file
-            html_url = blob.public_url
+        if blob.name.endswith('.txt'):
+            # Download the text content
+            file_contents = blob.download_as_text()
+
+            info_content = get_info_contents(file_contents, "INFO", {})
+            pass_content = get_info_contents(file_contents, "PASS", {})
+            fail_content = get_info_contents(file_contents, "FAIL", {})
 
             file_data = {
                 "name": file_name,
-                "type": "text/html",
-                "fuzzyPath": fuzzy_path_value,
-                "fuzzyValue": fuzzy_value,
-                "content": html_url,
-                "infoContent": get_info_contents(html_url, "INFO", {}),
-                "passContent": get_info_contents(html_url, "PASS", {}),
-                "failContent": get_info_contents(html_url, "FAIL", {})
-            }
-            classify_and_append(blob.name, file_data)
-
-            # Determine the monitor type and append the file data
-        elif blob.name.endswith('.txt'):
-            file_contents = blob.download_as_text()
-    
-            file_data = {
-                "name": file_name, 
                 "type": "text/plain",
                 "fuzzyPath": fuzzy_path_value,
-                "fuzzyValue": fuzzy_value,
+                "fuzzyValue": fuzzy_path_value.split("_")[-1] if fuzzy_path_value else "",
                 "content": file_contents,
-                "infoContent": get_info_contents(html_url, "INFO", {}),
-                "passContent": get_info_contents(html_url, "PASS", {}),
-                "failContent": get_info_contents(html_url, "FAIL", {})
+                "infoContent": info_content,
+                "passContent": pass_content,
+                "failContent": fail_content
             }
-            classify_and_append(blob.name, file_data)
+
+            # Determine the monitor type and append the file data
+            if "UnorderedWaypointMonitor" in blob.name:
+                result["UnorderedWaypointMonitor"].append(file_data)
+            elif "CircularDeviationMonitor" in blob.name:
+                result["CircularDeviationMonitor"].append(file_data)
+            elif "CollisionMonitor" in blob.name:
+                result["CollisionMonitor"].append(file_data)
+            elif "LandspaceMonitor" in blob.name:
+                result["LandspaceMonitor"].append(file_data)
+            elif "OrderedWaypointMonitor" in blob.name:
+                result["OrderedWaypointMonitor"].append(file_data)
+            elif "PointDeviationMonitor" in blob.name:
+                result["PointDeviationMonitor"].append(file_data)
+            elif "MinSepDistMonitor" in blob.name:
+                result["MinSepDistMonitor"].append(file_data)
+            elif "NoFlyZoneMonitor" in blob.name:
+                result["NoFlyZoneMonitor"].append(file_data)
 
         elif blob.name.endswith('.png'):
             # Download and encode the image in base64
             image_content = blob.download_as_bytes()
             encoded_string = base64.b64encode(image_content).decode('utf-8')
 
+            # Assume corresponding HTML exists
+            html_path = blob.name.replace("_plot.png", "_interactive.html")
+
             file_data = {
                 "name": file_name,
                 "type": "image/png",
                 "fuzzyPath": fuzzy_path_value,
-                "fuzzyValue": fuzzy_value,
+                "fuzzyValue": fuzzy_path_value.split("_")[-1] if fuzzy_path_value else "",
                 "imgContent": encoded_string,
+                "path": html_path
             }
-            classify_and_append(blob.name, file_data)     
+
+            # Determine the monitor type and append the file data
+            if "UnorderedWaypointMonitor" in blob.name:
+                result["UnorderedWaypointMonitor"].append(file_data)
+            elif "CircularDeviationMonitor" in blob.name:
+                result["CircularDeviationMonitor"].append(file_data)
+            elif "CollisionMonitor" in blob.name:
+                result["CollisionMonitor"].append(file_data)
+            elif "LandspaceMonitor" in blob.name:
+                result["LandspaceMonitor"].append(file_data)
+            elif "OrderedWaypointMonitor" in blob.name:
+                result["OrderedWaypointMonitor"].append(file_data)
+            elif "PointDeviationMonitor" in blob.name:
+                result["PointDeviationMonitor"].append(file_data)
+            elif "MinSepDistMonitor" in blob.name:
+                result["MinSepDistMonitor"].append(file_data)
+            elif "NoFlyZoneMonitor" in blob.name:
+                result["NoFlyZoneMonitor"].append(file_data)
 
 def get_info_contents(file_contents, keyword, drone_map):
     """
@@ -251,7 +280,7 @@ def get_current_running():
 @app.route('/report/<path:dir_name>')
 def get_report(dir_name=''):
     """
-    Serves reports from GCS. Note: Serving files directly from GCS might require generating signed URLs.
+    Serves reports from GCS.
     """
     try:
         if dir_name:
@@ -300,11 +329,35 @@ def get_state():
     }
     any other state will be not accepted by the unreal engine side and the change will be ignored
     """
-    return task_dispatcher.unreal_state
+    return jsonify(task_dispatcher.unreal_state)
 
 @app.route('/cesiumCoordinate', methods=['GET'])
 def get_map():
     return task_dispatcher.load_cesium_setting()
+
+# === Proxy Endpoint to Serve HTML Files ===
+@app.route('/serve-html/<folder_name>/<file_name>', methods=['GET'])
+def serve_html(folder_name, file_name):
+    """
+    Serves HTML files securely through a proxy route.
+    """
+    try:
+        # Construct the GCS file path
+        blob_path = f'reports/{folder_name}/{file_name}'
+        blob = bucket.blob(blob_path)
+
+        # Check if the file exists and is an HTML file
+        if not blob.exists() or not blob.name.endswith('.html'):
+            return jsonify({"error": "HTML file not found"}), 404
+
+        # Fetch the file content from GCS
+        file_contents = blob.download_as_text()
+
+        # Serve the HTML content as the response
+        return Response(file_contents, mimetype='text/html')
+    except Exception as e:
+        print(f"Error serving HTML file: {e}")
+        return jsonify({"error": "Failed to serve HTML file"}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000) 
