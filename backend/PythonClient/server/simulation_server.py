@@ -106,7 +106,8 @@ def list_reports():
 @app.route('/list-folder-contents/<folder_name>', methods=['POST'])
 def list_folder_contents(folder_name):
     """
-    Lists the contents of a specific report folder from GCS.
+    Lists the contents of a specific report folder from GCS,
+    including generating proxy URLs for HTML files.
     """
     try:
         # Define the prefix for the specific folder
@@ -124,7 +125,8 @@ def list_folder_contents(folder_name):
             "OrderedWaypointMonitor": [],
             "PointDeviationMonitor": [],
             "MinSepDistMonitor": [],
-            "NoFlyZoneMonitor": []
+            "NoFlyZoneMonitor": [],
+            "htmlFiles": []  # To store links to HTML files
         }
 
         fuzzy_folders = set()
@@ -143,6 +145,19 @@ def list_folder_contents(folder_name):
         else:
             process_gcs_directory(prefix, result, "")
 
+        # After processing all blobs, collect HTML files
+        html_blobs = bucket.list_blobs(prefix=prefix)
+        for html_blob in html_blobs:
+            if html_blob.name.endswith('.html'):
+                file_name = os.path.basename(html_blob.name)
+                # Create a proxy URL for the HTML file
+                proxy_url = f"/serve-html/{folder_name}/{file_name}"
+                result["htmlFiles"].append({
+                    "name": file_name,
+                    "url": proxy_url
+                })
+
+        print(json.dumps(result, indent=2))
         return jsonify(result)
 
     except Exception as e:
@@ -265,7 +280,7 @@ def get_current_running():
 @app.route('/report/<path:dir_name>')
 def get_report(dir_name=''):
     """
-    Serves reports from GCS. Note: Serving files directly from GCS might require generating signed URLs.
+    Serves reports from GCS.
     """
     try:
         if dir_name:
@@ -314,11 +329,35 @@ def get_state():
     }
     any other state will be not accepted by the unreal engine side and the change will be ignored
     """
-    return task_dispatcher.unreal_state
+    return jsonify(task_dispatcher.unreal_state)
 
 @app.route('/cesiumCoordinate', methods=['GET'])
 def get_map():
     return task_dispatcher.load_cesium_setting()
+
+# === Proxy Endpoint to Serve HTML Files ===
+@app.route('/serve-html/<folder_name>/<file_name>', methods=['GET'])
+def serve_html(folder_name, file_name):
+    """
+    Serves HTML files securely through a proxy route.
+    """
+    try:
+        # Construct the GCS file path
+        blob_path = f'reports/{folder_name}/{file_name}'
+        blob = bucket.blob(blob_path)
+
+        # Check if the file exists and is an HTML file
+        if not blob.exists() or not blob.name.endswith('.html'):
+            return jsonify({"error": "HTML file not found"}), 404
+
+        # Fetch the file content from GCS
+        file_contents = blob.download_as_text()
+
+        # Serve the HTML content as the response
+        return Response(file_contents, mimetype='text/html')
+    except Exception as e:
+        print(f"Error serving HTML file: {e}")
+        return jsonify({"error": "Failed to serve HTML file"}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000) 
