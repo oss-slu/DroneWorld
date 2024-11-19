@@ -10,7 +10,7 @@ from PythonClient.multirotor.storage import GCSStorageService, GoogleDriveStorag
 class AirSimApplication:
     # Parent class for all airsim client side mission and monitors
     def __init__(self):
-        # implementation of the GCS service
+        # Set up the storage service
         self.storage_service = GCSStorageService()
 
         self.circular_mission_names = {"FlyInCircle"}
