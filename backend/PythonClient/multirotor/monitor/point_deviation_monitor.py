@@ -5,6 +5,7 @@ from PythonClient.multirotor.util.geo.geo_util import GeoUtil
 from PythonClient.multirotor.util.graph.three_dimensional_grapher import ThreeDimensionalGrapher
 from PythonClient.multirotor.monitor.abstract.single_drone_mission_monitor import SingleDroneMissionMonitor
 
+
 class PointDeviationMonitor(SingleDroneMissionMonitor):
 
     def __init__(self, mission, deviation_percentage=15):
@@ -123,22 +124,29 @@ class PointDeviationMonitor(SingleDroneMissionMonitor):
         return distance
 
     def draw_trace_3d(self):
-        graph_dir = self.get_graph_dir()
+        # Construct the folder path
+        folder_path = f"{self.log_subdir}/{self.mission.__class__.__name__}/{self.__class__.__name__}/"
+
+        # Ensure the title reflects the mission status
         if not self.breach_flag:
             title = f"{self.target_drone} Planned vs. Actual\nDrone speed: {self.mission.speed} m/s\nWind: {self.wind_speed_text}"
         else:
             title = f"(FAILED) {self.target_drone} Planned vs. Actual\nDrone speed: {self.mission.speed} m/s\nWind: {self.wind_speed_text}"
-        grapher = ThreeDimensionalGrapher(self.storage_service, self.log_subdir)
-        grapher.draw_trace_vs_planned(planed_position_list=self.mission.points,
-                                      actual_position_list=self.est_position_array,
-                                      full_target_directory=graph_dir,
-                                      drone_name=self.target_drone,
-                                      title=title
-                                      )
+    
+        # Draw and upload the graphs
+        grapher = ThreeDimensionalGrapher(self.storage_service)
+        grapher.draw_trace_vs_planned(
+            planed_position_list=self.mission.points,
+            actual_position_list=self.est_position_array,
+            drone_name=self.target_drone,
+            title=title,
+            folder_path=folder_path
+        )
 
-        grapher.draw_interactive_trace_vs_planned(planed_position_list=self.mission.points,
-                                                  actual_position_list=self.est_position_array,
-                                                  full_target_directory=graph_dir,
-                                                  drone_name=self.target_drone,
-                                                  title=title
-                                                  )
+        grapher.draw_interactive_trace_vs_planned(
+            planed_position_list=self.mission.points,
+            actual_position_list=self.est_position_array,
+            drone_name=self.target_drone,
+            title=title,
+            folder_path=folder_path
+        )

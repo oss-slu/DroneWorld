@@ -29,7 +29,7 @@ class DriftMonitor(SingleDroneMissionMonitor):
 
     def make_drifted_array(self):
         dt = self.dt
-        closest = 9223372036854775807  # Max int
+        closest = float('inf')  # Maximum distance
         self.reached = False
         self.est_position_array = []
         while self.mission.state != self.mission.State.END:
@@ -54,26 +54,32 @@ class DriftMonitor(SingleDroneMissionMonitor):
                                     f"{round(self.threshold, 2)} meters. Closest distance: {round(closest, 2)} meters")
 
     def draw_trace_3d(self):
+        # Construct folder path for storage service
+        folder_path = f"{self.log_subdir}/{self.mission.__class__.__name__}/{self.__class__.__name__}/"
+
         actual = self.est_position_array
         dest = self.mission.point
+
+        # Determine the title based on whether the target was reached
         if self.reached:
             title = f"Drift path\nDrone speed: {self.mission.speed} m/s\nWind: {self.wind_speed_text}\n" \
-                    f"Closest distance: {round(self.closest,2)} meters"
+                    f"Closest distance: {round(self.closest, 2)} meters"
         else:
             title = f"(FAILED) Drift path\nDrone speed: {self.mission.speed} m/s\nWind: {self.wind_speed_text}\n" \
-                    f"Closest distance: {round(self.closest,2)} meters"
-        graph_dir = self.get_graph_dir()
-        grapher = ThreeDimensionalGrapher(self.storage_service,self.log_subdir)
+                    f"Closest distance: {round(self.closest, 2)} meters"
+
+        # Use the grapher to draw and upload graphs
+        grapher = ThreeDimensionalGrapher(self.storage_service)
         grapher.draw_trace_vs_point(destination_point=dest,
                                     actual_position_list=actual,
-                                    full_target_directory=graph_dir,
                                     drone_name=self.target_drone,
-                                    title=title)
+                                    title=title,
+                                    folder_path=folder_path)
         grapher.draw_interactive_trace_vs_point(actual_position=actual,
                                                 destination=dest,
-                                                full_target_directory=graph_dir,
                                                 drone_name=self.target_drone,
-                                                title=title)
+                                                title=title,
+                                                folder_path=folder_path)
 
 
 if __name__ == "__main__":
