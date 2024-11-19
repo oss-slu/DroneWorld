@@ -94,7 +94,7 @@ class CircularDeviationMonitor(SingleDroneMissionMonitor):
                 if not self.reported_breach:
                     self.reported_breach = True
                     self.append_fail_to_log(f"{self.target_drone};First breach: deviated more than "
-                                            f"{self.deviation_percentage}meter from the planned route")
+                                            f"{self.deviation_percentage} meter from the planned route")
                 self.breach_flag = True
             self.est_position_array.append([x, y, z])
             self.obj_position_array.append([ox, oy, oz])
@@ -103,12 +103,12 @@ class CircularDeviationMonitor(SingleDroneMissionMonitor):
         # print(self.position_array)
 
     def check_breach(self, x, y, z):
-        #print(f"Checking breach, Current position: {round(x, 2)}, {round(y, 2)}, {round(z, 2)}, "
+        # print(f"Checking breach, Current position: {round(x, 2)}, {round(y, 2)}, {round(z, 2)}, "
         #      f"center: {self.mission.center.x_val}, {self.mission.center.y_val}, {self.mission.altitude}")
         return GeoUtil.is_point_close_to_circle([self.mission.center.x_val, self.mission.center.y_val, self.mission.altitude],
-                                         self.mission.radius,
-                                         [x, y, -z],
-                                         self.deviation_percentage)
+                                                self.mission.radius,
+                                                [x, y, -z],
+                                                self.deviation_percentage)
 
     def calculate_actual_distance(self):
         distance = 0.0
@@ -118,36 +118,40 @@ class CircularDeviationMonitor(SingleDroneMissionMonitor):
 
     @staticmethod
     def get_distance_btw_points(point_arr_1, point_arr_2):
-        return math.sqrt((point_arr_2[0] - point_arr_1[0]) ** 2 + (point_arr_2[1] - point_arr_1[1]) ** 2 + (
-                point_arr_2[2] - point_arr_1[2]) ** 2)
+        return math.sqrt((point_arr_2[0] - point_arr_1[0]) ** 2 +
+                         (point_arr_2[1] - point_arr_1[1]) ** 2 +
+                         (point_arr_2[2] - point_arr_1[2]) ** 2)
 
     def draw_trace_3d(self):
-        graph_dir = self.get_graph_dir()
+        # Construct folder path
+        folder_path = f"{self.log_subdir}/{self.mission.__class__.__name__}/{self.__class__.__name__}/"
         est_actual = self.est_position_array
         # obj_actual = self.obj_position_array
         radius = self.mission.radius
         height = self.mission.altitude
+
         if not self.breach_flag:
             title = f"{self.target_drone} Planned vs. Actual\nDrone speed: {self.mission.speed} m/s\nWind: {self.wind_speed_text}"
         else:
             title = f"(FAILED) {self.target_drone} Planned vs. Actual\nDrone speed: {self.mission.speed} m/s\nWind: {self.wind_speed_text}"
+
         center = [self.mission.center.x_val, self.mission.center.y_val, height]
         theta = np.linspace(0, 2 * np.pi, 100)
         x = center[0] + radius * np.cos(theta)
         y = center[1] + radius * np.sin(theta)
         z = np.ones(100) * height
 
-        planned = []
-        for i in range(len(x)):
-            planned.append([x[i], y[i], -z[i]])
+        planned = [[x[i], y[i], -z[i]] for i in range(len(x))]
 
-        ThreeDimensionalGrapher.draw_trace_vs_planned(planed_position_list=planned,
-                                                      actual_position_list=est_actual,
-                                                      full_target_directory=graph_dir,
-                                                      drone_name=self.target_drone,
-                                                      title=title)
-        ThreeDimensionalGrapher.draw_interactive_trace_vs_planned(planed_position_list=planned,
-                                                                  actual_position_list=est_actual,
-                                                                  full_target_directory=graph_dir,
-                                                                  drone_name=self.target_drone,
-                                                                  title=title)
+        # Use the grapher to draw and upload graphs
+        grapher = ThreeDimensionalGrapher(self.storage_service)
+        grapher.draw_trace_vs_planned(planed_position_list=planned,
+                                      actual_position_list=est_actual,
+                                      drone_name=self.target_drone,
+                                      title=title,
+                                      folder_path=folder_path)
+        grapher.draw_interactive_trace_vs_planned(planed_position_list=planned,
+                                                  actual_position_list=est_actual,
+                                                  drone_name=self.target_drone,
+                                                  title=title,
+                                                  folder_path=folder_path)
