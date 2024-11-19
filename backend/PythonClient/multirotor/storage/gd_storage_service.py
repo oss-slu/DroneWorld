@@ -1,5 +1,4 @@
 from PythonClient.multirotor.storage.abstract.storage_service import StorageServiceInterface
-# backend.PythonClient.multirotor.storage.abstract.
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaInMemoryUpload
@@ -25,41 +24,90 @@ class GoogleDriveStorageService(StorageServiceInterface):
 
     def upload_to_service(self, file_name, content, content_type='text/plain'):
         """
-        Uploads a file to the Google Drive.
+        Uploads a file to Google Drive, creating folders as necessary.
+
+        Args:
+            file_name (str): The path of the file including folder hierarchy (e.g., 'folder1/folder2/file.txt').
+            content (str or bytes): The content of the file to upload.
+            content_type (str): The MIME type of the file.
         """
+        # Ensure content is bytes
+        if isinstance(content, str):
+            content = content.encode('utf-8')  # You can choose a different encoding if needed
 
-        with self._lock:  # Prevent race conditions
-            try:
-                # Prepare file metadata and content
-                media = MediaInMemoryUpload(content.encode('utf-8'), mimetype=content_type)
-                metadata = {'name': file_name, 'parents': [self.folder_id]}
+        # Handle folder creation and navigation
+        parent_id = self.folder_id
+        path_parts = file_name.strip('/').split('/')
+        for folder_name in path_parts[:-1]:  # All parts except the last (which is the file name)
+            with self._lock:  # Acquire lock to prevent race conditions
+                folder_id = self._get_or_create_folder(folder_name, parent_id)
+                if not folder_id:
+                    print(f"Failed to get or create folder '{folder_name}' under parent ID '{parent_id}'")
+                    return
+                parent_id = folder_id
 
-                # Upload the file
-                file_id = self.service.files().create(body=metadata, media_body=media, fields='id').execute().get('id')
-                print(f"Uploaded '{file_name}' with ID: {file_id}")
-                return file_id
+        # Prepare the file metadata and media
+        file_metadata = {
+            'name': path_parts[-1],
+            'parents': [parent_id]
+        }
+        media = MediaInMemoryUpload(content, mimetype=content_type)
 
-            except Exception as e:
-                print(f"Upload error: {e}")
-                return None
+        # Upload the file
+        try:
+            file = self.service.files().create(
+                body=file_metadata,
+                media_body=media,
+                fields='id'
+            ).execute()
+            print(f"File '{file_name}' uploaded to Google Drive with ID: {file.get('id')}.")
+        except Exception as e:
+            print(f"Failed to upload file '{file_name}': {e}")
 
+    def _get_or_create_folder(self, folder_name, parent_id):
+        """
+        Retrieves the folder ID if it exists, or creates it if it doesn't.
 
-def main():
-    # Initialize Google Drive storage service with default folder ID and credentials
-    drive_service = GoogleDriveStorageService()
+        Args:
+            folder_name (str): The name of the folder.
+            parent_id (str): The ID of the parent folder.
 
-    # Sample file details
-    file_name = 'test_log.txt'
-    content = 'This is a test log file content with relative path.'
+        Returns:
+            str: The ID of the retrieved or created folder.
+        """
+        # Escaping single quotes in folder_name to prevent query issues
+        escaped_folder_name = folder_name.replace("'", "\\'")
 
-    # Upload the file
-    file_id = drive_service.upload_to_service(file_name, content)
-
-    # Verify upload
-    if file_id:
-        print(f"File uploaded successfully with ID: {file_id}")
-    else:
-        print("File upload failed.")
-
-if __name__ == "__main__":
-    main()
+        # Check if the folder already exists
+        query = (
+            f"mimeType='application/vnd.google-apps.folder' and "
+            f"name='{escaped_folder_name}' and "
+            f"'{parent_id}' in parents and trashed=false"
+        )
+        try:
+            results = self.service.files().list(
+                q=query,
+                fields="files(id, name)",
+                spaces='drive'
+            ).execute()
+            items = results.get('files', [])
+            if items:
+                if len(items) > 1:
+                    print(f"Multiple folders named '{folder_name}' found under parent ID '{parent_id}'. Using the first one.")
+                return items[0]['id']
+            else:
+                # Folder does not exist; create it
+                file_metadata = {
+                    'name': folder_name,
+                    'mimeType': 'application/vnd.google-apps.folder',
+                    'parents': [parent_id]
+                }
+                folder = self.service.files().create(
+                    body=file_metadata,
+                    fields='id'
+                ).execute()
+                print(f"Created folder '{folder_name}' with ID: {folder.get('id')}")
+                return folder.get('id')
+        except Exception as e:
+            print(f"Error while getting or creating folder '{folder_name}': {e}")
+            return None
