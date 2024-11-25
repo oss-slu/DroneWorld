@@ -110,6 +110,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ReportDashboard() {
   const [reportFiles, setReportFiles] = React.useState([]);
+  const [htmlFiles, setHtmlFiles] = React.useState([]);
   const [isLoading, setIsloading] = React.useState(false);
   // const isFuzzy = file.filename.includes('Fuzzy');
   const classes = useStyles();
@@ -183,6 +184,7 @@ export default function ReportDashboard() {
           state: {
             data: data,
             file: { fuzzy: file.contains_fuzzy, fileName: file.filename, fail: file.fail },
+            htmlFiles: data.htmlFiles,
           },
         });
         return data;
@@ -474,6 +476,35 @@ export default function ReportDashboard() {
                               </TableRow>
                             </TableBody>
                           </Table>
+                          {file.htmlFiles && file.htmlFiles.length > 0 && (
+                            <div
+                            style={{
+                              marginTop: '20px',
+                              padding: '10px',
+                              border: '1px solid #ddd',
+                              borderRadius: '8px',
+                              backgroundColor: '#f9f9f9',
+                            }}
+                            >
+                              <Typography variant="h6" style={{ marginBottom: '10px', fontWeight: 'bold' }}>
+                                HTML Files
+                              </Typography>
+                              <ul style={{ listStyleType: 'none', paddingLeft: '0'}}>
+                                {file.htmlFiles.map((htmlFile, index) => (
+                                  <li key={index} style={{ marginBottom: '8px' }}>
+                                    <a
+                                      href={htmlFile.proxyUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      style={{ textDecoration: 'none', color: '#1976d2', fontWeight: 'bold '}}
+                                    >
+                                      {htmlFile.name}
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
                           <div style={{ position: 'absolute', bottom: '10px', right: '10px' }}>
                             <Link
                               style={{ cursor: 'pointer', fontSize: '18px', paddingRight: '15px' }}
