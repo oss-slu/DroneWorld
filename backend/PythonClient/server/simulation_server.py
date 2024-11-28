@@ -107,7 +107,7 @@ def list_reports():
 def list_folder_contents(folder_name):
     """
     Lists the contents of a specific report folder from GCS,
-    including generating proxy URLs for HTML files.
+    including generating proxy URLs for HTML files at any depth.
     """
     try:
         # Define the prefix for the specific folder
@@ -145,15 +145,16 @@ def list_folder_contents(folder_name):
         else:
             process_gcs_directory(prefix, result, "")
 
-        # After processing all blobs, collect HTML files
+        # After processing all blobs, collect HTML files at any depth
         html_blobs = bucket.list_blobs(prefix=prefix)
         for html_blob in html_blobs:
             if html_blob.name.endswith('.html'):
-                file_name = os.path.basename(html_blob.name)
-                # Create a proxy URL for the HTML file
-                proxy_url = f"/serve-html/{folder_name}/{file_name}"
+                relative_path = os.path.relpath(html_blob.name, prefix)
+                # Ensure URL is properly formatted
+                proxy_url = f"/serve-html/{folder_name}/{relative_path.replace(os.sep, '/')}"
                 result["htmlFiles"].append({
-                    "name": file_name,
+                    "name": os.path.basename(html_blob.name),
+                    "path": relative_path.replace(os.sep, '/'),  # Relative path within the folder
                     "url": proxy_url
                 })
 
@@ -280,7 +281,7 @@ def get_current_running():
 @app.route('/report/<path:dir_name>')
 def get_report(dir_name=''):
     """
-    Serves reports from GCS.
+    Serves reports from GCS. Note: Serving files directly from GCS might require generating signed URLs.
     """
     try:
         if dir_name:
@@ -336,14 +337,15 @@ def get_map():
     return task_dispatcher.load_cesium_setting()
 
 # === Proxy Endpoint to Serve HTML Files ===
-@app.route('/serve-html/<folder_name>/<file_name>', methods=['GET'])
-def serve_html(folder_name, file_name):
+@app.route('/serve-html/<folder_name>/<path:relative_path>', methods=['GET'])
+def serve_html(folder_name, relative_path):
     """
     Serves HTML files securely through a proxy route.
+    Handles HTML files located at any depth within the specified folder.
     """
     try:
-        # Construct the GCS file path
-        blob_path = f'reports/{folder_name}/{file_name}'
+        # Construct the full GCS file path
+        blob_path = f'reports/{folder_name}/{relative_path}'
         blob = bucket.blob(blob_path)
 
         # Check if the file exists and is an HTML file

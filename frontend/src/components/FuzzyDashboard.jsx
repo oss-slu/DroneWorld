@@ -1354,7 +1354,33 @@ export default function FuzzyDashboard() {
       </Box>
           </React.Fragment> }
       </Box>
-      
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', m: 1 }}>
+        <Paper elevation={3} sx={{ margin: '25px', padding: 2, width: '100%' }}>
+          <Typography variant="h5" component="h2" sx={{ fontFamily: 'sans-serif', fontWeight: 700 }}>
+            Interactable HTMLs
+          </Typography>
+          <ul>
+            {resp.htmlFiles && resp.htmlFiles.length > 0 ? (
+              resp.htmlFiles.map((htmlFile, index) => (
+                <li key={index}>
+                  <Link
+                    href={`http://localhost:5000${encodeURI(htmlFile.url)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{ textDecoration: 'none', color: 'blue' }}
+                  >
+                    {htmlFile.name}
+                  </Link>
+                </li>
+              ))
+            ) : (
+              <Typography variant="body1" sx={{ fontStyle: 'italic' }}>
+                No HTML files available for interaction.
+              </Typography>
+            )}
+          </ul>
+        </Paper>
+      </Box>
       {/* end of fuzzy  */}
         <div>
         <Modal
