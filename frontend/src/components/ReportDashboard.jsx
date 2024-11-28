@@ -39,42 +39,42 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Loading from './Loading';
 
 const useStyles = makeStyles((theme) => ({
-  lightBlueBackground: {
-    backgroundColor: '#e3f2fd',
-  },
-  cardMedia: {
-    width: '80%',
-    height: 'auto',
-  },
-  fullWidthBox: {
-    width: '100vw',
-    margin: 0,
-    padding: 0,
-  },
-  card: {
-    maxWidth: 400,
-    height: 270,
-    border: '1px solid lightgreen',
-    backgroundColor: '#e3f2fd',
-    boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2)',
-  },
-  fullScreenContainer: {
-    width: '50%',
-    padding: 0,
-    margin: 0,
-  },
-  invalidData: {
-    fontWeight: 'bold',
-    color: 'red',
-  },
-
-  button: {
-    backgroundColor: '#1976d2',
-    color: '#fff',
-    '&:hover': {
-      backgroundColor: '#1565c0',
+    lightBlueBackground: {
+        backgroundColor: '#e3f2fd',
     },
-  },
+    cardMedia: {
+        width: '80%',
+        height: 'auto',
+    },
+    fullWidthBox: {
+        width: '100vw',
+        margin: 0,
+        padding: 0,
+    },
+    card: {
+        maxWidth: 400,
+        height: 270,
+        border: '1px solid lightgreen',
+        backgroundColor: '#e3f2fd',
+        boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2)',
+    },
+    fullScreenContainer: {
+        width: '50%',
+        padding: 0,
+        margin: 0,
+    },
+    invalidData: {
+        fontWeight: 'bold',
+        color: 'red',
+    },
+
+    button: {
+        backgroundColor: '#1976d2',
+        color: '#fff',
+        '&:hover': {
+            backgroundColor: '#1565c0',
+        },
+    },
 }));
 
 //const sampleData = [
@@ -109,424 +109,393 @@ const useStyles = makeStyles((theme) => ({
 //];
 
 export default function ReportDashboard() {
-  const [reportFiles, setReportFiles] = React.useState([]);
-  const [htmlFiles, setHtmlFiles] = React.useState([]);
-  const [isLoading, setIsloading] = React.useState(false);
-  // const isFuzzy = file.filename.includes('Fuzzy');
-  const classes = useStyles();
-  const location = useLocation();  
+    const [reportFiles, setReportFiles] = React.useState([]);
+    const [isLoading, setIsloading] = React.useState(false);
+    // const isFuzzy = file.filename.includes('Fuzzy');
+    const classes = useStyles();
+    const location = useLocation();
 
-  const isReportDashboard = location.pathname.includes('/report-dashboard');
+    const isReportDashboard = location.pathname.includes('/report-dashboard');
 
-  const navigate = useNavigate();
-  const redirectToHome = () => {
-    navigate('/');
-  };
-  const redirectToFuzzyDashboard = () => {
-    navigate('/dashboard');
-  };
-
-  useEffect(() => {
-    const fetchData = () => {
-      setIsloading(true);
-      fetch('http://localhost:5000/list-reports', { method: 'GET' })
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error('No response from server/something went wrong');
-          }
-          return res.json();
-        })
-        .then((data) => {
-          // 'data.reports' containing filename and fuzzy info
-          setReportFiles(data.reports ?? []);
-        })
-        .catch((error) => {
-          console.error('Error fetching report data:', error);
-        })
-        .finally(() => {
-          setIsloading(false);
-        });
+    const navigate = useNavigate();
+    const redirectToHome = () => {
+        navigate('/');
     };
-    fetchData();
-  }, []);
+    const redirectToFuzzyDashboard = () => {
+        navigate('/dashboard');
+    };
 
-  const [snackBarState, setSnackBarState] = React.useState({
-    open: false,
-  });
+    useEffect(() => {
+        const fetchData = () => {
+            setIsloading(true);
+            fetch('http://localhost:5000/list-reports', { method: 'GET' })
+                .then((res) => {
+                    if (!res.ok) {
+                        throw new Error('No response from server/something went wrong');
+                    }
+                    return res.json();
+                })
+                .then((data) => {
+                    // 'data.reports' containing filename and fuzzy info
+                    setReportFiles(data.reports ?? []);
+                })
+                .catch((error) => {
+                    console.error('Error fetching report data:', error);
+                })
+                .finally(() => {
+                    setIsloading(false);
+                });
+        };
+        fetchData();
+    }, []);
 
-  const handleSnackBarVisibility = (val) => {
-    setSnackBarState((prevState) => ({
-      ...prevState,
-      open: val,
-    }));
-  };
-  const handleClickAway = () => {
-    handleSnackBarVisibility(true);
-  };
-  useEffect(() => {
-    handleSnackBarVisibility(true);
-  }, []);
-  const getFolderContents = (file) => {
-    fetch(`http://localhost:5000/list-folder-contents/${file.filename}`, {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: {},
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('No response from server/something went wrong');
-        }
-        return res.json();
-      })
-      .then((data) => {
-        console.log('File Json: ', data);
-        navigate('/dashboard', {
-          state: {
-            data: data,
-            file: { fuzzy: file.contains_fuzzy, fileName: file.filename, fail: file.fail },
-            htmlFiles: data.htmlFiles,
-          },
-        });
-        return data;
-      })
-      .catch((error) => {
-        console.error('Error fetching report data:', error);
-      });
-  };
-  const handleButtonClick = (file) => {
-    console.log('Button clicked:', file);
-    getFolderContents(file);
-  };
+    const [snackBarState, setSnackBarState] = React.useState({
+        open: false,
+    });
 
-  const acceptanceReportTypography = (
-    <Typography
-      variant='h4'
-      fontWeight='bold'
-      style={{ textAlign: 'center', marginTop: '20px', marginBottom: '2rem', color: '#000000' }}
-    >
-      <Link to='/report-dashboard' style={{ textDecoration: 'none', color: '#000000' }}>
-        Acceptance Report
-      </Link>
-      {isReportDashboard && (
-        <Tooltip title='Home' placement='bottom'>
-          <HomeIcon
-            style={{ float: 'right', cursor: 'pointer', fontSize: '35px' }}
-            onClick={redirectToHome}
-          />
-        </Tooltip>
-      )}
-    </Typography>
-  );
+    const handleSnackBarVisibility = (val) => {
+        setSnackBarState((prevState) => ({
+            ...prevState,
+            open: val,
+        }));
+    };
+    const handleClickAway = () => {
+        handleSnackBarVisibility(true);
+    };
+    useEffect(() => {
+        handleSnackBarVisibility(true);
+    }, []);
+    const getFolderContents = (file) => {
+        fetch(`http://localhost:5000/list-folder-contents/${file.filename}`, {
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            body: {},
+        })
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error('No response from server/something went wrong');
+                }
+                return res.json();
+            })
+            .then((data) => {
+                console.log('File Json: ', data);
+                navigate('/dashboard', {
+                    state: {
+                        data: data,
+                        file: { fuzzy: file.contains_fuzzy, fileName: file.filename, fail: file.fail },
+                    },
+                });
+                return data;
+            })
+            .catch((error) => {
+                console.error('Error fetching report data:', error);
+            });
+    };
+    const handleButtonClick = (file) => {
+        console.log('Button clicked:', file);
+        getFolderContents(file);
+    };
 
-  return (
-    <>
-      <Box className={classes.fullWidthBox}>
-        <CardMedia
-        // component="iframe"
-        //  src="your-embedded-content-url"
-        // className={classes.cardMedia}
-        // title="Embedded Content"
-        />
-      </Box>
+    const acceptanceReportTypography = (
+        <Typography
+            variant='h4'
+            fontWeight='bold'
+            style={{ textAlign: 'center', marginTop: '20px', marginBottom: '2rem', color: '#000000' }}
+        >
+            <Link to='/report-dashboard' style={{ textDecoration: 'none', color: '#000000' }}>
+                Acceptance Report
+            </Link>
+            {isReportDashboard && (
+                <Tooltip title='Home' placement='bottom'>
+                    <HomeIcon
+                        style={{ float: 'right', cursor: 'pointer', fontSize: '35px' }}
+                        onClick={redirectToHome}
+                    />
+                </Tooltip>
+            )}
+        </Typography>
+    );
 
-      {acceptanceReportTypography}
-
-      {isLoading ? (
-        <Loading />
-      ) : (
+    return (
         <>
-          {reportFiles.length === 0 && (
-            <>
-              <Snackbar
-                open={snackBarState.open}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                autoHideDuration={60000}
-                onClose={() => handleSnackBarVisibility(false)}
-              >
-                <Alert
-                  onClose={() => handleSnackBarVisibility(false)}
-                  severity='info'
-                  sx={{ maxHeight: '150px', maxWidth: '100%' }}
-                >
-                  {'No reports found'}
-                </Alert>
-              </Snackbar>
+            <Box className={classes.fullWidthBox}>
+                <CardMedia
+                // component="iframe"
+                //  src="your-embedded-content-url"
+                // className={classes.cardMedia}
+                // title="Embedded Content"
+                />
+            </Box>
 
-              <Container maxWidth='x1' style={{ padding: '10px', alignContent: 'center' }}>
-                {/* ... (existing Container, Paper, and div) */}
-              </Container>
+            {acceptanceReportTypography}
 
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-                <Button variant='contained' color='primary' onClick={redirectToHome}>
-                  Return to Home
-                </Button>
-              </div>
-            </>
-          )}
-          {reportFiles.length > 0 && (
-            <>
-              <Grid
-                container
-                spacing={2}
-                style={{ width: '100%', paddingLeft: '45px', justifyContent: 'flex-start' }}
-              >
-                {reportFiles.map((file) => {
-                  const parts = file.filename.split('_');
-                  const failed = file.fail > 0;
-                  const passed = file.pass > 0;
-
-                  if (!file || !file.filename || file.filename.includes('.DS_Store')) {
-                    return null;
-                  }
-
-                  if (parts.length < 2) {
-                    return (
-                      <Grid key={file.id} item xs={12}>
-                        <Accordion>{/* ... (other JSX components) */}</Accordion>
-                      </Grid>
-                    );
-                  }
-
-                  const datePart = parts[0];
-                  const batchName = parts.slice(1).join('_');
-
-                  const date = datePart.substr(0, 10);
-                  const time = datePart.substr(11, 8);
-
-                  const formattedDate = `${date.substr(5, 2)}-${date.substr(8, 2)}-${date.substr(
-                    0,
-                    4,
-                  )}`;
-                  const formattedTime = `${time.substr(0, 2)}:${time.substr(3, 2)}:${time.substr(
-                    6,
-                    2,
-                  )}`;
-
-                  const formattedTimestamp = `${formattedDate} ${formattedTime}`;
-
-                  const passedPercent = Math.round((file.pass / (file.pass + file.fail)) * 100);
-
-                  return (
-                    <Grid key={file.id} item xs={12}>
-                      <Accordion
-                        style={{
-                          border: '1px solid #2196F3',
-                          borderRadius: '8px',
-                          boxShadow: '0 4px 8px 0 rgba(33, 150, 243, 0.2)',
-                        }}
-                      >
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                          <Grid container alignItems='center'>
-                            {/* Date and Batch Name */}
-                            <Grid item xs>
-                              <Typography
-                                className={classes.heading}
-                                style={{ fontWeight: 'bold', marginRight: '9px' }}
-                              >
-                                {formattedTimestamp}
-                                <span style={{ fontStyle: 'italic', marginLeft: '9px' }}>
-                                  {batchName}
-                                </span>
-                                {file.contains_fuzzy && (
-                                  <Chip
-                                    label='Fuzzy Test'
-                                    style={{
-                                      marginLeft: '9px',
-                                      backgroundColor: 'lightgreen',
-                                      color: 'black',
-                                    }}
-                                  />
-                                )}
-                              </Typography>
-                            </Grid>
-
-                            <Grid
-                              item
-                              style={{
-                                marginLeft: 'auto',
-                                display: 'flex',
-                                alignItems: 'center',
-                                position: 'relative',
-                              }}
-                            >
-                              <div
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  marginRight: '8px',
+            {isLoading ? (
+                <Loading />
+            ) : (
+                <>
+                    {reportFiles.length === 0 && (
+                        <>
+                            <Snackbar
+                                open={snackBarState.open}
+                                anchorOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
                                 }}
-                              >
-                                {file.fail > 0 && (
-                                  <div
-                                    style={{
-                                      position: 'relative',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      marginRight: '8px',
-                                    }}
-                                  >
-                                    <div
-                                      style={{
-                                        border: '1px solid red',
-                                        borderRadius: '50%',
-                                        width: '30px',
-                                        height: '30px',
-                                        overflow: 'hidden',
-                                        marginLeft: '4px',
-                                        position: 'relative',
-                                      }}
-                                    >
-                                      <CircularProgress
-                                        variant='determinate'
-                                        size={30}
-                                        thickness={8}
-                                        value={Math.round(
-                                          (file.fail / (file.pass + file.fail)) * 100,
-                                        )}
-                                        style={{
-                                          color: 'rgba(255, 0, 0, 0.3)',
-                                        }}
-                                      />
-                                      <span
-                                        style={{
-                                          position: 'absolute',
-                                          top: '50%',
-                                          left: '50%',
-                                          transform: 'translate(-50%, -50%)',
-                                          fontSize: '12px',
-                                          color: 'red',
-                                        }}
-                                      >
-                                        ❌
-                                      </span>
-                                    </div>
-                                  </div>
-                                )}
-                                {passed && (
-                                  <div
-                                    style={{
-                                      position: 'relative',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      marginRight: '8px',
-                                    }}
-                                  >
-                                    <div
-                                      style={{
-                                        border: '1px solid lightgreen',
-                                        borderRadius: '50%',
-                                        width: '30px',
-                                        height: '30px',
-                                        overflow: 'hidden',
-                                        marginLeft: '4px',
-                                        position: 'relative',
-                                      }}
-                                    >
-                                      <CircularProgress
-                                        variant='determinate'
-                                        size={30}
-                                        thickness={8}
-                                        value={passedPercent}
-                                        style={{
-                                          color: 'lightgreen',
-                                        }}
-                                      />
-                                      <span
-                                        style={{
-                                          position: 'absolute',
-                                          top: '50%',
-                                          left: '50%',
-                                          transform: 'translate(-50%, -50%)',
-                                          fontSize: '12px',
-                                          color: 'lightgreen',
-                                        }}
-                                      >
-                                        ✅
-                                      </span>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </Grid>
-                          </Grid>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <Table style={{ width: '30%' }} aria-label='simple table'>
-                            <TableBody>
-                              <TableRow style={{ borderBottomWidth: '2px' }}>
-                                {/* <TableCell align="center"></TableCell>  */}
-                                <TableCell style={{ fontWeight: 'bold', color: 'blue' }}>
-                                  Drone Count
-                                </TableCell>
-                                <TableCell style={{ fontWeight: 'bold', color: 'green' }}>
-                                  Pass
-                                </TableCell>
-                                <TableCell style={{ fontWeight: 'bold', color: 'red' }}>
-                                  Fail
-                                </TableCell>
-                              </TableRow>
-                              <TableRow>
-                                {/* <TableCell align="right"></TableCell>  */}
-                                <TableCell>{file.drone_count}</TableCell>
-                                <TableCell>{file.pass}</TableCell>
-                                <TableCell>{file.fail}</TableCell>
-                              </TableRow>
-                            </TableBody>
-                          </Table>
-                          {file.htmlFiles && file.htmlFiles.length > 0 && (
-                            <div
-                            style={{
-                              marginTop: '20px',
-                              padding: '10px',
-                              border: '1px solid #ddd',
-                              borderRadius: '8px',
-                              backgroundColor: '#f9f9f9',
-                            }}
+                                autoHideDuration={60000}
+                                onClose={() => handleSnackBarVisibility(false)}
                             >
-                              <Typography variant="h6" style={{ marginBottom: '10px', fontWeight: 'bold' }}>
-                                HTML Files
-                              </Typography>
-                              <ul style={{ listStyleType: 'none', paddingLeft: '0'}}>
-                                {file.htmlFiles.map((htmlFile, index) => (
-                                  <li key={index} style={{ marginBottom: '8px' }}>
-                                    <a
-                                      href={htmlFile.proxyUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      style={{ textDecoration: 'none', color: '#1976d2', fontWeight: 'bold '}}
-                                    >
-                                      {htmlFile.name}
-                                    </a>
-                                  </li>
-                                ))}
-                              </ul>
+                                <Alert
+                                    onClose={() => handleSnackBarVisibility(false)}
+                                    severity='info'
+                                    sx={{ maxHeight: '150px', maxWidth: '100%' }}
+                                >
+                                    {'No reports found'}
+                                </Alert>
+                            </Snackbar>
+
+                            <Container maxWidth='x1' style={{ padding: '10px', alignContent: 'center' }}>
+                                {/* ... (existing Container, Paper, and div) */}
+                            </Container>
+
+                            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                                <Button variant='contained' color='primary' onClick={redirectToHome}>
+                                    Return to Home
+                                </Button>
                             </div>
-                          )}
-                          <div style={{ position: 'absolute', bottom: '10px', right: '10px' }}>
-                            <Link
-                              style={{ cursor: 'pointer', fontSize: '18px', paddingRight: '15px' }}
-                              onClick={() => handleButtonClick(file)}
+                        </>
+                    )}
+                    {reportFiles.length > 0 && (
+                        <>
+                            <Grid
+                                container
+                                spacing={2}
+                                style={{ width: '100%', paddingLeft: '45px', justifyContent: 'flex-start' }}
                             >
-                              Simulation Data
-                            </Link>
-                          </div>
-                        </AccordionDetails>
-                      </Accordion>
-                    </Grid>
-                  );
-                })}
-              </Grid>
-            </>
-          )}
+                                {reportFiles.map((file) => {
+                                    const parts = file.filename.split('_');
+                                    const failed = file.fail > 0;
+                                    const passed = file.pass > 0;
+
+                                    if (!file || !file.filename || file.filename.includes('.DS_Store')) {
+                                        return null;
+                                    }
+
+                                    if (parts.length < 2) {
+                                        return (
+                                            <Grid key={file.id} item xs={12}>
+                                                <Accordion>{/* ... (other JSX components) */}</Accordion>
+                                            </Grid>
+                                        );
+                                    }
+
+                                    const datePart = parts[0];
+                                    const batchName = parts.slice(1).join('_');
+
+                                    const date = datePart.substr(0, 10);
+                                    const time = datePart.substr(11, 8);
+
+                                    const formattedDate = `${date.substr(5, 2)}-${date.substr(8, 2)}-${date.substr(
+                                        0,
+                                        4,
+                                    )}`;
+                                    const formattedTime = `${time.substr(0, 2)}:${time.substr(3, 2)}:${time.substr(
+                                        6,
+                                        2,
+                                    )}`;
+
+                                    const formattedTimestamp = `${formattedDate} ${formattedTime}`;
+
+                                    const passedPercent = Math.round((file.pass / (file.pass + file.fail)) * 100);
+
+                                    return (
+                                        <Grid key={file.id} item xs={12}>
+                                            <Accordion
+                                                style={{
+                                                    border: '1px solid #2196F3',
+                                                    borderRadius: '8px',
+                                                    boxShadow: '0 4px 8px 0 rgba(33, 150, 243, 0.2)',
+                                                }}
+                                            >
+                                                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                                    <Grid container alignItems='center'>
+                                                        {/* Date and Batch Name */}
+                                                        <Grid item xs>
+                                                            <Typography
+                                                                className={classes.heading}
+                                                                style={{ fontWeight: 'bold', marginRight: '9px' }}
+                                                            >
+                                                                {formattedTimestamp}
+                                                                <span style={{ fontStyle: 'italic', marginLeft: '9px' }}>
+                                                                    {batchName}
+                                                                </span>
+                                                                {file.contains_fuzzy && (
+                                                                    <Chip
+                                                                        label='Fuzzy Test'
+                                                                        style={{
+                                                                            marginLeft: '9px',
+                                                                            backgroundColor: 'lightgreen',
+                                                                            color: 'black',
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                            </Typography>
+                                                        </Grid>
+
+                                                        <Grid
+                                                            item
+                                                            style={{
+                                                                marginLeft: 'auto',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                position: 'relative',
+                                                            }}
+                                                        >
+                                                            <div
+                                                                style={{
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    marginRight: '8px',
+                                                                }}
+                                                            >
+                                                                {file.fail > 0 && (
+                                                                    <div
+                                                                        style={{
+                                                                            position: 'relative',
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            marginRight: '8px',
+                                                                        }}
+                                                                    >
+                                                                        <div
+                                                                            style={{
+                                                                                border: '1px solid red',
+                                                                                borderRadius: '50%',
+                                                                                width: '30px',
+                                                                                height: '30px',
+                                                                                overflow: 'hidden',
+                                                                                marginLeft: '4px',
+                                                                                position: 'relative',
+                                                                            }}
+                                                                        >
+                                                                            <CircularProgress
+                                                                                variant='determinate'
+                                                                                size={30}
+                                                                                thickness={8}
+                                                                                value={Math.round(
+                                                                                    (file.fail / (file.pass + file.fail)) * 100,
+                                                                                )}
+                                                                                style={{
+                                                                                    color: 'rgba(255, 0, 0, 0.3)',
+                                                                                }}
+                                                                            />
+                                                                            <span
+                                                                                style={{
+                                                                                    position: 'absolute',
+                                                                                    top: '50%',
+                                                                                    left: '50%',
+                                                                                    transform: 'translate(-50%, -50%)',
+                                                                                    fontSize: '12px',
+                                                                                    color: 'red',
+                                                                                }}
+                                                                            >
+                                                                                ❌
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                                {passed && (
+                                                                    <div
+                                                                        style={{
+                                                                            position: 'relative',
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            marginRight: '8px',
+                                                                        }}
+                                                                    >
+                                                                        <div
+                                                                            style={{
+                                                                                border: '1px solid lightgreen',
+                                                                                borderRadius: '50%',
+                                                                                width: '30px',
+                                                                                height: '30px',
+                                                                                overflow: 'hidden',
+                                                                                marginLeft: '4px',
+                                                                                position: 'relative',
+                                                                            }}
+                                                                        >
+                                                                            <CircularProgress
+                                                                                variant='determinate'
+                                                                                size={30}
+                                                                                thickness={8}
+                                                                                value={passedPercent}
+                                                                                style={{
+                                                                                    color: 'lightgreen',
+                                                                                }}
+                                                                            />
+                                                                            <span
+                                                                                style={{
+                                                                                    position: 'absolute',
+                                                                                    top: '50%',
+                                                                                    left: '50%',
+                                                                                    transform: 'translate(-50%, -50%)',
+                                                                                    fontSize: '12px',
+                                                                                    color: 'lightgreen',
+                                                                                }}
+                                                                            >
+                                                                                ✅
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </Grid>
+                                                    </Grid>
+                                                </AccordionSummary>
+                                                <AccordionDetails>
+                                                    <Table style={{ width: '30%' }} aria-label='simple table'>
+                                                        <TableBody>
+                                                            <TableRow style={{ borderBottomWidth: '2px' }}>
+                                                                {/* <TableCell align="center"></TableCell>  */}
+                                                                <TableCell style={{ fontWeight: 'bold', color: 'blue' }}>
+                                                                    Drone Count
+                                                                </TableCell>
+                                                                <TableCell style={{ fontWeight: 'bold', color: 'green' }}>
+                                                                    Pass
+                                                                </TableCell>
+                                                                <TableCell style={{ fontWeight: 'bold', color: 'red' }}>
+                                                                    Fail
+                                                                </TableCell>
+                                                            </TableRow>
+                                                            <TableRow>
+                                                                {/* <TableCell align="right"></TableCell>  */}
+                                                                <TableCell>{file.drone_count}</TableCell>
+                                                                <TableCell>{file.pass}</TableCell>
+                                                                <TableCell>{file.fail}</TableCell>
+                                                            </TableRow>
+                                                        </TableBody>
+                                                    </Table>
+                                                    <div style={{ position: 'absolute', bottom: '10px', right: '10px' }}>
+                                                        <Link
+                                                            style={{ cursor: 'pointer', fontSize: '18px', paddingRight: '15px' }}
+                                                            onClick={() => handleButtonClick(file)}
+                                                        >
+                                                            Simulation Data
+                                                        </Link>
+                                                    </div>
+                                                </AccordionDetails>
+                                            </Accordion>
+                                        </Grid>
+                                    );
+                                })}
+                            </Grid>
+                        </>
+                    )}
+                </>
+            )}
         </>
-      )}
-    </>
-  );
+    );
 }
 
 ReportDashboard.propTypes = {
-  isHomePage: PropTypes.bool,
+    isHomePage: PropTypes.bool,
 };
