@@ -5,13 +5,13 @@ import time
 from abc import abstractmethod
 
 from PythonClient import airsim
-from PythonClient.multirotor.storage import GCSStorageService, GoogleDriveStorageService
+from PythonClient.multirotor.storage.storage_config import get_storage_service
 
 class AirSimApplication:
     # Parent class for all airsim client side mission and monitors
     def __init__(self):
         # Set up the storage service
-        self.storage_service = GCSStorageService()
+        self.storage_service = get_storage_service()
 
         self.circular_mission_names = {"FlyInCircle"}
         self.polygon_mission_names = {"FlyToPoints", "FlyToPointsGeo"}
