@@ -1364,7 +1364,7 @@ export default function FuzzyDashboard() {
               resp.htmlFiles.map((htmlFile, index) => (
                 <li key={index}>
                   <Link
-                    href={`http://localhost:5000/${encodeURI(htmlFile.url)}`}
+                    href={`http://localhost:5000${encodeURI(htmlFile.url)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     sx={{ textDecoration: 'none', color: 'blue' }}
