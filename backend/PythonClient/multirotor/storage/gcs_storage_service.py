@@ -1,4 +1,4 @@
-from .abstract.storage_service import StorageServiceInterface
+from PythonClient.multirotor.storage.abstract.storage_service import StorageServiceInterface
 from google.cloud import storage
 import base64
 import os
@@ -7,7 +7,7 @@ import json
 class GCSStorageService(StorageServiceInterface):
     """Concrete class for uploading to GCS."""
 
-    def __init__(self, bucket_name='droneworld'):
+    def __init__(self, bucket_name='your_bucket_name'):
         """Initializes the GCS client and bucket."""
         self.storage_client = storage.Client.from_service_account_json('key.json')
         self.bucket = self.storage_client.bucket(bucket_name)
