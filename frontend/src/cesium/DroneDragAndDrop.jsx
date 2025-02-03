@@ -18,7 +18,7 @@ import { useMainJson } from '../../contexts/MainJsonContext';
 import { SimulationConfigurationModel } from '../../model/SimulationConfigurationModel';
 import dayjs from 'dayjs';
 import { EnvironmentModel } from '../../model/EnvironmentModel';
-import { imageUrls } from '../../utils/const';
+//import { imageUrls } from '../../utils/const';
 
 const DroneDragAndDrop = ({ viewerReady, viewerRef, setCameraByPosition }) => {
   const { syncDroneLocation, mainJson, setMainJson, envJson, setEnvJson } = useMainJson();
@@ -102,7 +102,8 @@ const DroneDragAndDrop = ({ viewerReady, viewerRef, setCameraByPosition }) => {
             <Entity
               position={position}
               billboard={{
-                image: imageUrls.drone_thick_orange,
+                //TODO: make this placeholder the right images
+                //image: imageUrls.drone_thick_orange,
                 scale: labelVisible ? 1 : 0.75,
                 disableDepthTestDistance: Number.POSITIVE_INFINITY,
               }}
