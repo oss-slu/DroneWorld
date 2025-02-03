@@ -1,4 +1,6 @@
-import { imageUrls } from '../utils/const';
+//import { imageUrls } from '../utils/const';
+//this import is turned off as it is just place holders for our version
+//at the given moment
 import { origin } from '../utils/env';
 
 export class EnvironmentModel {
