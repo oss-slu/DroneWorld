@@ -98,9 +98,11 @@ export default function EnvironmentConfiguration (env) {
     const environmentJson = (event) => {
         env.environmentJson(event, env.id);
     }    
-    //new added
+    
     React.useEffect(() => {
-        environmentJson(envConf)
+        if (env.environmnetJson){
+            env.environmentJson(envConf, env.id);
+        }
     }, [envConf])
 
     const Direction = [
