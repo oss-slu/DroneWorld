@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+
     "@date-io/date-fns": "2.16.0",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
@@ -15,6 +16,7 @@
     "@testing-library/react": "^12.1.5",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.2.3",
+    "cesium":  "^1.117.0",
     "date-fns": "2.29.3",
     "dayjs": "^1.11.7",
     "install": "^0.13.0",
