@@ -1,7 +1,7 @@
 //import { imageUrls } from '../utils/const';
 //this import is turned off as it is just place holders for our version
 //at the given moment
-import { origin } from '../utils/env';
+import { origin } from '../constants/env';
 
 export class EnvironmentModel {
   constructor() {
