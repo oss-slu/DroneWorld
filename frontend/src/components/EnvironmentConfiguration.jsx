@@ -601,7 +601,7 @@ const handleSnackBarVisibility = (val) => {
              {fuzzyAlert ? "Fuzzy Testing Changes is under development !" : "Wind Type Changes is under Developement !"}
         </Alert>
     </Snackbar>
-    <Box sx={{ width: '100%',border: '1px solid grey', paddingBottom: 5, paddingTop: 4, paddingLeft:5 }}>
+    <Box sx={{ width: '50%', border: '1px solid grey', paddingBottom: 5, paddingTop: 4, paddingLeft:5 }}>
         {/* <Container fixed > */}
             <Typography>
                 <Grid container spacing={5} direction="row" >
