@@ -3,6 +3,8 @@ import Box from '@mui/material/Box'
 import Container from '@mui/material/Container';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import MyLocationIcon from '@mui/icons-material/MyLocation';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
@@ -13,7 +15,8 @@ import DroneConfiguration from './DroneConfiguration'
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Grid from '@mui/material/Grid';
-
+import Tooltip from '@mui/material/Tooltip';
+import { imageUrls } from '../../utils/const';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -192,6 +195,17 @@ export default function MissionConfiguration (mission) {
         popDrone()
     }
 
+    const handleDragStart = (event, index) => {
+        const imgSrc = event.target.src;
+        const dragData = {
+          type: 'drone',
+          src: imgSrc,
+          index: index,
+        };
+    
+        event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+      };
+
     const setDroneName = (e, index) => {
         setDroneArray(objs => {
             return objs.map((obj, i) => {
@@ -261,7 +275,32 @@ export default function MissionConfiguration (mission) {
                                     aria-controls="panel1a-content"
                                     id="panel1a-header"
                                     >
-                                    <Typography className={classes.heading}>{drone.droneName}</Typography>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            width: '100%',
+                                        }}
+                                    >
+                                        <Typography className={classes.heading}>{drone.droneName}</Typography>
+                                        <Grid container alignItems="center" columnSpacing={2} sx={{ width: 'auto' }}>
+                                            <Grid item>
+                                                <Tooltip title="Click to fly this drone on the map."></Tooltip>
+                                            </Grid>
+                                            <Grid item>
+                                                <Tooltip title="Drag and Drop this drone to set or update its home location on the map.">
+                                                    <img
+                                                        src={imageUrls.drone_icon}
+                                                        alt="Draggable Icon"
+                                                        draggable="true"
+                                                        onDragStart={(e) => handleDragStart(e, index)}
+                                                        style={{ width: 40, cursor: 'grab', marginRight: 20 }}
+                                                    />
+                                                </Tooltip>
+                                            </Grid>
+                                        </Grid>
+                                    </Box>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                     <Typography>
