@@ -1,4 +1,6 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from "react";
+console.log("React version:", React.version);
+
 import { Viewer, CameraFlyTo, Cesium3DTileset } from 'resium';
 import {
   Cartesian3,
@@ -6,6 +8,7 @@ import {
   Math as CesiumMath,
   createWorldTerrainAsync,
   Ion,
+  CesiumTerrainProvider,
 } from 'cesium';
 import { useMainJson } from "./contexts/MainJsonContext";
 
@@ -34,6 +37,7 @@ const CesiumMap = () => {
 
   const google3DTilesAssetId = 2275207;
   Ion.defaultAccessToken = process.env.REACT_APP_CESIUM_ION_ACCESS_TOKEN;
+  console.log('Cesium Ion Token:', process.env.REACT_APP_CESIUM_ION_ACCESS_TOKEN);
 
   const setCameraByLongLat = (long, lat, altitude, pitch) => {
     if (!viewerReady) return;
@@ -79,11 +83,21 @@ const CesiumMap = () => {
     );
   }, [envJson.Origin.latitude, envJson.Origin.longitude, viewerReady]);
 
+  // Load terrain from public folder
+  useEffect(() => {
+    const terrainProvider = createWorldTerrainAsync(); // Use default Cesium terrain
+  
+    if (viewerRef.current?.cesiumElement) {
+      viewerRef.current.cesiumElement.terrainProvider = terrainProvider;
+    }
+  }, []);
+  
+
   console.log("Rendering CesiumMap...");
 
   return (
     <Viewer ref={viewerRef} terrainProvider={createWorldTerrainAsync()}>
-      <Cesium3DTileset url={IonResource.fromAssetId(google3DTilesAssetId)} />
+      <Cesium3DTileset url= '/Assets' />
       <CameraFlyTo
         destination={cameraPosition.destination}
         orientation={cameraPosition.orientation}
