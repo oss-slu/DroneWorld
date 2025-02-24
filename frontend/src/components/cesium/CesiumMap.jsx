@@ -37,7 +37,7 @@ const CesiumMap = ({ activeConfigStep }) => {
   const OSMBuildingsAssetId = 96188;
   const google3DTilesAssetId = 2275207;
 
-  Ion.defaultAccessToken = process.env.REACT_APP_CESIUM_ION_ACCESS_TOKEN;
+  //Ion.defaultAccessToken = process.env.REACT_APP_CESIUM_ION_ACCESS_TOKEN;
 
   const setCameraByPosition = (position = null, pitch = null) => {
     if (!viewerReady) return;
