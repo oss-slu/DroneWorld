@@ -1,6 +1,5 @@
-//import { imageUrls } from '../utils/const';
-//this import is turned off as it is just place holders for our version
-//at the given moment
+import { imageUrls } from '../utils/const';
+
 import { origin } from '../constants/env';
 
 export class EnvironmentModel {
@@ -21,7 +20,7 @@ export class EnvironmentModel {
       name: '',
       height: 0,
       radius: origin.DEFAULT_RADIUS,
-      //image: imageUrls.location,
+      image: imageUrls.location,
     };
     this._sades = [];
     this._activeSadeZoneIndex = null;
@@ -144,11 +143,11 @@ export class EnvironmentModel {
   getOriginName() {
     return this._Origin.name;
   }
-/*
+
   getOriginImage() {
     return this._Origin.image;
   }
-  */
+  
   setOriginLatitude(value) {
     this._Origin.latitude = value;
   }
