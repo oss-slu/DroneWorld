@@ -13,7 +13,8 @@ import DroneConfiguration from './DroneConfiguration'
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Grid from '@mui/material/Grid';
-
+import Tooltip from '@mui/material/Tooltip';
+import { imageUrls } from '../../utils/const';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -192,6 +193,17 @@ export default function MissionConfiguration (mission) {
         popDrone()
     }
 
+    const handleDragStart = (event, index) => {
+        const imgSrc = event.target.src;
+        const dragData = {
+          type: 'drone',
+          src: imgSrc,
+          index: index,
+        };
+    
+        event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+      };
+
     const setDroneName = (e, index) => {
         setDroneArray(objs => {
             return objs.map((obj, i) => {
@@ -233,7 +245,7 @@ export default function MissionConfiguration (mission) {
     }
 
     return (
-        <Box sx={{border:1, borderRadius: 3, maxHeight: (mission.windowHeight)-200, overflow:'scroll', padding: 3}} >
+        <Box sx={{width: '50%', border:1, borderRadius: 3, maxHeight: (mission.windowHeight)-200, overflow:'scroll', padding: 3}} >
             {/* <Container fixed> */}
             <Grid container  direction="row" style={{padding: '12px'}} ><strong>Configure sUAS (small unmanned aircraft system) or drone characteristics in your scenario</strong></Grid>
                     <Alert severity="info">
@@ -261,7 +273,32 @@ export default function MissionConfiguration (mission) {
                                     aria-controls="panel1a-content"
                                     id="panel1a-header"
                                     >
-                                    <Typography className={classes.heading}>{drone.droneName}</Typography>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            width: '100%',
+                                        }}
+                                    >
+                                        <Typography className={classes.heading}>{drone.droneName}</Typography>
+                                        <Grid container alignItems="center" columnSpacing={2} sx={{ width: 'auto' }}>
+                                            <Grid item>
+                                                <Tooltip title="Click to fly this drone on the map."></Tooltip>
+                                            </Grid>
+                                            <Grid item>
+                                                <Tooltip title="Drag and Drop this drone to set or update its home location on the map.">
+                                                    <img
+                                                        src={imageUrls.drone_icon}
+                                                        alt="Draggable Icon"
+                                                        draggable="true"
+                                                        onDragStart={(e) => handleDragStart(e, index)}
+                                                        style={{ width: 40, cursor: 'grab', marginRight: 20 }}
+                                                    />
+                                                </Tooltip>
+                                            </Grid>
+                                        </Grid>
+                                    </Box>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                     <Typography>
