@@ -6,7 +6,6 @@ import {
   Cartesian3,
   IonResource,
   Math as CesiumMath,
-  createWorldTerrainAsync,
   Ion,
   CesiumTerrainProvider,
 } from 'cesium';
@@ -54,25 +53,10 @@ const CesiumMap = () => {
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (viewerRef.current?.cesiumElement) {
-        setViewerReady(true);
-        clearInterval(interval);
-      }
-    }, 100);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    console.log('Cesium map component has mounted');
-  }, []);
-  
-  useEffect(() => {
-    if (viewerRef.current) {
-      console.log('Cesium Viewer is initialized');
+    if (viewerRef.current?.cesiumElement) {
+      setViewerReady(true);
     }
-  }, [viewerRef]);
-  
+  }, [viewerRef.current]);
 
   useEffect(() => {
     setCameraByLongLat(
@@ -83,21 +67,16 @@ const CesiumMap = () => {
     );
   }, [envJson.Origin.latitude, envJson.Origin.longitude, viewerReady]);
 
-  // Load terrain from public folder
-  useEffect(() => {
-    const terrainProvider = createWorldTerrainAsync(); // Use default Cesium terrain
-  
-    if (viewerRef.current?.cesiumElement) {
-      viewerRef.current.cesiumElement.terrainProvider = terrainProvider;
-    }
-  }, []);
-  
-
   console.log("Rendering CesiumMap...");
 
+  // Use CesiumTerrainProvider instead of createWorldTerrain
+  const terrainProvider = new CesiumTerrainProvider({
+    url: IonResource.fromAssetId(1), // For global terrain from Cesium Ion
+  });
+
   return (
-    <Viewer ref={viewerRef} terrainProvider={createWorldTerrainAsync()}>
-      <Cesium3DTileset url= '/Assets' />
+    <Viewer ref={viewerRef} terrainProvider={terrainProvider}>
+      <Cesium3DTileset url={IonResource.fromAssetId(google3DTilesAssetId)} />
       <CameraFlyTo
         destination={cameraPosition.destination}
         orientation={cameraPosition.orientation}
