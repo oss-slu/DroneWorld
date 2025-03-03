@@ -715,7 +715,7 @@ export default function MonitorControl (monJson) {
     
     return(
         <div>
-            <Box sx={{ width: '50%', border: '1px solid grey', padding: 5, paddingTop: 2, maxHeight: '400px', overflow:'scroll'}}>
+            <Box sx={{ width: '100%', border: '1px solid grey', padding: 5, paddingTop: 2, maxHeight: '400px', overflow:'scroll'}}>
                 {/* <Container style={{overflow: 'scroll', height:'80%'}} > */}
                     <Box sx={{ width: '100%', typography: 'body1' }}>
                         <TabContext value={value}>

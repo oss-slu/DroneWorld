@@ -245,7 +245,7 @@ export default function MissionConfiguration (mission) {
     }
 
     return (
-        <Box sx={{width: '50%', border:1, borderRadius: 3, maxHeight: (mission.windowHeight)-200, overflow:'scroll', padding: 3}} >
+        <Box sx={{width: '100%', border:1, borderRadius: 3, maxHeight: (mission.windowHeight)-200, overflow:'scroll', padding: 3}} >
             {/* <Container fixed> */}
             <Grid container  direction="row" style={{padding: '12px'}} ><strong>Configure sUAS (small unmanned aircraft system) or drone characteristics in your scenario</strong></Grid>
                     <Alert severity="info">
