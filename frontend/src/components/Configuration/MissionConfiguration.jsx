@@ -18,6 +18,7 @@ import { imageUrls } from '../../utils/const';
 import { droneModels, droneTypes, droneImages } from '../../constants/drone';
 import { DroneModel } from '../../model/DroneModel';
 import { SimulationConfigurationModel } from '../../model/SimulationConfigurationModel';
+# import { useMainJson } from '../../contexts/MainJsonContext';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -127,7 +128,7 @@ export default function MissionConfiguration (mission) {
         newDrone.MissionValue = null;
         newDrone.setMissionObjectName('fly_to_points');
         newDrone.setMissionObjectParams([]);
-
+    
         mainJson.addNewDrone(newDrone);
         setMainJson(SimulationConfigurationModel.getReactStateBasedUpdate(mainJson));
             // Cameras: {
