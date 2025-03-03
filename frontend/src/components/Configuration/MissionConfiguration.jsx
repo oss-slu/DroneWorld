@@ -15,6 +15,9 @@ import AlertTitle from '@mui/material/AlertTitle';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
 import { imageUrls } from '../../utils/const';
+import { droneModels, droneTypes, droneImages } from '../../constants/drone';
+import { DroneModel } from '../../model/DroneModel';
+import { SimulationConfigurationModel } from '../../model/SimulationConfigurationModel';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -102,31 +105,31 @@ export default function MissionConfiguration (mission) {
         // }
     }]);
     const setDrone = () => {
-        droneArray.push({
-            id: (droneCount), 
-            droneName:"Drone " + (droneCount+1),
-            FlightController: "SimpleFlight",
-            droneType:"Multi Rotor", 
-            droneModel:"DJI", 
-            VehicleType: "SimpleFlight",
-            DefaultVehicleState: "Armed",
-            EnableCollisionPassthrogh: false,
-            EnableCollisions: true,
-            AllowAPIAlways: true,
-            EnableTrace: false,
-            Name:"Drone " + (droneCount+1),
-            X:mission.mainJsonValue.environment != null ? droneCount > 0 ? (mission.mainJsonValue.environment.Origin.Latitude) + (0.0001 * droneCount): mission.mainJsonValue.environment.Origin.Latitude : 0,
-            Y:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Longitude : 0,
-            Z:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Height : 0,
-            Pitch: 0,
-            Roll: 0, 
-            Yaw: 0,
-            Sensors: null,
-            MissionValue: null,
-            Mission : {
-                name:"fly_to_points",
-                param : []
-            },
+        let newDrone = new DroneModel();
+        newDrone.FlightController = 'SimpleFlight';
+        newDrone.droneType = droneTypes[0].value;
+        newDrone.droneModel = droneModels[droneTypes[0].value][0].value;
+        newDrone.VehicleType = 'SimpleFlight';
+        newDrone.DefaultVehicleState = 'Armed';
+        newDrone.EnableCollisionPassthrogh = false;
+        newDrone.EnableCollisions = true;
+        newDrone.AllowAPIAlways = true;
+        newDrone.EnableTrace = false;
+        newDrone.image = droneImages[droneCount].src;
+        newDrone.color = droneImages[droneCount].color;
+        newDrone.X = mainJson.environment.getOriginLatitude() + 0.0001 * droneCount;
+        newDrone.Y = mainJson.environment.getOriginLongitude();
+        newDrone.Z = mainJson.environment.getOriginHeight();
+        newDrone.Pitch = 0;
+        newDrone.Roll = 0;
+        newDrone.Yaw = 0;
+        newDrone.Sensors = null;
+        newDrone.MissionValue = null;
+        newDrone.setMissionObjectName('fly_to_points');
+        newDrone.setMissionObjectParams([]);
+
+        mainJson.addNewDrone(newDrone);
+        setMainJson(SimulationConfigurationModel.getReactStateBasedUpdate(mainJson));
             // Cameras: {
             //     CaptureSettings: [
             //         {
