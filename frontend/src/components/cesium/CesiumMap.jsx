@@ -10,10 +10,10 @@ import {
   Cartographic,
 } from 'cesium';
 import PropTypes from 'prop-types';
-import DrawSadeZone from './DrawSadeZone';
-import DroneDragAndDrop from './DroneDragAndDrop';
-import RadiusDragAndDrop from './RegionDragAndDrop';
-import TimeLineSetterCesiumComponent from './TimeLineSetterCesiumComponent';
+// import DrawSadeZone from './DrawSadeZone';
+// import DroneDragAndDrop from './DroneDragAndDrop';
+// import RadiusDragAndDrop from './RegionDragAndDrop';
+// import TimeLineSetterCesiumComponent from './TimeLineSetterCesiumComponent';
 import { useMainJson } from '../../contexts/MainJsonContext';
 import { originTypes } from '../../constants/env';
 import { EnvironmentModel } from '../../model/EnvironmentModel';

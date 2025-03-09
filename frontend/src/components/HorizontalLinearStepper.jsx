@@ -4,12 +4,10 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import styled from '@emotion/styled';
 import MissionConfiguration from './Configuration/MissionConfiguration';
 import EnvironmentConfiguration from './EnvironmentConfiguration';
 import MonitorControl from './MonitorControl';
-import Home from '../pages/Home';
 import { useNavigate } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
 import Tooltip from '@mui/material/Tooltip';
@@ -244,30 +242,12 @@ export default function HorizontalLinearStepper(data) {
               );
             })}
           </Stepper>
-          {stepsComponent.map(
-            (compo, index) =>
-              compo.id === activeStep + 1 && (
-                <Box key={compo.id} sx={{ mt: 2 }}>
-                  {compo.comp}
-                </Box>
-              )
-          )}
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-            <StyledButton
-              color="inherit"
-              disabled={activeStep === 0}
-              onClick={handleBack}
-              sx={{ mr: 1 }}
-              variant="outlined"
-            >
-              Back
-            </StyledButton>
-            <Box sx={{ flex: '1 1 auto' }} />
-            <StyledButton variant="outlined" onClick={handleNext}>
-              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-            </StyledButton>
+
+          <Box sx={{ mt: 2 }}>
+            {stepsComponent[activeStep].comp}
           </Box>
         </Box>
+          
         <Box sx={{ width: '55%', overflow: 'hidden', border: 1, borderColor: 'yellow', ml: 5 }}>
           <CesiumMap activeConfigStep={activeStep} />
         </Box>
