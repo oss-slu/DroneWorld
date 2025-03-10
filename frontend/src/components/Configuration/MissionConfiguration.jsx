@@ -18,7 +18,8 @@ import { imageUrls } from '../../utils/const';
 import { droneModels, droneTypes, droneImages } from '../../constants/drone';
 import { DroneModel } from '../../model/DroneModel';
 import { SimulationConfigurationModel } from '../../model/SimulationConfigurationModel';
-# import { useMainJson } from '../../contexts/MainJsonContext';
+
+//import { useMainJson } from '../../contexts/MainJsonContext';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -28,83 +29,19 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 export default function MissionConfiguration (mission) {
-    const classes = useStyles();
-    const [droneCount, setDroneCount] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones.length : 1);
-    const [droneArray, setDroneArray] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones : [{
-        id: droneCount-1, 
-        droneName:"Drone " + droneCount,
-        FlightController: "SimpleFlight",
-        droneType:"Multi Rotor", 
-        droneModel:"DJI",
-        VehicleType: "SimpleFlight",
-        DefaultVehicleState: "Armed",
-        EnableCollisionPassthrogh: false,
-        EnableCollisions: true,
-        AllowAPIAlways: true,
-        EnableTrace: false,
-        Name:"Drone " + (droneCount),
-        X:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Latitude : 0,
-        Y:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Longitude : 0,
-        Z:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Height : 0,
-        Pitch: 0,
-        Roll: 0, 
-        Yaw: 0,
-        Sensors: null,
-        MissionValue: null,
-        Mission : {
-            name:"fly_to_points",
-            param : []
-        },
-        // Cameras: {
-        //     CaptureSettings: [
-        //         {
-        //           ImageType: 0,
-        //           Width: 256,
-        //           Height: 144,
-        //           FOV_Degrees: 90,
-        //           AutoExposureSpeed: 100,
-        //           AutoExposureBias: 0,
-        //           AutoExposureMaxBrightness: 0.64,
-        //           AutoExposureMinBrightness: 0.03,
-        //           MotionBlurAmount: 0,
-        //           TargetGamma: 1,
-        //           ProjectionMode: '',
-        //           OrthoWidth: 5.12
-        //         }
-        //     ],
-        //     NoiseSettings: [
-        //         {
-        //           Enabled: false,
-        //           ImageType: 0,
-        //           RandContrib: 0.2,
-        //           RandSpeed: 100000,
-        //           RandSize: 500,
-        //           RandDensity: 2,
-        //           HorzWaveContrib: 0.03,
-        //           HorzWaveStrength: 0.08,
-        //           HorzWaveVertSize: 1,
-        //           HorzWaveScreenSize: 1,
-        //           HorzNoiseLinesContrib: 1,
-        //           HorzNoiseLinesDensityY: 0.01,
-        //           HorzNoiseLinesDensityXY: 0.5,
-        //           HorzDistortionContrib: 1,
-        //           HorzDistortionStrength: 0.002
-        //         }
-        //     ],
-        //     Gimbal: {
-        //         Stabilization: 0,
-        //         Pitch: 0,
-        //         Roll: 0,
-        //         Yaw: 0
-        //     },
-        //     X:0,
-        //     Y:0,
-        //     Z:0,
-        //     Pitch: 0,
-        //     Roll: 0, 
-        //     Yaw: 0
-        // }
-    }]);
+  const { mainJson, setMainJson, setCameraPositionRef } = useMainJson();
+  const [duplicateNameIndex, setDuplicateNameIndex] = React.useState(-1);
+
+  const [droneCount, setDroneCount] = React.useState(mainJson.getAllDrones().length);
+  const [snackBarState, setSnackBarState] = React.useState({
+    open: true,
+  });
+  const { activeScreen, setActiveScreen } = useMainJson();
+  React.useEffect(() => {
+    setActiveScreen(configurationTabNames[mission.tabIndex]);
+  });
+
+
     const setDrone = () => {
         let newDrone = new DroneModel();
         newDrone.FlightController = 'SimpleFlight';
@@ -180,8 +117,8 @@ export default function MissionConfiguration (mission) {
             //     Roll: 0, 
             //     Yaw: 0
             // }
-        })
-    }
+        
+    };
 
     const popDrone = () =>{
         droneArray.pop()

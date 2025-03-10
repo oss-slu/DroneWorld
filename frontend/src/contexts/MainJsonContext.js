@@ -79,3 +79,4 @@ export const MainJsonProvider = ({ children }) => {
 
 MainJsonProvider.propTypes = {
   children: PropTypes.node.isRequired,
+};
