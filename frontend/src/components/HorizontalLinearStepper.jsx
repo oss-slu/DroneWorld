@@ -1,17 +1,21 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
+import { Box, Grid } from '@mui/material';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 import styled from '@emotion/styled';
 import MissionConfiguration from './Configuration/MissionConfiguration';
 import EnvironmentConfiguration from './EnvironmentConfiguration';
 import MonitorControl from './MonitorControl';
+import Home from '../pages/Home';
 import { useNavigate } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
 import Tooltip from '@mui/material/Tooltip';
-import CesiumMap from '../cesium/CesiumMap';
+import CesiumMap from './cesium/CesiumMap';
+import { mapControls } from '../constants/map';
+import ControlsDisplay from './Configuration/ControlsDisplay';
 
 const StyledButton = styled(Button)`
   border-radius: 25px;
@@ -19,17 +23,13 @@ const StyledButton = styled(Button)`
   font-weight: bolder;
 `;
 
-const steps = [
-  'Environment Configuration',
-  'Mission Configuration',
-  'Test Configuration',
-];
+const steps = ['Environment Configuration', 'Mission Configuration', 'Test Configuration'];
 
 export default function HorizontalLinearStepper(data) {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
-  const [mainJson, setJson] = React.useState({
+  const [mainJson, setJson, activeScreen] = React.useState({
     Drones: null,
     environment: null,
     monitors: null,
@@ -68,6 +68,9 @@ export default function HorizontalLinearStepper(data) {
       newSkipped = new Set(newSkipped.values());
       newSkipped.delete(activeStep);
     }
+    // if(activeStep == 0) {
+    //   setMainJson();
+    // }
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     setSkipped(newSkipped);
     invokePostAPI();
@@ -110,6 +113,19 @@ export default function HorizontalLinearStepper(data) {
         delete drone.Sensors.Barometer['Key'];
         delete drone.Sensors.Magnetometer['Key'];
         delete drone.Sensors.GPS['Key'];
+        // delete drone.Sensors.GPS["EphTimeConstant"]
+        // drone.Sensors.GPS["EpvTimeConstant"] ? delete drone.Sensors.GPS["EpvTimeConstant"]: null
+        // drone.Sensors.GPS["EphInitial"] ? delete drone.Sensors.GPS["EphInitial"]: null
+        // drone.Sensors.GPS["EpvInitial"] ? delete drone.Sensors.GPS["EpvInitial"]: null
+        // drone.Sensors.GPS["EphFinal"] ? delete drone.Sensors.GPS["EphFinal"]: null
+        // drone.Sensors.GPS["EpvFinal"] ? delete drone.Sensors.GPS["EpvFinal"]: null
+        // drone.Sensors.GPS["EphMin3d"] ? delete drone.Sensors.GPS["EphMin3d"]: null
+        // drone.Sensors.GPS["EphMin2d"] ? delete drone.Sensors.GPS["EphMin2d"]: null
+        // drone.Sensors.GPS["UpdateLatency"] ? delete drone.Sensors.GPS["UpdateLatency"]: null
+        // drone.Sensors.GPS["StartupDelay"] ? delete drone.Sensors.GPS["StartupDelay"]: null
+        // delete drone.Cameras.CaptureSettings.map(capt => {
+        //   delete capt["key"]
+        // })
       });
 
       delete mainJson.environment['time'];
@@ -162,7 +178,6 @@ export default function HorizontalLinearStepper(data) {
         .then((res) => console.log(res));
     }
   };
-
   const stepsComponent = [
     {
       name: 'Environment Configuration',
@@ -170,7 +185,7 @@ export default function HorizontalLinearStepper(data) {
       comp: (
         <EnvironmentConfiguration
           environmentJson={setMainJson}
-          id="environment"
+          id='environment'
           mainJsonValue={mainJson}
         />
       ),
@@ -181,7 +196,7 @@ export default function HorizontalLinearStepper(data) {
       comp: (
         <MissionConfiguration
           droneArrayJson={setMainJson}
-          id="Drones"
+          id='Drones'
           mainJsonValue={mainJson}
           windowHeight={windowSize.current[1]}
         />
@@ -193,7 +208,7 @@ export default function HorizontalLinearStepper(data) {
       comp: (
         <MonitorControl
           monitorJson={setMainJson}
-          id="monitors"
+          id='monitors'
           mainJsonValue={mainJson}
           windowHeight={windowSize.current[1]}
         />
@@ -202,56 +217,85 @@ export default function HorizontalLinearStepper(data) {
   ];
 
   return (
-    <Box
-      sx={{
-        width: '100vw',
-        height: '100vh',
-        maxHeight: '98vh',
-        overflowY: 'hidden',
-        padding: '1vw',
-        boxSizing: 'border-box',
-      }}
-    >
-      <Tooltip title="Return to home" placement="bottom">
-        <HomeIcon
-          style={{ float: 'right', cursor: 'pointer', fontSize: '35px', color: 'white' }}
-          onClick={redirectToHome}
-        />
-      </Tooltip>
-      <Box
-        sx={{
-          display: 'flex',
-          width: '98vw',
-          alignItems: 'start',
-          padding: '1vw',
-          boxSizing: 'border-box',
-        }}
-      >
-        <Box sx={{ width: '45%' }}>
-          <Stepper activeStep={activeStep} style={{ padding: 20 }}>
-            {steps.map((label, index) => {
-              const stepProps = {};
-              const labelProps = {};
-              if (isStepSkipped(index)) {
-                stepProps.completed = false;
-              }
-              return (
-                <Step key={label} {...stepProps}>
-                  <StepLabel {...labelProps}>{label}</StepLabel>
-                </Step>
-              );
-            })}
-          </Stepper>
+    <Box sx={{ width: '95%' }}>
+      <Typography sx={{ mb: 1 }} variant='h4' component='h4'>
+        Requirement
+        <Tooltip title='Home' placement='bottom'>
+          <HomeIcon
+            style={{ float: 'right', cursor: 'pointer', fontSize: '35px' }}
+            onClick={redirectToHome}
+          />
+        </Tooltip>
+      </Typography>
+      <Typography sx={{ mt: 2, mb: 1 }} variant='h6' component='h4'>
+        {data.desc}
+      </Typography>
+      <Stepper activeStep={activeStep} style={{ padding: 20 }}>
+        {steps.map((label, index) => {
+          const stepProps = {};
+          const labelProps = {};
+          if (isStepSkipped(index)) {
+            stepProps.completed = false;
+          }
+          return (
+            <Step key={label} {...stepProps}>
+              <StepLabel {...labelProps}>{label}</StepLabel>
+            </Step>
+          );
+        })}
+      </Stepper>
+      {activeStep === steps.length ? (
+        <React.Fragment>
+          Redirect to dashboard //TODO
+          {/* <Typography sx={{ mt: 2, mb: 1 }}>finish</Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+            <Box sx={{ flex: '1 1 auto' }} />
+            <Button onClick={handleReset}>Reset</Button>
+          </Box> */}
+        </React.Fragment>
+      ) : (
+        <React.Fragment>
+          {/* <Typography sx={{ mt: 2, mb: 1 }}  variant="h4" component="h4">Requirement</Typography>
+          <Typography sx={{ mt: 2, mb: 1 }}  variant="h6" component="h4">{data.desc}</Typography> */}
+          <Box
+            sx={{
+              display: 'flex',
+            }}
+          >
+            <Box sx={{ width: '45%' }}>
+              {stepsComponent.map((compo, index) => {
+                return compo.id === activeStep + 1 ? compo.comp : '';
+              })}
+              <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+                <StyledButton
+                  color='inherit'
+                  disabled={activeStep === 0}
+                  onClick={handleBack}
+                  sx={{ mr: 1 }}
+                  variant='outlined'
+                >
+                  Back
+                </StyledButton>
+                <Box sx={{ flex: '1 1 auto' }} />
+                <StyledButton variant='outlined' onClick={handleNext}>
+                  {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                </StyledButton>
+              </Box>
+            </Box>
 
-          <Box sx={{ mt: 2 }}>
-            {stepsComponent[activeStep].comp}
+            <Box sx={{ width: '55%', overflow: 'hidden', ml: 5 }}>
+              <Grid container>
+                <ControlsDisplay mapControl={mapControls.default} />
+                <Grid item xs={12}>
+                  <CesiumMap activeConfigStep={activeStep} />
+                </Grid>
+
+                <ControlsDisplay mapControl={mapControls[activeScreen]} />
+              </Grid>
+            </Box>
           </Box>
-        </Box>
-          
-        <Box sx={{ width: '55%', overflow: 'hidden', border: 1, borderColor: 'yellow', ml: 5 }}>
-          <CesiumMap activeConfigStep={activeStep} />
-        </Box>
-      </Box>
+        </React.Fragment>
+      )}
     </Box>
   );
 }
