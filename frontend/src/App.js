@@ -1,6 +1,6 @@
 import React from "react";
-import { MainJsonProvider } from './contexts/MainJsonContext';  // Make sure to import the provider
-import CesiumMap from './CesiumMap';  // Your CesiumMap component
+import { MainJsonProvider } from './contexts/MainJsonContext';  
+import CesiumMap from './CesiumMap'; 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Wizard from './pages/Wizard';
@@ -26,7 +26,7 @@ function App() {
             <Route exact path='/' element={<LandingPage />} />
             <Route exact path='/about-us' element={<AboutUs />} />
             <Route exact path='*' element={<NotFound />} />
-            <Route exact path='/cesium-map' element={<CesiumMap />} />
+
           </Routes>
         </Router>
       </div>
