@@ -1,6 +1,4 @@
 import React, { useRef, useEffect, useState } from "react";
-console.log("React version:", React.version);
-
 import { Viewer, CameraFlyTo, Cesium3DTileset } from 'resium';
 import {
   Cartesian3,
@@ -9,15 +7,14 @@ import {
   Ion,
   CesiumTerrainProvider,
 } from 'cesium';
+//import DrawSadeZone from './DrawSadeZone';
+//import RadiusDragAndDrop from './RegionDragAndDrop';
+//import TimeLineSetterCesiumComponent from './TimeLineSetterCesiumComponent';
 import { useMainJson } from "./contexts/MainJsonContext";
 
 const CesiumMap = () => {
   const DEFAULT_CAMERA_HEIGHT = 5000;
   const { mainJson, envJson, registerSetCameraByPosition } = useMainJson();
-
-  // Debugging log to check the values of mainJson and envJson
-  console.log("mainJson:", mainJson);
-  console.log("envJson:", envJson);
 
   const viewerRef = useRef(null);
   const [viewerReady, setViewerReady] = useState(false);
@@ -66,8 +63,6 @@ const CesiumMap = () => {
       -Math.PI / 2,
     );
   }, [envJson.Origin.latitude, envJson.Origin.longitude, viewerReady]);
-
-  console.log("Rendering CesiumMap...");
 
   // Use CesiumTerrainProvider instead of createWorldTerrain
   const terrainProvider = new CesiumTerrainProvider({
