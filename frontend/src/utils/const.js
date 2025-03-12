@@ -26,6 +26,7 @@ export const UAV_DESCRIPTION = {
 };
 
 export const imageUrls = {
+  drone_icon: '/images/drone-icon.png',
   pin: '/images/map-pin.png',
   left_click: '/images/left-click.png',
   middle_click: '/images/middle-click.png',

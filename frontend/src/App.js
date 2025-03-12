@@ -1,6 +1,5 @@
 import React from "react";
 import { MainJsonProvider } from './contexts/MainJsonContext';  
-import CesiumMap from './CesiumMap'; 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Wizard from './pages/Wizard';
