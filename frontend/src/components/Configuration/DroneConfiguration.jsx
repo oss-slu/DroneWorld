@@ -179,6 +179,18 @@ export default function DroneConfiguration (droneData)  {
         sendJson()
     }, [drone])
 
+    React.useEffect(() => {
+        setDrone((prevState) => ({
+            ...prevState, // Preserve existing state
+            X: droneData.droneObject?.X ?? prevState.X, // Update X safely
+            Y: droneData.droneObject?.Y ?? prevState.Y, // Update Y safely
+            Z: droneData.droneObject?.Z ?? prevState.Z  // Update Z safely
+        }));
+    }, [droneData.droneObject?.X, droneData.droneObject?.Y, droneData.droneObject?.Z]);
+    
+    
+    
+
     const sendJson = () => {
         droneData.droneJson(drone, droneData.id);
     }

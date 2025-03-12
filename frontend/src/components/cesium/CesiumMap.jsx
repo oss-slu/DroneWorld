@@ -10,10 +10,10 @@ import {
   Cartographic,
 } from 'cesium';
 import PropTypes from 'prop-types';
-// import DrawSadeZone from './DrawSadeZone';
+import DrawSadeZone from './DrawSadeZone';
 import DroneDragAndDrop from './DroneDragAndDrop';
-// import RadiusDragAndDrop from './RegionDragAndDrop';
-// import TimeLineSetterCesiumComponent from './TimeLineSetterCesiumComponent';
+import RadiusDragAndDrop from './RegionDragAndDrop';
+import TimeLineSetterCesiumComponent from './TimeLineSetterCesiumComponent';
 import { useMainJson } from '../../contexts/MainJsonContext';
 import { originTypes } from '../../constants/env';
 import { EnvironmentModel } from '../../model/EnvironmentModel';
@@ -37,7 +37,7 @@ const CesiumMap = ({ activeConfigStep }) => {
   const OSMBuildingsAssetId = 96188;
   const google3DTilesAssetId = 2275207;
 
-  //Ion.defaultAccessToken = process.env.REACT_APP_CESIUM_ION_ACCESS_TOKEN;
+  Ion.defaultAccessToken = process.env.REACT_APP_CESIUM_ION_ACCESS_TOKEN;
 
   const setCameraByPosition = (position = null, pitch = null) => {
     if (!viewerReady) return;
@@ -165,7 +165,7 @@ const CesiumMap = ({ activeConfigStep }) => {
       terrainProvider={terrainProvider}
       style={{ cursor: envJson.activeSadeZoneIndex == null ? 'default' : 'crosshair' }}
     >
-      <Cesium3DTileset url={IonResource.fromAssetId(google3DTilesAssetId)} />
+      {/* <Cesium3DTileset url={IonResource.fromAssetId(google3DTilesAssetId)} /> */}
       <CameraFlyTo
         destination={cameraPosition.destination}
         orientation={cameraPosition.orientation}
