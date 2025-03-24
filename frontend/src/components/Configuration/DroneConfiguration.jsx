@@ -295,26 +295,26 @@ export default function DroneConfiguration (droneData)  {
                                 <React.Fragment>
                                     <Tooltip title="Stepping distance of 0.0001, equivalent to 1m" placement='bottom'>
                                     <Grid item xs={3}>
-                                        <TextField id="X" label="Latitude" variant="standard" type="number" inputProps={{ step: ".0001" }} value={drone.X} onChange={handleChange}/>
+                                        <TextField id="X" label="Latitude" variant="standard" type="number" inputProps={{ step: ".0001" }} value={drone.X} onChange={handleLocChange}/>
                                     </Grid>
                                     </Tooltip>
                                     <Tooltip title="Stepping distance of 0.0001, equivalent to 1m" placement='bottom'>
                                     <Grid item xs={3}>
-                                        <TextField id="Y" label="Longitude" variant="standard" type="number" inputProps={{ step: ".0001" }} value={drone.Y} onChange={handleChange}/>
+                                        <TextField id="Y" label="Longitude" variant="standard" type="number" inputProps={{ step: ".0001" }} value={drone.Y} onChange={handleLocChange}/>
                                     </Grid>
                                     </Tooltip>
                                     <Tooltip title="Drone Spawning Height above ground (meters)" placement='bottom'>
                                     <Grid item xs={3}>
-                                        <TextField id="Z" label="Height" variant="standard" type="number" inputProps={{ step: "1" }} value={drone.Z} onChange={handleChange}/>
+                                        <TextField id="Z" label="Height" variant="standard" type="number" inputProps={{ step: "1" }} value={drone.Z} onChange={handleLocChange}/>
                                     </Grid>
                                     </Tooltip>
                                 </React.Fragment> : 
                                 <React.Fragment>
                                     <Grid item xs={3}>
-                                        <TextField id="X" label="X" variant="standard" type="number" inputProps={{ step: ".0001" }} value={drone.X} onChange={handleChange} />
+                                        <TextField id="X" label="X" variant="standard" type="number" inputProps={{ step: ".0001" }} value={drone.X} onChange={handleLocChange} />
                                     </Grid>
                                     <Grid item xs={3}>
-                                        <TextField id="Y" label="Y" variant="standard" type="number" inputProps={{ step: ".0001" }} value={drone.Y} onChange={handleChange} />
+                                        <TextField id="Y" label="Y" variant="standard" type="number" inputProps={{ step: ".0001" }} value={drone.Y} onChange={handleLocChange} />
                                     </Grid>
                                     <Grid item xs={3}> 
                                         <TextField id="Z" label="Z" variant="standard" type="number" inputProps={{ step: ".0001" }} value={drone.Z} disabled/>
