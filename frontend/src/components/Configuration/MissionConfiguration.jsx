@@ -13,7 +13,10 @@ import DroneConfiguration from './DroneConfiguration'
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Grid from '@mui/material/Grid';
-
+import Tooltip from '@mui/material/Tooltip';
+import { imageUrls } from '../../utils/const';
+import { useMainJson } from '../../contexts/MainJsonContext';
+import { SimulationConfigurationModel } from '../../model/SimulationConfigurationModel';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -23,6 +26,8 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 export default function MissionConfiguration (mission) {
+    const { mainJson, setMainJson, setCameraPositionRef } = useMainJson();
+    const [duplicateNameIndex, setDuplicateNameIndex] = React.useState(-1);
     const classes = useStyles();
     const [droneCount, setDroneCount] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones.length : 1);
     const [droneArray, setDroneArray] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones : [{
@@ -38,9 +43,9 @@ export default function MissionConfiguration (mission) {
         AllowAPIAlways: true,
         EnableTrace: false,
         Name:"Drone " + (droneCount),
-        X: 0,
-        Y: 0 + (1 * droneCount),
-        Z: 0,
+        X:mainJson.environment.getOriginLatitude() + 0.0001 * droneCount,
+        Y:mainJson.environment.getOriginLongitude(),
+        Z:mainJson.environment.getOriginHeight(),
         Pitch: 0,
         Roll: 0, 
         Yaw: 0,
@@ -100,6 +105,14 @@ export default function MissionConfiguration (mission) {
         //     Yaw: 0
         // }
     }]);
+
+    React.useEffect(() => {
+        if(droneArray.length===1){
+            mainJson.addNewDrone(droneArray[droneCount-1]);
+            setMainJson(SimulationConfigurationModel.getReactStateBasedUpdate(mainJson));
+        }
+    }, []);
+
     const setDrone = () => {
         droneArray.push({
             id: (droneCount), 
@@ -114,9 +127,9 @@ export default function MissionConfiguration (mission) {
             AllowAPIAlways: true,
             EnableTrace: false,
             Name:"Drone " + (droneCount+1),
-            X:mission.mainJsonValue.environment != null ? droneCount > 0 ? (mission.mainJsonValue.environment.Origin.Latitude) + (0.0001 * droneCount): mission.mainJsonValue.environment.Origin.Latitude : 0,
-            Y:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Longitude : 0,
-            Z:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Height : 0,
+            X:mainJson.environment.getOriginLatitude() + 0.0001 * droneCount,
+            Y:mainJson.environment.getOriginLongitude(),
+            Z:mainJson.environment.getOriginHeight(),
             Pitch: 0,
             Roll: 0, 
             Yaw: 0,
@@ -176,6 +189,8 @@ export default function MissionConfiguration (mission) {
             //     Yaw: 0
             // }
         })
+        mainJson.addNewDrone(droneArray[droneCount]);
+        setMainJson(SimulationConfigurationModel.getReactStateBasedUpdate(mainJson));
     }
 
     const popDrone = () =>{
@@ -191,6 +206,17 @@ export default function MissionConfiguration (mission) {
         setDroneCount(droneCount -1)
         popDrone()
     }
+
+    const handleDragStart = (event, index) => {
+        const imgSrc = event.target.src;
+        const dragData = {
+          type: 'drone',
+          src: imgSrc,
+          index: index,
+        };
+    
+        event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+      };
 
     const setDroneName = (e, index) => {
         setDroneArray(objs => {
@@ -233,7 +259,7 @@ export default function MissionConfiguration (mission) {
     }
 
     return (
-        <Box sx={{border:1, borderRadius: 3, maxHeight: (mission.windowHeight)-200, overflow:'scroll', padding: 3}} >
+        <Box sx={{width: '100%', border:1, borderRadius: 3, overflow:'scroll', padding: 3}} >
             {/* <Container fixed> */}
             <Grid container  direction="row" style={{padding: '12px'}} ><strong>Configure sUAS (small unmanned aircraft system) or drone characteristics in your scenario</strong></Grid>
                     <Alert severity="info">
@@ -261,11 +287,36 @@ export default function MissionConfiguration (mission) {
                                     aria-controls="panel1a-content"
                                     id="panel1a-header"
                                     >
-                                    <Typography className={classes.heading}>{drone.droneName}</Typography>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            width: '100%',
+                                        }}
+                                    >
+                                        <Typography className={classes.heading}>{drone.droneName}</Typography>
+                                        <Grid container alignItems="center" columnSpacing={2} sx={{ width: 'auto' }}>
+                                            <Grid item>
+                                                <Tooltip title="Click to fly this drone on the map."></Tooltip>
+                                            </Grid>
+                                            <Grid item>
+                                                <Tooltip title="Drag and Drop this drone to set or update its home location on the map.">
+                                                    <img
+                                                        src={imageUrls.drone_icon}
+                                                        alt="Draggable Icon"
+                                                        draggable="true"
+                                                        onDragStart={(e) => handleDragStart(e, index)}
+                                                        style={{ width: 40, cursor: 'grab', marginRight: 20 }}
+                                                    />
+                                                </Tooltip>
+                                            </Grid>
+                                        </Grid>
+                                    </Box>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                     <Typography>
-                                        <DroneConfiguration name={drone.droneName} id={drone.id} resetName={setDroneName} droneJson={setDroneJson} droneObject={droneArray[(drone.id)]}/>
+                                        <DroneConfiguration name={drone.droneName} id={drone.id} resetName={setDroneName} droneJson={setDroneJson} droneObject={droneArray[(drone.id)]} index={index} duplicateNameIndex={duplicateNameIndex} setDuplicateNameIndex={setDuplicateNameIndex}/>
                                     </Typography>
                                     </AccordionDetails>
                                 </Accordion>
