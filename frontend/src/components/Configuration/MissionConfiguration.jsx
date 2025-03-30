@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function MissionConfiguration (mission) {
     const classes = useStyles();
+    const { mainJson, setMainJson, setCameraPositionRef } = useMainJson();
     const [droneCount, setDroneCount] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones.length : 1);
     const [droneArray, setDroneArray] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones : [{
         id: droneCount-1, 
@@ -38,9 +39,9 @@ export default function MissionConfiguration (mission) {
         AllowAPIAlways: true,
         EnableTrace: false,
         Name:"Drone " + (droneCount),
-        X:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Latitude : 0,
-        Y:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Longitude : 0,
-        Z:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Height : 0,
+        X:mainJson.environment.getOriginLatitude() ,
+        Y:mainJson.environment.getOriginLongitude(),
+        Z:mainJson.environment.getOriginHeight() +  1 * droneCount,
         Pitch: 0,
         Roll: 0, 
         Yaw: 0,
