@@ -13,8 +13,6 @@ import DroneConfiguration from './DroneConfiguration'
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Grid from '@mui/material/Grid';
-import { useMainJson } from '../../contexts/MainJsonContext';
-
 
 
 const useStyles = makeStyles((theme) => ({
@@ -26,7 +24,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function MissionConfiguration (mission) {
     const classes = useStyles();
-    const { mainJson, setMainJson, setCameraPositionRef } = useMainJson();
     const [droneCount, setDroneCount] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones.length : 1);
     const [droneArray, setDroneArray] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones : [{
         id: droneCount-1, 
@@ -41,9 +38,9 @@ export default function MissionConfiguration (mission) {
         AllowAPIAlways: true,
         EnableTrace: false,
         Name:"Drone " + (droneCount),
-        X:mainJson.environment.getOriginLatitude() ,
-        Y:mainJson.environment.getOriginLongitude(),
-        Z:mainJson.environment.getOriginHeight() +  1 * droneCount,
+        X: 0,
+        Y: 0 + (1 * droneCount),
+        Z: 0,
         Pitch: 0,
         Roll: 0, 
         Yaw: 0,
