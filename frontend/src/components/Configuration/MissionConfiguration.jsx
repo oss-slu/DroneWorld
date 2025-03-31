@@ -16,7 +16,7 @@ import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
 import { imageUrls } from '../../utils/const';
 import { useMainJson } from '../../contexts/MainJsonContext';
-import { SimulationConfigurationModel } from '../../model/SimulationConfigurationModel'
+import { SimulationConfigurationModel } from '../../model/SimulationConfigurationModel';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -189,6 +189,8 @@ export default function MissionConfiguration (mission) {
             //     Yaw: 0
             // }
         })
+        mainJson.addNewDrone(droneArray[droneCount]);
+        setMainJson(SimulationConfigurationModel.getReactStateBasedUpdate(mainJson));
     }
 
     const handleDragStart = (event, index) => {
