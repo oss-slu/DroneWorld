@@ -303,7 +303,7 @@ export default function MissionConfiguration (mission) {
                                     </AccordionSummary>
                                     <AccordionDetails>
                                     <Typography>
-                                        <DroneConfiguration name={drone.droneName} id={drone.id} resetName={setDroneName} droneJson={setDroneJson} droneObject={droneArray[(drone.id)]} index={index} duplicateNameIndex={duplicateNameIndex} setDuplicateNameIndex={setDuplicateNameIndex}/>
+                                        <DroneConfiguration name={drone.droneName} id={drone.id} resetName={setDroneName} droneJson={setDroneJson} droneObject={droneArray[(drone.id)]}/>
                                     </Typography>
                                     </AccordionDetails>
                                 </Accordion>
