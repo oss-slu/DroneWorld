@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 export default function MissionConfiguration (mission) {
-    const { mainJson, setMainJson, setCameraPositionRef } = useMainJson();
+    const { mainJson, setMainJson } = useMainJson();
     const [duplicateNameIndex, setDuplicateNameIndex] = React.useState(-1);
     const classes = useStyles();
     const [droneCount, setDroneCount] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones.length : 1);
