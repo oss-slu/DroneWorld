@@ -15,6 +15,8 @@ import AlertTitle from '@mui/material/AlertTitle';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
 import { imageUrls } from '../../utils/const';
+import { useMainJson } from '../../contexts/MainJsonContext';
+import { SimulationConfigurationModel } from '../../model/SimulationConfigurationModel';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -24,6 +26,8 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 export default function MissionConfiguration (mission) {
+    const { mainJson, setMainJson, setCameraPositionRef } = useMainJson();
+    const [duplicateNameIndex, setDuplicateNameIndex] = React.useState(-1);
     const classes = useStyles();
     const [droneCount, setDroneCount] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones.length : 1);
     const [droneArray, setDroneArray] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones : [{
@@ -39,9 +43,9 @@ export default function MissionConfiguration (mission) {
         AllowAPIAlways: true,
         EnableTrace: false,
         Name:"Drone " + (droneCount),
-        X:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Latitude : 0,
-        Y:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Longitude : 0,
-        Z:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Height : 0,
+        X:mainJson.environment.getOriginLatitude() + 0.0001 * droneCount,
+        Y:mainJson.environment.getOriginLongitude(),
+        Z:mainJson.environment.getOriginHeight(),
         Pitch: 0,
         Roll: 0, 
         Yaw: 0,
@@ -101,6 +105,14 @@ export default function MissionConfiguration (mission) {
         //     Yaw: 0
         // }
     }]);
+
+    React.useEffect(() => {
+        if(droneArray.length===1){
+            mainJson.addNewDrone(droneArray[droneCount-1]);
+            setMainJson(SimulationConfigurationModel.getReactStateBasedUpdate(mainJson));
+        }
+    }, []);
+
     const setDrone = () => {
         droneArray.push({
             id: (droneCount), 
@@ -115,9 +127,9 @@ export default function MissionConfiguration (mission) {
             AllowAPIAlways: true,
             EnableTrace: false,
             Name:"Drone " + (droneCount+1),
-            X:mission.mainJsonValue.environment != null ? droneCount > 0 ? (mission.mainJsonValue.environment.Origin.Latitude) + (0.0001 * droneCount): mission.mainJsonValue.environment.Origin.Latitude : 0,
-            Y:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Longitude : 0,
-            Z:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Height : 0,
+            X:mainJson.environment.getOriginLatitude() + 0.0001 * droneCount,
+            Y:mainJson.environment.getOriginLongitude(),
+            Z:mainJson.environment.getOriginHeight(),
             Pitch: 0,
             Roll: 0, 
             Yaw: 0,
@@ -177,6 +189,8 @@ export default function MissionConfiguration (mission) {
             //     Yaw: 0
             // }
         })
+        mainJson.addNewDrone(droneArray[droneCount]);
+        setMainJson(SimulationConfigurationModel.getReactStateBasedUpdate(mainJson));
     }
 
     const popDrone = () =>{
@@ -302,7 +316,7 @@ export default function MissionConfiguration (mission) {
                                     </AccordionSummary>
                                     <AccordionDetails>
                                     <Typography>
-                                        <DroneConfiguration name={drone.droneName} id={drone.id} resetName={setDroneName} droneJson={setDroneJson} droneObject={droneArray[(drone.id)]}/>
+                                        <DroneConfiguration name={drone.droneName} id={drone.id} resetName={setDroneName} droneJson={setDroneJson} droneObject={droneArray[(drone.id)]} index={index} duplicateNameIndex={duplicateNameIndex} setDuplicateNameIndex={setDuplicateNameIndex}/>
                                     </Typography>
                                     </AccordionDetails>
                                 </Accordion>

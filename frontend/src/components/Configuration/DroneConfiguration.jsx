@@ -68,44 +68,67 @@ export default function DroneConfiguration(droneData) {
     return { ...defaults, ...droneObject };
   });
 
-
   const syncDroneLocation = React.useCallback((x, y, z) => {
-  
+    // Ensure droneData exists and initialize droneObject if needed
+    if (!droneData) return;
+    
+    if (!droneData.droneObject) {
+      droneData.droneObject = {};
+    }
+    
+    // Safely update properties
+    droneData.droneObject.X = x;
+    droneData.droneObject.Y = y;
+    droneData.droneObject.Z = z;
+    
+    // Update React state
     setDrone(prev => ({
       ...prev,
       X: x,
       Y: y,
       Z: z
     }));
-  }, []);
+  }, [droneData]);
   
-
-  // Drop handler for canvas
   const dropHandler = React.useCallback((e) => {
     e.preventDefault();
-    const rect = e.currentTarget.getBoundingClientRect();
+    
+    // Safely calculate position
+    const canvas = e.currentTarget;
+    const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
+    
     syncDroneLocation(x, y, 0);
   }, [syncDroneLocation]);
-
-
-  React.useEffect(() => {
-    sendJson();
-  }, [drone]);
   
+
+  // Set up event listeners
+  React.useEffect(() => {
+    const canvas = document.getElementById('drone-config-canvas');
+    if (canvas) {
+      canvas.addEventListener('drop', dropHandler);
+      canvas.addEventListener('dragover', (e) => e.preventDefault());
+      
+      return () => {
+        canvas.removeEventListener('drop', dropHandler);
+        canvas.removeEventListener('dragover', (e) => e.preventDefault());
+      };
+    }
+  }, [dropHandler]);
 
   // Sync position changes from external updates
   React.useEffect(() => {
-    if (droneData.droneObject?.X !== undefined) {
-      setDrone(prev => ({
-        ...prev,
-        X: droneData.droneObject.X,
-        Y: droneData.droneObject.Y,
-        Z: droneData.droneObject.Z
-      }));
-    }
-  }, [droneData.droneObject?.X, droneData.droneObject?.Y, droneData.droneObject?.Z]);
+    if (!droneData?.droneObject) return;
+    
+    setDrone(prev => ({
+      ...prev,
+      X: droneData.droneObject.X ?? prev.X,
+      Y: droneData.droneObject.Y ?? prev.Y,
+      Z: droneData.droneObject.Z ?? prev.Z
+    }));
+  }, [droneData?.droneObject?.X, droneData?.droneObject?.Y, droneData?.droneObject?.Z]);
+
 
   const handleMissionChange = (event) => {
     setDrone(prevState => ({
@@ -148,13 +171,9 @@ export default function DroneConfiguration(droneData) {
       [val.target.id]: val.target.type === "number" ? parseFloat(val.target.value) : val.target.value
     }));
   };
-  
+
   const sendJson = () => {
-    // Send the complete state including position
-    droneData.droneJson({
-      ...droneData.droneObject,
-      ...drone
-    }, droneData.id);
+    droneJson(drone, id);
   };
 
   const setSensorConfig = (sensor) => {
