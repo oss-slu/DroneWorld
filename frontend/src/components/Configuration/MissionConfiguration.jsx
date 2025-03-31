@@ -16,7 +16,7 @@ import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
 import { imageUrls } from '../../utils/const';
 import { useMainJson } from '../../contexts/MainJsonContext';
-import { SimulationConfigurationModel } from '../../model/Simulation'
+import { SimulationConfigurationModel } from '../../model/SimulationConfigurationModel'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -190,6 +190,17 @@ export default function MissionConfiguration (mission) {
             // }
         })
     }
+
+    const handleDragStart = (event, index) => {
+        const imgSrc = event.target.src;
+        const dragData = {
+          type: 'drone',
+          src: imgSrc,
+          index: index,
+        };
+
+        event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+      };
 
     const popDrone = () =>{
         droneArray.pop()
