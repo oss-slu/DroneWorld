@@ -26,7 +26,8 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 export default function MissionConfiguration (mission) {
-
+    const { mainJson, setMainJson } = useMainJson();
+    const [duplicateNameIndex, setDuplicateNameIndex] = React.useState(-1);
     const classes = useStyles();
     const [droneCount, setDroneCount] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones.length : 1);
     const [droneArray, setDroneArray] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones : [{
@@ -104,6 +105,14 @@ export default function MissionConfiguration (mission) {
         //     Yaw: 0
         // }
     }]);
+
+    React.useEffect(() => {
+        if(droneArray.length===1){
+            mainJson.addNewDrone(droneArray[droneCount-1]);
+            setMainJson(SimulationConfigurationModel.getReactStateBasedUpdate(mainJson));
+        }
+    }, []);
+
     const setDrone = () => {
         droneArray.push({
             id: (droneCount), 
@@ -184,6 +193,17 @@ export default function MissionConfiguration (mission) {
         setMainJson(SimulationConfigurationModel.getReactStateBasedUpdate(mainJson));
     }
 
+    const handleDragStart = (event, index) => {
+        const imgSrc = event.target.src;
+        const dragData = {
+          type: 'drone',
+          src: imgSrc,
+          index: index,
+        };
+
+        event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+      };
+
     const popDrone = () =>{
         droneArray.pop()
     }
@@ -197,17 +217,6 @@ export default function MissionConfiguration (mission) {
         setDroneCount(droneCount -1)
         popDrone()
     }
-
-    const handleDragStart = (event, index) => {
-        const imgSrc = event.target.src;
-        const dragData = {
-          type: 'drone',
-          src: imgSrc,
-          index: index,
-        };
-    
-        event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
-      };
 
     const setDroneName = (e, index) => {
         setDroneArray(objs => {
