@@ -26,8 +26,6 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 export default function MissionConfiguration (mission) {
-    const { mainJson, setMainJson, setCameraPositionRef } = useMainJson();
-    const [duplicateNameIndex, setDuplicateNameIndex] = React.useState(-1);
 
     const classes = useStyles();
     const [droneCount, setDroneCount] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones.length : 1);
@@ -56,7 +54,6 @@ export default function MissionConfiguration (mission) {
             name:"fly_to_points",
             param : []
         },
-
         // Cameras: {
         //     CaptureSettings: [
         //         {
@@ -133,7 +130,6 @@ export default function MissionConfiguration (mission) {
                 name:"fly_to_points",
                 param : []
             },
-
             // Cameras: {
             //     CaptureSettings: [
             //         {
