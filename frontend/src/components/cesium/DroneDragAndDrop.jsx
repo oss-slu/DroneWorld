@@ -108,7 +108,7 @@ const DroneDragAndDrop = ({ viewerReady, viewerRef, setCameraByPosition }) => {
                 disableDepthTestDistance: Number.POSITIVE_INFINITY,
               }}
               label={{
-                text: drone.name,
+                text: drone.droneName,
                 font: '14pt',
                 showBackground: true,
                 backgroundColor: Color.CORAL,
