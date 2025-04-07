@@ -15,7 +15,7 @@ import AlertTitle from '@mui/material/AlertTitle';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
 import { imageUrls } from '../../utils/const';
-
+import PixelStreaming  from '../PixelStreaming';
 const useStyles = makeStyles((theme) => ({
     root: {
       width: '100%',
