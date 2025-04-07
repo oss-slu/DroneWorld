@@ -15,7 +15,10 @@ import AlertTitle from '@mui/material/AlertTitle';
 import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
 import { imageUrls } from '../../utils/const';
-import PixelStreaming  from '../PixelStreaming';
+
+import { SimulationConfigurationModel } from '../../model/SimulationConfigurationModel';
+import { useMainJson } from '../../contexts/MainJsonContext';
+
 const useStyles = makeStyles((theme) => ({
     root: {
       width: '100%',
@@ -24,8 +27,8 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 export default function MissionConfiguration (mission) {
-
-
+    const { mainJson, setMainJson } = useMainJson();
+    const [duplicateNameIndex, setDuplicateNameIndex] = React.useState(-1);
     const classes = useStyles();
     const [droneCount, setDroneCount] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones.length : 1);
     const [droneArray, setDroneArray] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones : [{
@@ -104,7 +107,12 @@ export default function MissionConfiguration (mission) {
         // }
     }]);
 
-
+    React.useEffect(() => {
+        if(droneArray.length===1){
+            mainJson.addNewDrone(droneArray[droneCount-1]);
+            setMainJson(SimulationConfigurationModel.getReactStateBasedUpdate(mainJson));
+        }
+    }, []);
 
     const setDrone = () => {
         droneArray.push({
@@ -120,7 +128,7 @@ export default function MissionConfiguration (mission) {
             AllowAPIAlways: true,
             EnableTrace: false,
             Name:"Drone " + (droneCount+1),
-            X:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Latitude : 0,
+            X:mission.mainJsonValue.environment != null ? droneCount > 0 ? (mission.mainJsonValue.environment.Origin.Latitude) + (0.0001 * droneCount): mission.mainJsonValue.environment.Origin.Latitude : 0,
             Y:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Longitude : 0,
             Z:mission.mainJsonValue.environment != null ? mission.mainJsonValue.environment.Origin.Height : 0,
             Pitch: 0,
@@ -182,8 +190,20 @@ export default function MissionConfiguration (mission) {
             //     Yaw: 0
             // }
         })
-       
+        mainJson.addNewDrone(droneArray[droneCount]);
+        setMainJson(SimulationConfigurationModel.getReactStateBasedUpdate(mainJson));
     }
+
+    const handleDragStart = (event, index) => {
+        const imgSrc = event.target.src;
+        const dragData = {
+          type: 'drone',
+          src: imgSrc,
+          index: index,
+        };
+
+        event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+      };
 
     const popDrone = () =>{
         droneArray.pop()
@@ -198,17 +218,6 @@ export default function MissionConfiguration (mission) {
         setDroneCount(droneCount -1)
         popDrone()
     }
-
-    const handleDragStart = (event, index) => {
-        const imgSrc = event.target.src;
-        const dragData = {
-          type: 'drone',
-          src: imgSrc,
-          index: index,
-        };
-    
-        event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
-      };
 
     const setDroneName = (e, index) => {
         setDroneArray(objs => {
