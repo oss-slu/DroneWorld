@@ -7,8 +7,16 @@ export default function PixelStreaming() {
   useEffect(() => {
     const app = new Application({
       settings: {
-        useUrlParams: true,  // Auto-connect via URL (e.g., `?peer=localhost`)
+        peerOptions: {
+          host: 'localhost',
+          port: 80
+        }
       },
+      
+      initialSettings: {
+        StartVideoMuted: true,
+        MatchViewportResolution: true
+      }
     });
     app.videoElement = videoRef.current;
     app.connect();
