@@ -230,6 +230,13 @@ export default function MissionConfiguration (mission) {
                 return obj
             })
         })
+
+        const updatedDrone = mainJson.getDroneBasedOnIndex(index);
+        if (updatedDrone) {
+            updatedDrone.droneName = e;
+            mainJson.updateDroneBasedOnIndex(index, updatedDrone);
+            setMainJson(SimulationConfigurationModel.getReactStateBasedUpdate(mainJson));
+        }
     }
 
     React.useEffect(() => {
