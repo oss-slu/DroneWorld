@@ -68,54 +68,7 @@ export default function DroneConfiguration(droneData) {
     return { ...defaults, ...droneObject };
   });
 
-  const syncDroneLocation = React.useCallback((x, y, z) => {
-    // Ensure droneData exists and initialize droneObject if needed
-    if (!droneData) return;
-    
-    if (!droneData.droneObject) {
-      droneData.droneObject = {};
-    }
-    
-    // Safely update properties
-    droneData.droneObject.X = x;
-    droneData.droneObject.Y = y;
-    droneData.droneObject.Z = z;
-    
-    // Update React state
-    setDrone(prev => ({
-      ...prev,
-      X: x,
-      Y: y,
-      Z: z
-    }));
-  }, [droneData]);
-  
-  const dropHandler = React.useCallback((e) => {
-    e.preventDefault();
-    
-    // Safely calculate position
-    const canvas = e.currentTarget;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    syncDroneLocation(x, y, 0);
-  }, [syncDroneLocation]);
-  
 
-  // Set up event listeners
-  React.useEffect(() => {
-    const canvas = document.getElementById('drone-config-canvas');
-    if (canvas) {
-      canvas.addEventListener('drop', dropHandler);
-      canvas.addEventListener('dragover', (e) => e.preventDefault());
-      
-      return () => {
-        canvas.removeEventListener('drop', dropHandler);
-        canvas.removeEventListener('dragover', (e) => e.preventDefault());
-      };
-    }
-  }, [dropHandler]);
 
   // Sync position changes from external updates
   React.useEffect(() => {

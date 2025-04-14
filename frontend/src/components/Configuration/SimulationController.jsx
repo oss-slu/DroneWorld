@@ -18,6 +18,7 @@ import { mapEnvironmentData } from '../../utils/mapper/envMapper';
 import { mapDroneData } from '../../utils/mapper/droneMapper';
 import { isTokenExpired } from '../../utils/authUtils';
 import useSessionManager from '../../hooks/useSessionManager';
+import PixelStreaming from '../PixelStreaming';
 
 export default function SimulationController() {
   // START of DOM model ===================
@@ -158,6 +159,13 @@ export default function SimulationController() {
         />
       ),
     },
+    {
+      name: 'Live Stream', 
+      id: 4,
+      comp: (
+        <PixelStreaming /> 
+      ),
+    },
   ];
 
   if (loading) {
@@ -199,6 +207,7 @@ export default function SimulationController() {
           <StyledTabs value={activeStep} onChange={handleTabChange} aria-label='Configuration Tabs'>
             <StyledTab label='Environment' />
             <StyledTab label='sUAS' />
+            <StyledTab label="Live Stream" />
             {/* <StyledTab label="Test" /> */}
           </StyledTabs>
           <div>{activeStep != steps.length && stepsComponent[activeStep].comp}</div>
@@ -206,12 +215,18 @@ export default function SimulationController() {
 
         <Box sx={{ width: '55%', overflow: 'hidden', border: 1, borderColor: 'yellow', ml: 5 }}>
           <Grid container>
-            <ControlsDisplay mapControl={mapControls.default} />
-            <Grid item xs={12}>
-              <CesiumMap activeConfigStep={activeStep} />
-            </Grid>
+            {activeStep == 3 ?(
+              <PixelStreaming />
+            ):(
+            <>
+              <ControlsDisplay mapControl={mapControls.default} />
+              <Grid item xs={12}>
+                <CesiumMap activeConfigStep={activeStep} />
+              </Grid>
 
-            <ControlsDisplay mapControl={mapControls[activeScreen]} />
+              <ControlsDisplay mapControl={mapControls[activeScreen]} />
+            </>
+            )}
           </Grid>
         </Box>
       </Box>
