@@ -61,12 +61,7 @@ export class SimulationConfigurationModel {
   popLastDrone() {
     this._drones.pop();
   }
-
-  deleteDroneById(droneId) {
-    this._drones = this._drones.filter(drone => drone.id !== droneId);
-  }
   
-
   static getReactStateBasedUpdate(instance) {
     let model = new SimulationConfigurationModel();
     model.environment = instance.environment;

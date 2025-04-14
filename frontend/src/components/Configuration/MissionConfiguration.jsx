@@ -216,9 +216,7 @@ export default function MissionConfiguration (mission) {
     const handleDecrement = () => {
         setDroneCount(droneCount -1)
         setDroneArray(prev => {
-            if (prev.length <= 1) return prev;
-                const removedDrone = prev[prev.length - 1];
-                mainJson.deleteDroneById(removedDrone.id);
+                mainJson.popLastDrone();
                 setMainJson(SimulationConfigurationModel.getReactStateBasedUpdate(mainJson));
                 return prev.slice(0, -1);
             }
