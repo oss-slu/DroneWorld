@@ -165,7 +165,7 @@ const CesiumMap = ({ activeConfigStep }) => {
       terrainProvider={terrainProvider}
       style={{ cursor: envJson.activeSadeZoneIndex == null ? 'default' : 'crosshair' }}
     >
-      {/* <Cesium3DTileset url={IonResource.fromAssetId(google3DTilesAssetId)} /> */}
+      <Cesium3DTileset url={IonResource.fromAssetId(google3DTilesAssetId)} />
       <CameraFlyTo
         destination={cameraPosition.destination}
         orientation={cameraPosition.orientation}
