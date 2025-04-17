@@ -32,6 +32,63 @@ task_number = 1  # Global task counter
 storage_service = get_storage_service()
 print(f"Using {storage_service.__class__.__name__} as the storage service.")
 
+# === Simulation Configuration State ===
+simulation_state = {
+    "environment": {},
+    "monitors": {},
+    "drones": []
+}
+
+# === New API Routes ===
+
+@app.route('/api/simulation', methods=['GET'])
+def get_simulation_state():
+    """Retrieve the current simulation state."""
+    return jsonify(simulation_state), 200
+
+@app.route('/api/simulation/drones', methods=['POST'])
+def add_drone():
+    """Add a new drone to the simulation."""
+    new_drone = request.get_json()
+    if not new_drone or "id" not in new_drone:
+        return jsonify({"error": "Invalid drone data"}), 400
+
+    simulation_state["drones"].append(new_drone)
+    return jsonify(new_drone), 201
+
+@app.route('/api/simulation/drones/<drone_id>', methods=['PUT'])
+def update_drone(drone_id):
+    """Update an existing drone's configuration."""
+    updated_drone = request.get_json()
+    for i, drone in enumerate(simulation_state["drones"]):
+        if str(drone["id"]) == drone_id:
+            simulation_state["drones"][i] = updated_drone
+            return jsonify(updated_drone), 200
+    return jsonify({"error": "Drone not found"}), 404
+
+@app.route('/api/simulation/drones/<drone_id>', methods=['DELETE'])
+def delete_drone(drone_id):
+    """Remove a drone from the simulation."""
+    for i, drone in enumerate(simulation_state["drones"]):
+        if str(drone["id"]) == drone_id:
+            del simulation_state["drones"][i]
+            return jsonify({"message": "Drone deleted"}), 200
+    return jsonify({"error": "Drone not found"}), 404
+
+@app.route('/api/simulation/environment', methods=['PUT'])
+def update_environment():
+    """Update the simulation environment settings."""
+    new_environment = request.get_json()
+    simulation_state["environment"] = new_environment
+    return jsonify({"message": "Environment updated"}), 200
+
+@app.route('/api/simulation/monitors', methods=['PUT'])
+def update_monitors():
+    """Update the simulation monitor settings."""
+    new_monitors = request.get_json()
+    simulation_state["monitors"] = new_monitors
+    return jsonify({"message": "Monitors updated"}), 200
+
 # === Flask Routes ===
 
 @app.route('/list-reports', methods=['GET'])

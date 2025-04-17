@@ -98,9 +98,11 @@ export default function EnvironmentConfiguration (env) {
     const environmentJson = (event) => {
         env.environmentJson(event, env.id);
     }    
-    //new added
+    
     React.useEffect(() => {
-        environmentJson(envConf)
+        if (env.environmnetJson){
+            env.environmentJson(envConf, env.id);
+        }
     }, [envConf])
 
     const Direction = [
@@ -599,14 +601,14 @@ const handleSnackBarVisibility = (val) => {
              {fuzzyAlert ? "Fuzzy Testing Changes is under development !" : "Wind Type Changes is under Developement !"}
         </Alert>
     </Snackbar>
-    <Box sx={{ width: '100%',border: '1px solid grey', paddingBottom: 5, paddingTop: 4, paddingLeft:5 }}>
+    <Box sx={{ width: '100%', border: '1px solid grey', paddingBottom: 5, paddingTop: 4, paddingLeft:5 }}>
         {/* <Container fixed > */}
             <Typography>
-                <Grid container spacing={5} direction="row" >
+                <Grid container spacing={5} direction="column" alignItems="center" >
                     {/* <Grid item xs={3}>
                         <Typography id="standard-basic" label="Wind" mt={4}>Wind</Typography>
                     </Grid> */}
-                    <Grid item xs={3}> 
+                    <Grid item xs={12}> 
                         <FormControl variant="standard" sx={{ minWidth: 150 }}>
                             <InputLabel id="WindType">Wind Type</InputLabel>
                                 <Select
@@ -624,7 +626,7 @@ const handleSnackBarVisibility = (val) => {
                     </Grid>
 
                     {/* {selectedWindType !== "Wind Shear" && ( */}
-                    <Grid item xs={3}>
+                    <Grid item xs={12}>
                         <FormControl variant="standard" sx = {{ minWidth: 150 }}>
                             <InputLabel id="Direction">Wind Direction</InputLabel>
                             <Select label="Direction" value={envConf.Wind.Direction} onChange={handleDirection}>
@@ -661,7 +663,7 @@ const handleSnackBarVisibility = (val) => {
 
                     {/* {selectedWindType !== "Wind Shear" && ( */}
                     <Tooltip title="Enter Wind Velocity in Meters per second" placement='bottom'>
-                        <Grid item xs={3}>
+                        <Grid item xs={12}>
                             <TextField id="Force" 
                                 label="Wind Velocity (m/s)" 
                                 variant="standard" type="number" 
@@ -674,7 +676,7 @@ const handleSnackBarVisibility = (val) => {
                     
 
                     {(selectedWindType === "Turbulent Wind" || selectedWindType === "Wind Shear")  && (
-                            <Grid item xs={3}>
+                            <Grid item xs={12}>
                                  <Tooltip title="Enter Fluctuation %" placement='bottom'>
                                 <TextField id="Fluctuation %" 
                                     label="Fluctuation %" 
@@ -785,8 +787,8 @@ const handleSnackBarVisibility = (val) => {
                     </Dialog> */}
                 </Grid>
                 {selectedWindType === "Wind Shear" &&  windShears.map((shear, index) => ((<Typography key={index}><Grid container spacing={5} direction="row" sx={{ marginTop: '20px' }}>
-                    <Grid item xs={3}></Grid>
-                            <Grid item xs={3}>
+                    <Grid item xs={12}></Grid>
+                            <Grid item xs={12}>
                                 <FormControl variant="standard" sx = {{ minWidth: 150 }}>
                                     <InputLabel id="Direction">Wind Direction</InputLabel>
                                     <Select label="Direction" value={shear.windDirection} onChange={(e) => handleShearWindDirection(e.target.value, index)}>
@@ -800,7 +802,7 @@ const handleSnackBarVisibility = (val) => {
                             </Grid>
                     
                             <Tooltip title="Enter Wind Velocity in Meters per second" placement='bottom'>
-                                <Grid item xs={3}>
+                                <Grid item xs={12}>
                                     <TextField id="Velocity" 
                                         label="Wind Velocity (m/s)" 
                                         variant="standard" type="number" 
@@ -809,7 +811,7 @@ const handleSnackBarVisibility = (val) => {
                                         inputProps={{ min: 0 }}/>
                                 </Grid>
                             </Tooltip>
-                            <Grid item xs={3}>
+                            <Grid item xs={12}>
                             <Tooltip title="Enter Fluctuation %" placement='bottom'>
                             <TextField id="Fluctuation%" 
                                     label="Fluctuation %" 
@@ -833,8 +835,8 @@ const handleSnackBarVisibility = (val) => {
                 )))}
 
 
-                <Grid container spacing={5} direction="row" sx={{ marginTop: '20px' }}>  
-                    <Grid item xs={3} >
+                <Grid container spacing={5} direction="column" alignItems="center" sx={{ marginTop: '10px' }}>  
+                    <Grid item xs={12} >
                         <FormControl variant="standard" sx={{ minWidth: 150 }}>
                             <InputLabel id="Origin">Region</InputLabel>
                             <Select label="Region" value={envConf.Origin.Name} onChange={handleOrigin} >
@@ -846,18 +848,18 @@ const handleSnackBarVisibility = (val) => {
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={12}>
                         <TextField id="Latitude" label="Latitude" variant="standard" type="number" 
                         inputProps={{ step: ".0001" }} onChange={handleOriginChange} value={envConf.Origin.Latitude}
                          disabled={envConf.Origin.Name=="Specify Region" ? false : true} 
                          />
                     </Grid>
 
-                    <Grid item xs={3}>
+                    <Grid item xs={12}>
                         <TextField id="Longitude" label="Longitude" variant="standard" type="number" inputProps={{ step: ".0001" }} onChange={handleOriginChange} value={envConf.Origin.Longitude} disabled={envConf.Origin.Name=="Specify Region" ? false : true} />
                     </Grid>
 
-                    <Grid item xs={3}>
+                    <Grid item xs={12}>
         <TextField id="Height" label="Altitude" variant="standard" type="number" inputProps={{ step: "1" }} onChange={handleOriginChange} value={envConf.Origin.Height} disabled={envConf.Origin.Name=="Specify Region" ? false : true}
         helperText={envConf.Origin.Name == "Specify Region" ? "Please enter the Altitude above mean sea level. If you're unsure of the exact altitude, please enter 200 as a default value.":  null}/>
     </Grid>
@@ -871,9 +873,9 @@ const handleSnackBarVisibility = (val) => {
                     </Grid> */}
                 </Grid>
 
-                    <Grid container spacing={5} direction="row" sx={{ marginTop: '20px' }}>
+                    <Grid container spacing={5} direction="column" alignItems="center" sx={{ marginTop: '20px' }}>
                         <Tooltip title="Enter time of day (24 Hours Format)" placement='bottom'>
-                            <Grid item xs={3}>
+                            <Grid item xs={12}>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <Stack spacing={3}>
                                     <TimePicker

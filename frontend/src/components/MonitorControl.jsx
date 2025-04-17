@@ -742,7 +742,7 @@ export default function MonitorControl (monJson) {
                                                 onChange={handleVerticalChange}
                                                 variant="scrollable"
                                                 scrollButtons="auto"
-                                                sx={{ borderRight: 1, borderColor: 'divider' }}
+                                                sx={{ borderRight: 1, borderColor: 'divider', minWidth:'100px' }}
                                             >
                                                 {singleMonitors.map(function(single, index) {
                                                     return <Tab key={index} label={single.name} value={single.value} style={{ justifyContent: "block", alignItems:"block", color:single.colorText}} wrapped/>
