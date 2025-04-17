@@ -5,12 +5,10 @@ on:
     branches:
       - main
       - docker-main 
-      - DragAndDrop
   pull_request:
     branches:
       - main
       - docker-main
-      - DragAndDrop 
 
 jobs:
   frontend-setup:
