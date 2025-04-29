@@ -214,15 +214,34 @@ export default function MissionConfiguration (mission) {
     }
 
     const handleDecrement = () => {
-        setDroneCount(droneCount -1)
-        setDroneArray(prev => {
-                mainJson.popLastDrone();
-                setMainJson(SimulationConfigurationModel.getReactStateBasedUpdate(mainJson));
-                return prev.slice(0, -1);
-            }
-        );
-      };
+        // Ensure droneCount is greater than 0 to prevent negative counts
+        if (droneCount > 0) {
+          setDroneCount(prevCount => prevCount - 1);
       
+          // Update the drone array by removing the last element
+          setDroneArray(prevArray => {
+            const updatedArray = prevArray.slice(0, -1); // Creates a new array without the last element
+      
+            // Call mainJson.popLastDrone() if it exists
+            if (mainJson && typeof mainJson.popLastDrone === 'function') {
+              mainJson.popLastDrone();
+            } else {
+              console.warn('mainJson.popLastDrone is not a function');
+            }
+      
+            // Safely update mainJson state
+            if (typeof SimulationConfigurationModel?.getReactStateBasedUpdate === 'function') {
+              setMainJson(SimulationConfigurationModel.getReactStateBasedUpdate(mainJson));
+            } else {
+              console.warn('SimulationConfigurationModel.getReactStateBasedUpdate is not a function');
+            }
+      
+            return updatedArray;
+          });
+        } else {
+          console.warn('Drone count is already at zero.');
+        }
+      };
     
     const setDroneName = (e, index) => {
         setDroneArray(objs => {
