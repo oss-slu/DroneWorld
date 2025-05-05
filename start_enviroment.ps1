@@ -29,12 +29,18 @@ if (-Not (Test-Path "venv")) {
 
 .\venv\Scripts\Activate.ps1
 
+Set-Location -Path ".\backend"
+
 Write-Info "installing requirements..."
+
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd $(Get-Location); "
+
 pip install -r requirements.txt
+
 
 #back end starting 
 Write-Info "Starting backend..."
-Set-Location -Path ".\backend"
+
 
 
 #open another shell for backend
