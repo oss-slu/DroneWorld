@@ -11,6 +11,8 @@ import SensorConfiguration from './SensorConfiguration';
 import Tooltip from '@mui/material/Tooltip';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { useMainJson } from '../../contexts/MainJsonContext';
+import { SimulationConfigurationModel } from '../../model/SimulationConfigurationModel';
 
 const flightPaths = [
   {value: 'fly_in_circle', label: 'Circle', id: 1},
@@ -35,6 +37,7 @@ const droneModels = {
 };
 
 export default function DroneConfiguration(droneData) {
+  const { mainJson, setMainJson } = useMainJson();
   const { name = "", id = "", droneObject = {}, resetName = () => {}, droneJson = () => {} } = droneData || {};
   
   const [selectedLoc, setSelectedLoc] = React.useState('GeoLocation');
@@ -65,30 +68,24 @@ export default function DroneConfiguration(droneData) {
         param: []
       }
     };
-    return { ...defaults, ...droneObject };
+    return { ...defaults, ...(droneData?.getDroneBasedOnIndex?.(id) || {}), ...droneObject };
   });
 
   const syncDroneLocation = React.useCallback((x, y, z) => {
-    // Ensure droneData exists and initialize droneObject if needed
-    if (!droneData) return;
-    
-    if (!droneData.droneObject) {
-      droneData.droneObject = {};
-    }
-    
-    // Safely update properties
-    droneData.droneObject.X = x;
-    droneData.droneObject.Y = y;
-    droneData.droneObject.Z = z;
-    
-    // Update React state
-    setDrone(prev => ({
-      ...prev,
+    const updatedDrone = {
+      ...(droneData?.getDroneBasedOnIndex?.(id) || drone),
       X: x,
       Y: y,
       Z: z
-    }));
-  }, [droneData]);
+    };
+  
+    if (droneData?.updateDroneBasedOnIndex) {
+      droneData.updateDroneBasedOnIndex(id, updatedDrone);
+    }
+  
+    setDrone(updatedDrone);
+    droneJson(updatedDrone, id);
+  }, [droneData, id, droneJson, drone]);
   
   const dropHandler = React.useCallback((e) => {
     e.preventDefault();
@@ -159,7 +156,9 @@ export default function DroneConfiguration(droneData) {
   };
 
   const handleChange = (val) => {
+    let drone = mainJson.getDroneBasedOnIndex(id)
     if (val.target.id === "Name") {
+      drone.droneName = val.target.value;
       resetName(val.target.value, id);
       setDrone(prevState => ({
         ...prevState,
@@ -170,10 +169,9 @@ export default function DroneConfiguration(droneData) {
       ...prevState,
       [val.target.id]: val.target.type === "number" ? parseFloat(val.target.value) : val.target.value
     }));
-  };
-
-  const sendJson = () => {
-    droneJson(drone, id);
+    drone[val.target.id] = val.target.type === "number" ? parseFloat(val.target.value) : val.target.value;
+    mainJson.updateDroneBasedOnIndex(id, drone);
+    setMainJson(SimulationConfigurationModel.getReactStateBasedUpdate(mainJson));
   };
 
   const setSensorConfig = (sensor) => {
@@ -208,16 +206,19 @@ export default function DroneConfiguration(droneData) {
           border: '1px solid grey', 
           paddingBottom: 5, 
           paddingTop: 2,
-          position: 'relative'
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2
         }}
       >
-        <Container fixed>
-          <Grid container spacing={1}>
-            <Grid item xs={3}>
+        <Container fixed sx={{ display: 'flex', flexDirection: 'column'}}>
+          <Grid container spacing={2} direction="column" alignItems="center">
+            <Grid item xs={12} sm={6} md={3}>
               <TextField label="Name" id="Name" value={drone.droneName} variant="standard" onChange={handleChange}/>
             </Grid>
 
-            <Grid item xs={3} alignItems="flex-end">
+            <Grid item xs={12} sm={6} md={3}>
               <FormControl variant="standard" sx={{ m: 1, minWidth: 150 }}>
                 <InputLabel id="flight-path">Mission</InputLabel>
                 <Select label="Flight Path" value={drone.Mission.name} onChange={handleMissionChange}>
@@ -230,7 +231,7 @@ export default function DroneConfiguration(droneData) {
               </FormControl>
             </Grid>
 
-            <Grid item xs={3} alignItems="flex-end">
+            <Grid item xs={12} sm={6} md={3}>
               <FormControl variant="standard" sx={{ m: 1, minWidth: 150 }}>
                 <InputLabel id="drone-type">Drone Type</InputLabel>
                 <Select label="Select Drone Type" value={selectedDroneType} onChange={handleDroneTypeChange}>
@@ -243,7 +244,7 @@ export default function DroneConfiguration(droneData) {
               </FormControl>
             </Grid>
 
-            <Grid item xs={3} alignItems="flex-end">
+            <Grid item xs={12} sm={6} md={3}>
               <FormControl variant="standard" sx={{ m: 1, minWidth: 150 }}>
                 <InputLabel id="drone-model">Drone Model</InputLabel>
                 <Select label="Select Drone Model" value={selectedModel} onChange={handleDroneModelChange}>
@@ -256,10 +257,10 @@ export default function DroneConfiguration(droneData) {
               </FormControl>
             </Grid>
 
-            <Grid container direction="row">
-              <FormControl variant="standard" sx={{ minWidth: 150 }}>
-                <InputLabel id="home-location">Home Location</InputLabel>
-              </FormControl>
+            <Grid container direction="column" alignItems="center">
+              {!(drone.X) && (
+                <FormControl variant="standard" sx={{ minWidth: 150 }}>Home Location</FormControl>
+              )}
 
               {selectedLoc === 'GeoLocation' ? 
                 <>
