@@ -8,6 +8,7 @@ import ReportDashboard from './components/ReportDashboard';
 import LandingPage from './LandingPage';
 import AboutUs from './components/AboutUs';
 import NavigationBar from './pages/NavigationBar';
+import Footer from './pages/Footer';
 import './styles.css';
 import NotFound from './pages/NotFound';
 
@@ -22,10 +23,10 @@ function App() {
             <Route exact path='/simulation' element={<Wizard />} />
             <Route exact path='/dashboard' element={<FuzzyDashboard />} />
             <Route exact path='/report-dashboard' element={<ReportDashboard />} />
-            <Route exact path='/' element={<LandingPage />} />
+            <Route exact path='/' element={<><LandingPage /><Footer /></>} />
             <Route exact path='/about-us' element={<AboutUs />} />
             <Route exact path='*' element={<NotFound />} />
-
+            
           </Routes>
         </Router>
       </div>
