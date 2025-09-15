@@ -14,12 +14,12 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '1.5rem',
-    backgroundColor: '#0000CD',
+    padding: '1.5rem 5rem 1.5rem 2rem',
+    backgroundColor: '#5bdbf5',
     fontFamily: 'Arial, sans-serif',
   },
   siteTitle: {
-    color: '#fff',
+    color: 'black',
     textDecoration: 'none',
     fontSize: '1.5rem',
     fontWeight: 'bold',
@@ -32,12 +32,18 @@ const useStyles = makeStyles((theme) => ({
     fontFamily: 'Arial, sans-serif',
   },
   navListItem: {
+
     display: 'inline-block',
     marginLeft: '1rem',
+    textDecoration: 'none',
+    color: 'black',
+    padding: '0.5rem 1rem',
+    borderRadius: '30px',
+    transition: 'background-color 0.3s ease'
   },
   aboutLink: {
     textDecoration: 'none',
-    color: '#fff',
+    color: 'black',
     padding: '0.5rem 1rem',
     borderRadius: '30px',
     transition: 'background-color 0.3s ease',
@@ -69,24 +75,40 @@ function NavigationBar() {
         <a href="/" className={classes.siteTitle}>
           Drone World
         </a>
+
         <ul className={classes.navList}>
+          <a href="/" className={classes.navListItem}>
+            Home
+          </a>
+          <a href="/reports" className={classes.navListItem}>
+            Reports
+          </a>
+          <a href="/simulation" className={classes.navListItem}>
+            Simulation
+          </a>
+          <a href="/aboutus" className={classes.navListItem}>
+            About Us
+          </a>
+
+          {/* THIS IS THE OLD ABOUT US, not deleting yet in case someone wants to use the info in it
           <li className={classes.navListItem}>
             <Box component="span">
               <Button
                 className={classes.aboutLink}
                 onClick={() => setOpen(true)}
-                style={{ color: '#fff' }}
+                style={{ color: 'black' }}
               >
                 About Us &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               </Button>
-              {/* <Tooltip title="Home" placement="bottom">
+              { <Tooltip title="Home" placement="bottom">
             <HomeIcon style={{ float: 'right', cursor: 'pointer', fontSize: '35px' }} onClick={redirectToHome} />
-          </Tooltip> */}
+          </Tooltip> }
             </Box>
           </li>
+          */}
         </ul>
       </nav>
-    {/* About Us Modal */}
+    {/* About Us Modal, not currently in use */}
     <Modal
         open={open}
         onClose={() => setOpen(false)}
