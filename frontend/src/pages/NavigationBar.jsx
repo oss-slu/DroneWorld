@@ -15,11 +15,11 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '1.5rem',
-    backgroundColor: '#0000CD',
+    backgroundColor: '#6ddaed',
     fontFamily: 'Arial, sans-serif',
   },
   siteTitle: {
-    color: '#fff',
+    color: 'black',
     textDecoration: 'none',
     fontSize: '1.5rem',
     fontWeight: 'bold',
@@ -34,6 +34,11 @@ const useStyles = makeStyles((theme) => ({
   navListItem: {
     display: 'inline-block',
     marginLeft: '1rem',
+    textDecoration: 'none',
+    color: 'black',
+    padding: '0.5rem 1rem',
+    borderRadius: '30px',
+    transition: 'background-color 0.3s ease'
   },
   aboutLink: {
     textDecoration: 'none',
@@ -42,6 +47,10 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: '30px',
     transition: 'background-color 0.3s ease',
   },
+  navLink: {
+    textDecoration : 'none',
+    color : 'black'
+  }
 }));
 const modalStyle = {
   position: 'absolute',
@@ -69,7 +78,30 @@ function NavigationBar() {
         <a href="/" className={classes.siteTitle}>
           Drone World
         </a>
+
         <ul className={classes.navList}>
+          <li className={classes.navListItem}>
+              <a href="/" className = {classes.navLink}>
+                Home
+              </a>
+          </li>
+          <li className={classes.navListItem}>
+              <a href="/reports" className = {classes.navLink}>
+                Reports
+              </a>
+          </li>
+          <li className={classes.navListItem}>
+              <a href="/simuation" className = {classes.navLink}>
+                Simulations
+              </a>
+          </li>
+          <li className={classes.navListItem}>
+              <a href="/aboutus" className = {classes.navLink}>
+                About Us
+              </a>
+          </li>
+          
+          {/* This is the old about us, which still have info we might want
           <li className={classes.navListItem}>
             <Box component="span">
               <Button
@@ -81,9 +113,10 @@ function NavigationBar() {
               </Button>
               {/* <Tooltip title="Home" placement="bottom">
             <HomeIcon style={{ float: 'right', cursor: 'pointer', fontSize: '35px' }} onClick={redirectToHome} />
-          </Tooltip> */}
+          </Tooltip> }
             </Box>
-          </li>
+          </li> */}
+
         </ul>
       </nav>
     {/* About Us Modal */}
