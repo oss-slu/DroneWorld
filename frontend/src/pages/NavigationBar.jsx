@@ -92,7 +92,7 @@ function NavigationBar() {
           </li>
           <li className={classes.navListItem}>
               <a href="/simuation" className = {classes.navLink}>
-                Simulations
+                Simulation
               </a>
           </li>
           <li className={classes.navListItem}>
