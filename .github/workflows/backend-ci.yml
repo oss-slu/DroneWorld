@@ -12,9 +12,10 @@ on:
 
 jobs:
   backend-setup:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
         python-version: [3.10]
 
     steps:

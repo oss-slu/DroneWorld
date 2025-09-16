@@ -12,7 +12,10 @@ on:
 
 jobs:
   frontend-setup:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
 
     steps:
     - name: Checkout code
