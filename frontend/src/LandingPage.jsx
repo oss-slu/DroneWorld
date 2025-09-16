@@ -423,6 +423,73 @@ export default function LandingPage() {
             </Grid>
           </Container>
         </Box>
+                    
+        <Box
+          component="section"
+          sx={{ bgcolor: '#f8fafc', py: { xs: 6, md: 8 }, borderTop: '1px solid #e5e7eb' }}
+        >
+          <Container maxWidth="lg">
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} md={8}>
+                <Typography
+                  sx={{
+                    fontWeight: 800,
+                    color: '#0f172a',
+                    fontSize: { xs: 22, md: 28 },
+                    mb: 0.5,
+                  }}
+                >
+                  Ready to start simulating?
+                </Typography>
+                <Typography
+                  sx={{
+                    fontWeight: 800,
+                    color: '#1d4ed8', // blue emphasis
+                    fontSize: { xs: 22, md: 28 },
+                  }}
+                >
+                  Create your first test scenario today.
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12} md={4}>
+                <Stack direction="row" spacing={2} justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
+                  <Button
+                    component={Link}
+                    to="/upload"
+                    variant="contained"
+                    sx={{
+                      bgcolor: '#1e3a8a',
+                      '&:hover': { bgcolor: '#172554' },
+                      textTransform: 'none',
+                      fontWeight: 700,
+                      borderRadius: 2,
+                    }}
+                  >
+                    Get Started
+                  </Button>
+                  <Button
+                    component={Link}
+                    to="https://oss-slu.github.io/projects/droneworld/about" // update if your docs route differs
+                    variant="outlined"
+                    sx={{
+                      borderColor: '#cbd5e1',
+                      color: '#0f172a',
+                      '&:hover': { borderColor: '#94a3b8', backgroundColor: '#ffffff' },
+                      textTransform: 'none',
+                      fontWeight: 700,
+                      borderRadius: 2,
+                      bgcolor: '#fff',
+                    }}
+                  >
+                    View Documentation
+                  </Button>
+                </Stack>
+              </Grid>
+            </Grid>
+          </Container>
+        </Box>
+      
 
       {isLoading ? (
         <Loading />
