@@ -54,3 +54,4 @@ jobs:
       run: |
         pip install safety
         safety check -r backend/requirements.txt
+        
