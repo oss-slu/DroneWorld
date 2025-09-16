@@ -32,6 +32,7 @@ jobs:
             brew update
             brew install portaudio
           fi
+        shell: bash
 
       - name: Cache pip dependencies
         uses: actions/cache@v4
