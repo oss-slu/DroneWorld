@@ -16,42 +16,41 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
-        python-version: [3.10]
+        python-version: ["3.10"]
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Cache pip dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-${{ matrix.python-version }}-
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r backend/requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
 
-    - name: Lint backend code
-      run: |
-        pip install flake8
-        flake8 backend/ --max-line-length 160 --ignore E127,E251,E302,E501,E261,E262,E265,F401,F403,F405,F841,W293,E128,E303,E305,W292,E122,W391,E111,E117,E301,E125,E222,E226,E201,E203,E202,E721,W503,W504,E272,E126,E225,W291,E211,E231,E722,W191,E712,F523,E402,E306
+      - name: Lint backend code
+        run: |
+          pip install flake8
+          flake8 backend/ --max-line-length 160 --ignore E127,E251,E302,E501,E261,E262,E265,F401,F403,F405,F841,W293,E128,E303,E305,W292,E122,W391,E111,E117,E301,E125,E222,E226,E201,E203,E202,E721,W503,W504,E272,E126,E225,W291,E211,E231,E722,W191,E712,F523,E402,E306
 
-    - name: Format backend code with Black
-      run: |
-        pip install black
-        black backend/
+      - name: Format backend code with Black
+        run: |
+          pip install black
+          black backend/
 
-    - name: Perform Dependency Audit
-      run: |
-        pip install safety
-        safety check -r backend/requirements.txt
-        
+      - name: Perform Dependency Audit
+        run: |
+          pip install safety
+          safety check -r backend/requirements.txt
