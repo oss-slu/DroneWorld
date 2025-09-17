@@ -9,6 +9,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import Tooltip from '@mui/material/Tooltip';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 const useStyles = makeStyles((theme) => ({
   nav: {
     display: 'flex',
@@ -49,8 +50,18 @@ const useStyles = makeStyles((theme) => ({
   },
   navLink: {
     textDecoration : 'none',
-    color : 'black'
-  }
+    color : 'black',
+    display : 'inline-block',
+    '&:hover': {
+      color: 'white',
+      transform : 'scale(1.2)'
+    }
+
+  },
+  active: {
+    textDecoration: "underline",
+    fontWeight: "bold",
+  },
 }));
 const modalStyle = {
   position: 'absolute',
@@ -67,58 +78,40 @@ const modalStyle = {
 
 function NavigationBar() {
   const classes = useStyles();
-  const [open, setOpen] = useState(false); // State for modal
-  // const navigate = useNavigate(); 
-  // const redirectToHome = () => {
-  //   navigate('/')
-  // }
+  const location = useLocation();
+  const [open, setOpen] = useState(false);
+
   return (
     <div>
       <nav className={classes.nav}>
-        <a href="/" className={classes.siteTitle}>
+        <Link to="/" className={classes.siteTitle}>
           Drone World
-        </a>
+        </Link>
 
         <ul className={classes.navList}>
           <li className={classes.navListItem}>
-              <a href="/" className = {classes.navLink}>
+              <Link to="/" className = {classes.navLink} style={{ textDecoration: location.pathname === "/" ? "underline" : "none" }}>
                 Home
-              </a>
+              </Link>
           </li>
           <li className={classes.navListItem}>
-              <a href="/reports" className = {classes.navLink}>
+              <Link to="/reports" className = {classes.navLink} style={{ textDecoration: location.pathname === "/reports" ? "underline" : "none" }} >
                 Reports
-              </a>
+              </Link>
           </li>
           <li className={classes.navListItem}>
-              <a href="/simuation" className = {classes.navLink}>
+              <Link to="/simulation" className = {classes.navLink} style={{ textDecoration: location.pathname === "/simulation" ? "underline" : "none" }}>
                 Simulation
-              </a>
+              </Link>
           </li>
           <li className={classes.navListItem}>
-              <a href="/aboutus" className = {classes.navLink}>
+              <Link to="/aboutus" className = {classes.navLink} style={{ textDecoration: location.pathname === "/aboutus" ? "underline" : "none" }}>
                 About Us
-              </a>
+              </Link>
           </li>
-          
-          {/* This is the old about us, which still have info we might want
-          <li className={classes.navListItem}>
-            <Box component="span">
-              <Button
-                className={classes.aboutLink}
-                onClick={() => setOpen(true)}
-                style={{ color: '#fff' }}
-              >
-                About Us &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              </Button>
-              {/* <Tooltip title="Home" placement="bottom">
-            <HomeIcon style={{ float: 'right', cursor: 'pointer', fontSize: '35px' }} onClick={redirectToHome} />
-          </Tooltip> }
-            </Box>
-          </li> */}
-
         </ul>
       </nav>
+
     {/* About Us Modal */}
     <Modal
         open={open}
