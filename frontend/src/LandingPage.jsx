@@ -426,7 +426,7 @@ export default function LandingPage() {
                     
         <Box
           component="section"
-          sx={{ bgcolor: '#f8fafc', py: { xs: 6, md: 8 }, borderTop: '1px solid #e5e7eb' }}
+          sx={{ width: '80%', bgcolor: '#f8fafc', py: { xs: 6, md: 8 }, borderTop: '1px solid #e5e7eb' }}
         >
           <Container maxWidth="lg">
             <Grid container spacing={2} alignItems="center">
@@ -456,7 +456,7 @@ export default function LandingPage() {
                 <Stack direction="row" spacing={2} justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
                   <Button
                     component={Link}
-                    to="/upload"
+                    to="/home"
                     variant="contained"
                     sx={{
                       bgcolor: '#1e3a8a',
@@ -474,7 +474,7 @@ export default function LandingPage() {
                     variant="outlined"
                     sx={{
                       borderColor: '#cbd5e1',
-                      color: '#0f172a',
+                      color: '#172554',
                       '&:hover': { borderColor: '#94a3b8', backgroundColor: '#ffffff' },
                       textTransform: 'none',
                       fontWeight: 700,
