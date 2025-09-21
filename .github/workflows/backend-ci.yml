@@ -19,11 +19,9 @@ jobs:
         python-version: ["3.10"]
 
     steps:
-      # Checkout code and submodules
+      # Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       # Install system dependencies for Linux/macOS
       - name: Install system dependencies

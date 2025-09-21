@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - docker-main 
+      - docker-main
   pull_request:
     branches:
       - main
@@ -18,11 +18,9 @@ jobs:
         os: [windows-latest, macos-latest, ubuntu-latest]
 
     steps:
-      # Checkout code and submodules
+      # Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       # Ensure npm cache directory exists (for macOS/Linux)
       - name: Ensure npm cache directory exists
