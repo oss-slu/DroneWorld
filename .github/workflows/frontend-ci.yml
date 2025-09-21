@@ -18,43 +18,58 @@ jobs:
         os: [windows-latest, macos-latest, ubuntu-latest]
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      # Checkout code and submodules
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-    - name: Cache Node.js modules
-      uses: actions/cache@v4
-      with:
-        path: ~/.npm
-        key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-npm-
+      # Ensure npm cache directory exists (for macOS/Linux)
+      - name: Ensure npm cache directory exists
+        if: runner.os != 'Windows'
+        run: mkdir -p ~/.npm
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '16'
+      # Cache Node.js modules
+      - name: Cache Node.js modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
 
-    - name: Install dependencies
-      run: |
-        cd frontend
-        npm install
+      # Setup Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
 
-    - name: Lint frontend code
-      run: |
-        cd frontend
-        npx eslint src --ext .js,.jsx,.ts,.tsx,.json || true
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
 
-    - name: Format frontend code with Prettier
-      run: |
-        cd frontend
-        npx prettier --check "**/*.{js,jsx,ts,tsx,json,css,scss,md}" || true
+      # Lint frontend code
+      - name: Lint frontend code
+        run: |
+          cd frontend
+          npx eslint src --ext .js,.jsx,.ts,.tsx,.json
 
-    - name: Build frontend
-      run: |
-        cd frontend
-        npm run build
+      # Format frontend code with Prettier
+      - name: Format frontend code
+        run: |
+          cd frontend
+          npx prettier --check "**/*.{js,jsx,ts,tsx,json,css,scss,md}"
 
-    - name: Run ESLint Security Checks
-      run: |
-        cd frontend
-        npm audit --omit=dev --audit-level=critical || true
+      # Build frontend
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+      # Run npm audit for security checks
+      - name: Run ESLint Security Checks
+        run: |
+          cd frontend
+          npm audit --omit=dev --audit-level=critical || true
