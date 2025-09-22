@@ -1,6 +1,7 @@
+# Use slim Python base
 FROM python:3.10-slim
 
-# Install system dependencies for PyAudio and building wheels
+# Install system dependencies for PyAudio & others
 RUN apt-get update && \
     apt-get install -y gcc portaudio19-dev build-essential libssl-dev && \
     rm -rf /var/lib/apt/lists/*
@@ -8,14 +9,14 @@ RUN apt-get update && \
 # Set working directory
 WORKDIR /app
 
-# Copy requirements first (to leverage Docker caching)
-COPY backend/requirements.txt .
+# Copy only requirements first (for better Docker caching)
+COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend code
-COPY backend/ .
+# Copy the rest of the backend code
+COPY . .
 
-# Set default command (adjust as needed)
+# Default command (adjust if needed)
 CMD ["python", "app.py"]
