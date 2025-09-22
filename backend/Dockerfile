@@ -1,22 +1,28 @@
-# Use slim Python base
+# Use a slim Python image
 FROM python:3.10-slim
-
-# Install system dependencies for PyAudio & others
-RUN apt-get update && \
-    apt-get install -y gcc portaudio19-dev build-essential libssl-dev && \
-    rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
-# Copy only requirements first (for better Docker caching)
-COPY requirements.txt .
+# Install system dependencies for compilation and audio
+RUN apt-get update && \
+    apt-get install -y gcc portaudio19-dev build-essential libssl-dev && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Copy requirements and install Python dependencies
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the backend code
-COPY . .
+# Copy backend code
+COPY backend/ . 
 
-# Default command (adjust if needed)
-CMD ["python", "app.py"]
+# Set environment variables for Flask
+ENV FLASK_APP=pythonclient/server/simulation_server.py
+ENV FLASK_RUN_HOST=0.0.0.0
+ENV FLASK_RUN_PORT=5000
+
+# Expose port
+EXPOSE 5000
+
+# Run the Flask app
+CMD ["python", "pythonclient/server/simulation_server.py"]
