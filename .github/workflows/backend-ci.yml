@@ -29,7 +29,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      # Install dependencies
+      # Install system dependencies (needed for PyAudio)
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y portaudio19-dev build-essential libssl-dev
+
+      # Install Python dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
