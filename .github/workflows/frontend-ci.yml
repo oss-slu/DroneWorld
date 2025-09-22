@@ -15,28 +15,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Set up Node.js (Node >=20.19.0 to satisfy Cesium/Resium)
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.22.0'  # Update Node to meet Cesium/Resium requirements
+          node-version: '20.19.0'
           cache: 'npm'
           cache-dependency-path: 'frontend/package-lock.json'
 
+      # Ensure package-lock.json exists
+      - name: Ensure package-lock.json
+        run: |
+          cd frontend
+          if [ ! -f package-lock.json ]; then
+            echo "{}" > package-lock.json
+          fi
+
+      # Install dependencies
       - name: Install dependencies
         run: |
           cd frontend
-          npm install
+          npm ci || npm install
 
+      # Lint & format check
       - name: Lint & Format Check
         run: |
           cd frontend
           npm install --save-dev eslint prettier
-          npx eslint src --ext .js,.jsx,.ts,.tsx,.json || echo "ESLint warnings found"
+          npx eslint src --ext .js,.jsx,.ts,.tsx,.json --max-warnings=0 || echo "ESLint warnings found"
           npx prettier --check "**/*.{js,jsx,ts,tsx,json,css,scss,md}" || echo "Prettier warnings found"
 
+      # Optional: auto-fix formatting
       - name: Auto-fix formatting
         if: github.event_name == 'push'
         run: |
@@ -44,15 +57,18 @@ jobs:
           npx eslint src --fix
           npx prettier --write "**/*.{js,jsx,ts,tsx,json,css,scss,md}"
 
+      # Build frontend
       - name: Build frontend
         run: |
           cd frontend
           npm run build
 
+      # Build Docker image (lowercase for GHCR)
       - name: Build Docker image
         run: |
           docker build -t ghcr.io/imjusthenry/droneworld/frontend:latest ./frontend
 
+      # Log in to GHCR
       - name: Log in to GHCR
         uses: docker/login-action@v2
         with:
@@ -60,6 +76,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Push Docker image
       - name: Push Docker image
         run: |
           docker push ghcr.io/imjusthenry/droneworld/frontend:latest
