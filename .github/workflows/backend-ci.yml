@@ -35,11 +35,18 @@ jobs:
           cache: "pip"
 
       # Install system dependencies (Ubuntu only)
-      - name: Install system dependencies
+      - name: Install system dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y portaudio19-dev build-essential libssl-dev
+          sudo apt-get install -y portaudio19-dev build-essential libssl-dev ffmpeg
+
+      # Install system dependencies (MacOS only)
+      - name: Install system dependencies (MacOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew update
+          brew install portaudio pkg-config ffmpeg
 
       # Install Python dependencies
       - name: Install Python dependencies
