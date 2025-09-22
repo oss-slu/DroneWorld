@@ -12,7 +12,7 @@ on:
 
 jobs:
   frontend-setup:
-    runs-on: ubuntu-latest  # Docker builds run best on Linux
+    runs-on: ubuntu-latest
 
     steps:
       # Checkout code
@@ -24,13 +24,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'  # caches npm dependencies
+          cache: 'npm'
 
-      # Install dependencies (fallback if no lock file)
+      # Ensure package-lock.json exists to avoid npm ci error
+      - name: Ensure package-lock.json
+        run: |
+          cd frontend
+          if [ ! -f package-lock.json ]; then
+            echo "{}" > package-lock.json
+          fi
+
+      # Install dependencies
       - name: Install dependencies
         run: |
           cd frontend
-          if [ -f package-lock.json ] || [ -f yarn.lock ]; then
+          if [ -f package-lock.json ]; then
             npm ci
           else
             npm install
@@ -41,16 +49,16 @@ jobs:
         run: |
           cd frontend
           npm install --save-dev eslint prettier
-          npx eslint src --ext .js,.jsx,.ts,.tsx,.json --max-warnings=0 || true
-          npx prettier --check "**/*.{js,jsx,ts,tsx,json,css,scss,md}" || true
+          npx eslint src --ext .js,.jsx,.ts,.tsx,.json --max-warnings=0
+          npx prettier --check "**/*.{js,jsx,ts,tsx,json,css,scss,md}"
 
-      # Optional: auto-fix lint & formatting issues
+      # Optional: auto-fix formatting
       - name: Auto-fix formatting
         if: github.event_name == 'push'
         run: |
           cd frontend
-          npx eslint src --fix || true
-          npx prettier --write "**/*.{js,jsx,ts,tsx,json,css,scss,md}" || true
+          npx eslint src --fix
+          npx prettier --write "**/*.{js,jsx,ts,tsx,json,css,scss,md}"
 
       # Build frontend
       - name: Build frontend
@@ -58,12 +66,12 @@ jobs:
           cd frontend
           npm run build
 
-      # Build Docker image
+      # Build Docker image (lowercase tag for GHCR)
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/ImJustHenry/DroneWorld/frontend:latest ./frontend
+          docker build -t ghcr.io/imjusthenry/droneworld/frontend:latest ./frontend
 
-      # Log in to GitHub Container Registry (GHCR)
+      # Log in to GitHub Container Registry
       - name: Log in to GHCR
         uses: docker/login-action@v2
         with:
@@ -74,4 +82,4 @@ jobs:
       # Push Docker image
       - name: Push Docker image
         run: |
-          docker push ghcr.io/ImJustHenry/DroneWorld/frontend:latest
+          docker push ghcr.io/imjusthenry/droneworld/frontend:latest
