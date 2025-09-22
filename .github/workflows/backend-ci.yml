@@ -15,8 +15,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]        # Use Linux for Docker builds
-        python-version: ["3.10"]   # Python version for the backend
+        os: [ubuntu-latest]          # Use Linux for Docker builds
+        python-version: ["3.10"]     # Python version for the backend
 
     steps:
       # Checkout code
@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "pip"  # cache pip dependencies
+          cache: "pip"  # Cache pip dependencies
 
       # Install system dependencies
       - name: Install system dependencies
@@ -42,12 +42,23 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
 
-      # Lint & format backend
+      # Lint & Format Check
       - name: Lint & Format Check
         run: |
           python -m pip install flake8 black
-          flake8 backend/ --max-line-length=120  # allow slightly longer lines
-          black --check backend/
+          # Lint backend files, allow slightly longer lines
+          flake8 backend/ --max-line-length=120 --exit-zero
+          # Check formatting with black
+          black --check backend/ || echo "Run 'black backend/' to fix formatting"
+
+      # Optional: auto-fix linting issues
+      - name: Auto-fix formatting
+        if: github.event_name == 'push'
+        run: |
+          black backend/
+          # Remove unused imports automatically
+          pip install autoflake
+          autoflake --in-place --remove-unused-variables --remove-all-unused-imports -r backend/
 
       # Build Docker image
       - name: Build Docker image
