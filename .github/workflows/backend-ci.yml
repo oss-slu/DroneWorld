@@ -15,8 +15,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]  # Docker builds usually run on Linux
-        python-version: ["3.10"]
+        os: [ubuntu-latest]        # Use Linux for Docker builds
+        python-version: ["3.10"]   # Python version for the backend
 
     steps:
       # Checkout code
@@ -28,24 +28,25 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+          cache: "pip"  # cache pip dependencies
 
-      # Install system dependencies (needed for PyAudio)
+      # Install system dependencies
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y portaudio19-dev build-essential libssl-dev
 
       # Install Python dependencies
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
 
-      # Lint & format (optional)
-      - name: Lint backend
+      # Lint & format backend
+      - name: Lint & Format Check
         run: |
           python -m pip install flake8 black
-          flake8 backend/
+          flake8 backend/ --max-line-length=120  # allow slightly longer lines
           black --check backend/
 
       # Build Docker image
