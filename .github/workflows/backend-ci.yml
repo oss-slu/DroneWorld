@@ -20,7 +20,7 @@ jobs:
 
     permissions:
       contents: read
-      packages: write
+      packages: write   # needed to push to GHCR
 
     steps:
       # Checkout code
@@ -34,17 +34,12 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
 
-      # Install system dependencies
+      # Install system dependencies (Ubuntu only)
       - name: Install system dependencies
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            sudo apt-get update
-            sudo apt-get install -y portaudio19-dev build-essential libssl-dev
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            brew update
-            brew install portaudio pkg-config ffmpeg
-            xcode-select --install || echo "Xcode CLT already installed"
-          fi
+          sudo apt-get update
+          sudo apt-get install -y portaudio19-dev build-essential libssl-dev
 
       # Install Python dependencies
       - name: Install Python dependencies
@@ -60,27 +55,30 @@ jobs:
           black --check backend/ || echo "Run 'black backend/' to fix formatting"
           autoflake --check --remove-unused-variables --remove-all-unused-imports -r backend/ || echo "Unused imports found"
 
-      # Optional: Auto-fix formatting
+      # Optional: Auto-fix formatting and unused imports on push
       - name: Auto-fix formatting
         if: github.event_name == 'push'
         run: |
           black backend/
           autoflake --in-place --remove-unused-variables --remove-all-unused-imports -r backend/
 
-      # Build Docker image
+      # Build Docker image (only on Ubuntu)
       - name: Build Docker image
+        if: matrix.os == 'ubuntu-latest'
         run: |
           docker build -t ghcr.io/imjusthenry/droneworld/backend:latest ./backend
 
-      # Log in to GHCR
+      # Log in to GHCR (only on Ubuntu)
       - name: Log in to GHCR
+        if: matrix.os == 'ubuntu-latest'
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Push Docker image
+      # Push Docker image (only on Ubuntu)
       - name: Push Docker image
+        if: matrix.os == 'ubuntu-latest'
         run: |
           docker push ghcr.io/imjusthenry/droneworld/backend:latest
