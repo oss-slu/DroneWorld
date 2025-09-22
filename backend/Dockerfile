@@ -1,28 +1,24 @@
-# Use a slim Python image
+# Use Python 3.10 slim as base
 FROM python:3.10-slim
 
-# Set working directory
+# Set working directory inside container
 WORKDIR /app
 
-# Install system dependencies for compilation and audio
+# Install system dependencies needed for building packages like PyAudio
 RUN apt-get update && \
     apt-get install -y gcc portaudio19-dev build-essential libssl-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install Python dependencies
-COPY backend/requirements.txt .
+# Copy Python requirements and install them
+COPY requirements.txt .
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend code
-COPY backend/ . 
+# Copy the rest of the backend code
+COPY . .
 
-# Set environment variables for Flask
-ENV FLASK_APP=pythonclient/server/simulation_server.py
-ENV FLASK_RUN_HOST=0.0.0.0
-ENV FLASK_RUN_PORT=5000
-
-# Expose port
+# Expose Flask port
 EXPOSE 5000
 
-# Run the Flask app
-CMD ["python", "pythonclient/server/simulation_server.py"]
+# Set the default command to run your Flask app
+CMD ["python", "simulation_server.py"]
