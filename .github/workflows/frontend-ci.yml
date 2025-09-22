@@ -12,62 +12,48 @@ on:
 
 jobs:
   frontend-setup:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ubuntu-latest  # Docker builds run best on Linux
 
     steps:
       # Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Ensure npm cache directory exists (for macOS/Linux)
-      - name: Ensure npm cache directory exists
-        if: runner.os != 'Windows'
-        run: mkdir -p ~/.npm
-
-      # Cache Node.js modules
-      - name: Cache Node.js modules
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
-
-      # Setup Node.js
+      # Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '16'
 
-      # Install dependencies
-      - name: Install dependencies
-        run: |
-          cd frontend
-          npm ci
-
-      # Lint frontend code
-      - name: Lint frontend code
-        run: |
-          cd frontend
-          npx eslint src --ext .js,.jsx,.ts,.tsx,.json
-
-      # Format frontend code with Prettier
-      - name: Format frontend code
-        run: |
-          cd frontend
-          npx prettier --check "**/*.{js,jsx,ts,tsx,json,css,scss,md}"
-
-      # Build frontend
+      # Install dependencies & build
       - name: Build frontend
         run: |
           cd frontend
+          npm ci
           npm run build
 
-      # Run npm audit for security checks
-      - name: Run ESLint Security Checks
+      # Lint & format (optional)
+      - name: Lint frontend
         run: |
           cd frontend
-          npm audit --omit=dev --audit-level=critical || true
+          npm install -g eslint prettier
+          npx eslint src --ext .js,.jsx,.ts,.tsx,.json
+          npx prettier --check "**/*.{js,jsx,ts,tsx,json,css,scss,md}"
+
+      # Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/ImJustHenry/DroneWorld/frontend:latest ./frontend
+
+      # Log in to GHCR
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Push Docker image
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/ImJustHenry/DroneWorld/frontend:latest

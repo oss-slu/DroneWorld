@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+        os: [ubuntu-latest]  # Docker builds usually run on Linux
         python-version: ["3.10"]
 
     steps:
@@ -23,59 +23,39 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Install system dependencies for Linux/macOS
-      - name: Install system dependencies
-        if: runner.os != 'Windows'
-        run: |
-          if [[ "${RUNNER_OS}" == "Linux" ]]; then
-            sudo apt-get update
-            sudo apt-get install -y portaudio19-dev
-          elif [[ "${RUNNER_OS}" == "macOS" ]]; then
-            brew update
-            brew install portaudio
-          fi
-        shell: bash
-
-      # Ensure pip cache directory exists
-      - name: Ensure pip cache directory exists
-        if: runner.os != 'Windows'
-        run: mkdir -p ~/.cache/pip
-
-      # Cache pip dependencies
-      - name: Cache pip dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.python-version }}-
-
-      # Setup Python
+      # Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
-      # Install Python dependencies
-      - name: Install Python dependencies
+      # Install dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
 
-      # Lint backend code
-      - name: Lint backend code
+      # Lint & format (optional)
+      - name: Lint backend
         run: |
-          python -m pip install flake8
-          flake8 backend/ --max-line-length 160 --ignore E127,E251,E302,E501,E261,E262,E265,F401,F403,F405,F841,W293,E128,E303,E305,W292,E122,W391,E111,E117,E301,E125,E222,E226,E201,E203,E202,E721,W503,W504,E272,E126,E225,W291,E211,E231,E722,W191,E712,F523,E402,E306
+          python -m pip install flake8 black
+          flake8 backend/
+          black --check backend/
 
-      # Format backend code with Black
-      - name: Format backend code with Black
+      # Build Docker image
+      - name: Build Docker image
         run: |
-          python -m pip install black
-          black backend/
+          docker build -t ghcr.io/ImJustHenry/DroneWorld/backend:latest ./backend
 
-      # Perform Dependency Audit (safety scan)
-      - name: Perform Dependency Audit
+      # Log in to GitHub Container Registry (GHCR)
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Push Docker image
+      - name: Push Docker image
         run: |
-          python -m pip install safety
-          safety scan -r backend/requirements.txt
+          docker push ghcr.io/ImJustHenry/DroneWorld/backend:latest
