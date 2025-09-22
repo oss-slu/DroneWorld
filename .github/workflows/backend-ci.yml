@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "pip"  # Cache pip dependencies
+          cache: "pip"
 
       # Install system dependencies
       - name: Install system dependencies
@@ -46,9 +46,7 @@ jobs:
       - name: Lint & Format Check
         run: |
           python -m pip install flake8 black
-          # Lint backend files, allow slightly longer lines
           flake8 backend/ --max-line-length=120 --exit-zero
-          # Check formatting with black
           black --check backend/ || echo "Run 'black backend/' to fix formatting"
 
       # Optional: auto-fix linting issues
@@ -56,14 +54,13 @@ jobs:
         if: github.event_name == 'push'
         run: |
           black backend/
-          # Remove unused imports automatically
           pip install autoflake
           autoflake --in-place --remove-unused-variables --remove-all-unused-imports -r backend/
 
-      # Build Docker image
+      # Build Docker image (repository name lowercase)
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/ImJustHenry/DroneWorld/backend:latest ./backend
+          docker build -t ghcr.io/imjusthenry/droneworld/backend:latest ./backend
 
       # Log in to GitHub Container Registry (GHCR)
       - name: Log in to GHCR
@@ -76,4 +73,4 @@ jobs:
       # Push Docker image
       - name: Push Docker image
         run: |
-          docker push ghcr.io/ImJustHenry/DroneWorld/backend:latest
+          docker push ghcr.io/imjusthenry/droneworld/backend:latest
