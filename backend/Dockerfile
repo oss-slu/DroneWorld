@@ -20,4 +20,9 @@ COPY backend/ .
 # Set environment variables
 ENV FLASK_APP=PythonClient/server/simulation_server.py
 ENV FLASK_RUN_HOST=0.0.0.0
-E
+
+# Expose port for Flask
+EXPOSE 5000
+
+# Run Flask when the container starts
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
