@@ -18,6 +18,10 @@ jobs:
         os: [ubuntu-latest]          # Linux for Docker builds
         python-version: ["3.10"]     # Python version
 
+    permissions:
+      contents: read
+      packages: write   # ✅ needed to push to GHCR
+
     steps:
       # Checkout code
       - name: Checkout code
