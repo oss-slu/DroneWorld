@@ -15,8 +15,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]          # Use Linux for Docker builds
-        python-version: ["3.10"]     # Python version for the backend
+        os: [ubuntu-latest]          # Linux for Docker builds
+        python-version: ["3.10"]     # Python version
 
     steps:
       # Checkout code
@@ -45,16 +45,16 @@ jobs:
       # Lint & Format Check
       - name: Lint & Format Check
         run: |
-          python -m pip install flake8 black
+          python -m pip install flake8 black autoflake
           flake8 backend/ --max-line-length=120 --exit-zero
           black --check backend/ || echo "Run 'black backend/' to fix formatting"
+          autoflake --check --remove-unused-variables --remove-all-unused-imports -r backend/ || echo "Unused imports found"
 
-      # Optional: auto-fix linting issues
+      # Optional: Auto-fix formatting and unused imports on push
       - name: Auto-fix formatting
         if: github.event_name == 'push'
         run: |
           black backend/
-          pip install autoflake
           autoflake --in-place --remove-unused-variables --remove-all-unused-imports -r backend/
 
       # Build Docker image (repository name lowercase)
