@@ -1,9 +1,15 @@
 FROM python:3.10-slim
 
-# Install system dependencies
+# Install system dependencies (including OpenGL)
 RUN apt-get update && \
-    apt-get install -y gcc portaudio19-dev build-essential libssl-dev && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y \
+        gcc \
+        portaudio19-dev \
+        build-essential \
+        libssl-dev \
+        libgl1 \
+        libglib2.0-0 \
+        && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
