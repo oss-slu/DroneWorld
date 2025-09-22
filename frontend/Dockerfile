@@ -11,11 +11,10 @@ RUN npm run build
 # Use Nginx for serving static files
 FROM nginx:alpine
 
-# Copy built frontend files
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copy built frontend files (CRA outputs to /build, not /dist)
+COPY --from=builder /app/build /usr/share/nginx/html
 
 # Expose port 80
 EXPOSE 80
 
-# Default command
 CMD ["nginx", "-g", "daemon off;"]
