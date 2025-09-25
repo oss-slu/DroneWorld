@@ -113,7 +113,8 @@ export default function ReportDashboard() {
   const [isLoading, setIsloading] = React.useState(false);
   // const isFuzzy = file.filename.includes('Fuzzy');
   const classes = useStyles();
-  const location = useLocation();  
+  const location = useLocation();
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
   const isReportDashboard = location.pathname.includes('/report-dashboard');
 
@@ -128,7 +129,7 @@ export default function ReportDashboard() {
   useEffect(() => {
     const fetchData = () => {
       setIsloading(true);
-      fetch('http://localhost:5000/list-reports', { method: 'GET' })
+      fetch(`${backendUrl}/list-reports`, { method: 'GET' })
         .then((res) => {
           if (!res.ok) {
             throw new Error('No response from server/something went wrong');
@@ -166,10 +167,10 @@ export default function ReportDashboard() {
     handleSnackBarVisibility(true);
   }, []);
   const getFolderContents = (file) => {
-    fetch(`http://localhost:5000/list-folder-contents/${file.filename}`, {
-      method: 'post',
+    fetch(`${backendUrl}/list-folder-contents/${file.filename}`, {
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: {},
+      body: JSON.stringify({}),
     })
       .then((res) => {
         if (!res.ok) {
