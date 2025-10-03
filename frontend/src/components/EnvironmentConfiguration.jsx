@@ -185,15 +185,33 @@ export default function EnvironmentConfiguration (env) {
         }))
     } 
     */
-    const handleWindChange = (val) => {
-        setEnvConf((prevState) => ({
-          ...prevState,
-          Wind: {
-            ...prevState.Wind,
-            Velocity: val.target.type === "number" ? parseFloat(val.target.value) : 0,
-          },
+    const handleWindChange = (e) => {
+        const v = e.target.value;
+
+        
+        if (v === '') {
+            setEnvConf(prev => ({
+            ...prev,
+            Wind: { ...prev.Wind, Force: '' },   
+            }));
+            return;
+        }
+
+        const n = Number(v);
+        if (Number.isNaN(n)) {
+            return;
+        }
+
+       
+        const clamped = Math.min(50, Math.max(0, n));
+        setEnvConf(prev => ({
+            ...prev,
+            Wind: { ...prev.Wind, Force: clamped },
         }));
-      };
+    };
+
+
+
     const handleOriginChange = (val) => {
         setEnvConf(prevState => ({
             ...prevState,
@@ -669,7 +687,7 @@ const handleSnackBarVisibility = (val) => {
                                 variant="standard" type="number" 
                                 onChange={handleWindChange} 
                                 value={envConf.Wind.Force} 
-                                inputProps={{ min: 0 }}
+                                inputProps={{ min: 0, max: 50, }}
                                 helperText={`Allowed range: 0-50 m/s`}/>
                         </Grid>
                     </Tooltip>

@@ -16,8 +16,8 @@ function App() {
   return (
     <MainJsonProvider>  {/* Wrap everything inside MainJsonProvider */}
       <div>
-        <NavigationBar />
         <Router>
+          <NavigationBar />
           <Routes>
             <Route exact path='/home' element={<Home />} />
             <Route exact path='/simulation' element={<Wizard />} />
