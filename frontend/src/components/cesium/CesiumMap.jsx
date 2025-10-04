@@ -21,6 +21,8 @@ import { EnvironmentModel } from '../../model/EnvironmentModel';
 const CesiumMap = ({ activeConfigStep }) => {
   const DEFAULT_CAMERA_HEIGHT = 5000;
   const { mainJson, envJson, setEnvJson, registerSetCameraByPosition } = useMainJson();
+  console.log('envJson:', envJson);
+  console.log('Origin:', envJson.Origin);
   const viewerRef = useRef(null);
   const [viewerReady, setViewerReady] = useState(false);
   const [cameraPosition, setCameraPosition] = useState({
@@ -136,6 +138,17 @@ const CesiumMap = ({ activeConfigStep }) => {
         });
     }
   }, [envJson.Origin.name, viewerReady]);
+
+  useEffect(() => {
+    const { destination, orientation } = cameraPosition;
+    const carto = Cartographic.fromCartesian(destination);
+    console.log('CameraFlyTo triggered:');
+    console.log(`Longitude: ${CesiumMath.toDegrees(carto.longitude)}`);
+    console.log(`Latitude: ${CesiumMath.toDegrees(carto.latitude)}`);
+    console.log(`Height: ${carto.height}`);
+    console.log(`Heading (deg): ${CesiumMath.toDegrees(orientation.heading)}`);
+    console.log(`Pitch (deg): ${CesiumMath.toDegrees(orientation.pitch)}`);
+  }, [cameraPosition]);
 
   const findHeight = async () => {
     const viewer = viewerRef.current?.cesiumElement;
