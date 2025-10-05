@@ -100,7 +100,7 @@ export default function EnvironmentConfiguration (env) {
     }    
     
     React.useEffect(() => {
-        if (env.environmnetJson){
+        if (env.environmentJson){
             env.environmentJson(envConf, env.id);
         }
     }, [envConf])

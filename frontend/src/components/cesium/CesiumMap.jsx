@@ -21,7 +21,11 @@ import { EnvironmentModel } from '../../model/EnvironmentModel';
 const CesiumMap = ({ activeConfigStep }) => {
   const DEFAULT_CAMERA_HEIGHT = 5000;
   const { mainJson, envJson, setEnvJson, registerSetCameraByPosition } = useMainJson();
+  console.log('envJson:', envJson);
+  console.log('Origin:', envJson.Origin);
   const viewerRef = useRef(null);
+  const flyPending = useRef(false);
+
   const [viewerReady, setViewerReady] = useState(false);
   const [cameraPosition, setCameraPosition] = useState({
     destination: Cartesian3.fromDegrees(
@@ -71,7 +75,6 @@ const CesiumMap = ({ activeConfigStep }) => {
 
   useEffect(() => {
     registerSetCameraByPosition(setCameraByLongLat);
-
     return () => registerSetCameraByPosition(null);
   }, [cameraPosition]);
 
@@ -89,6 +92,12 @@ const CesiumMap = ({ activeConfigStep }) => {
   useEffect(() => {
     if (!viewerReady) return;
     const viewer = viewerRef.current.cesiumElement;
+    const { longitude, latitude, name } = envJson.Origin;
+
+    flyPending.current = true
+    if (!name || longitude === 0 || latitude === 0) {
+      flyPending.current = false
+    }
 
     // If the user is currently on the sUAS screen, Set the camera
     // at the origin coordinates with -90 degrees pitch
@@ -111,6 +120,13 @@ const CesiumMap = ({ activeConfigStep }) => {
 
   // Move camera to the origin whenever the origin's changed
   useEffect(() => {
+
+    const { longitude, latitude, name } = envJson.Origin;
+    flyPending.current = true
+    if (!name || longitude === 0 || latitude === 0) {
+      return;
+    }
+
     setCameraByLongLat(
       envJson.Origin.longitude,
       envJson.Origin.latitude,
@@ -136,6 +152,17 @@ const CesiumMap = ({ activeConfigStep }) => {
         });
     }
   }, [envJson.Origin.name, viewerReady]);
+
+  useEffect(() => {
+    const { destination, orientation } = cameraPosition;
+    const carto = Cartographic.fromCartesian(destination);
+    console.log('CameraFlyTo triggered:');
+    console.log(`Longitude: ${CesiumMath.toDegrees(carto.longitude)}`);
+    console.log(`Latitude: ${CesiumMath.toDegrees(carto.latitude)}`);
+    console.log(`Height: ${carto.height}`);
+    console.log(`Heading (deg): ${CesiumMath.toDegrees(orientation.heading)}`);
+    console.log(`Pitch (deg): ${CesiumMath.toDegrees(orientation.pitch)}`);
+  }, [cameraPosition]);
 
   const findHeight = async () => {
     const viewer = viewerRef.current?.cesiumElement;
@@ -166,11 +193,16 @@ const CesiumMap = ({ activeConfigStep }) => {
       style={{ cursor: envJson.activeSadeZoneIndex == null ? 'default' : 'crosshair' }}
     >
       <Cesium3DTileset url={IonResource.fromAssetId(google3DTilesAssetId)} />
-      <CameraFlyTo
+      {flyPending.current && (
+        <CameraFlyTo
         destination={cameraPosition.destination}
         orientation={cameraPosition.orientation}
         duration={2}
-      />
+        onComplete={() => {
+          flyPending.current = false
+        }}
+        />
+      )}
 
       <DroneDragAndDrop
         viewerReady={viewerReady}
