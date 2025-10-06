@@ -14,11 +14,10 @@ import NotFound from './pages/NotFound';
 
 function App() {
   return (
-    <MainJsonProvider>  {/* Wrap everything inside MainJsonProvider */}
-        <Router>
-      <div>
-        <NavigationBar />
-        <Router>
+    <MainJsonProvider>
+      <Router>
+        <div>
+          <NavigationBar />
           <Routes>
             <Route exact path='/home' element={<Home />} />
             <Route exact path='/simulation' element={<Wizard />} />
@@ -34,6 +33,7 @@ function App() {
     </MainJsonProvider>
   );
 }
+
 
 export default App;
 
