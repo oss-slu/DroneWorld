@@ -15,7 +15,6 @@ import NotFound from './pages/NotFound';
 function App() {
   return (
     <MainJsonProvider>  {/* Wrap everything inside MainJsonProvider */}
-      <div>
         <Router>
         <NavigationBar />
           <Routes>
@@ -28,8 +27,7 @@ function App() {
             <Route exact path='*' element={<NotFound />} />
           </Routes>
           <Footer />
-        </div>
-      </Router>
+          </Router>
     </MainJsonProvider>
   );
 }
