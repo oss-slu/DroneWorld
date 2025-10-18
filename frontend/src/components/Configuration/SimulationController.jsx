@@ -33,6 +33,7 @@ export default function SimulationController() {
   const [loading, setLoading] = useState(false);
   // END of DOM Model================
 
+
   const fetchConfigDetailsFromApi = async () => {
     if (isTokenExpired()) {
       handleSessionExpiration(location, null);
@@ -42,6 +43,8 @@ export default function SimulationController() {
     setLoading(true);
     try {
       const data = await callAPI(`api/sade_task/${configId}`, 'GET', null, 'JSON');
+      console.log('Raw environment data:', data.environment);
+
 
       const droneData = mapDroneData(data.drones);
       mainJson.drones = droneData;
@@ -62,6 +65,8 @@ export default function SimulationController() {
       const savedJson = localStorage.getItem('mainJson');
       if (configId || !savedJson) return;
       const parsedJson = JSON.parse(savedJson);
+      console.log('Saved environment JSON:', parsedJson.environment);
+
 
       const droneData = mapDroneData(parsedJson.drones);
       mainJson.drones = droneData;
@@ -76,6 +81,7 @@ export default function SimulationController() {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     if (configId) {
@@ -97,6 +103,11 @@ export default function SimulationController() {
   const handleTabChange = (event, newValue) => {
     setActiveStep(newValue);
   };
+
+  useEffect(() => {
+    console.log('envJson updated:', envJson);
+  }, [envJson]);
+
 
   const handleNext = () => {
     let newSkipped = skipped;
@@ -122,7 +133,7 @@ export default function SimulationController() {
       id: 1,
       comp: (
         <EnvironmentConfiguration
-          environemntJSONSetState={setEnvJson}
+          environmentJSONSetState={setEnvJson}
           id='environment'
           mainJSON={mainJson}
           environmentJSON={envJson}

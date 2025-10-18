@@ -100,10 +100,29 @@ export default function EnvironmentConfiguration (env) {
     }    
     
     React.useEffect(() => {
-        if (env.environmentJson){
-            env.environmentJson(envConf, env.id);
+        console.log("Passing data up")
+        if (env.environmentJSONSetState){
+            env.environmentJSONSetState(envConf, env.id);
         }
+
+        if (env.mainJSONSetState){
+        env.mainJSONSetState(prevMainJson => ({
+            ...prevMainJson,
+            environment: envConf
+        }));
+    }
     }, [envConf])
+
+    useEffect(() => {
+    console.log('envConf updated:', envConf);
+    if (env.environmentJson) {
+        console.log('Calling environmentJson()');
+        env.environmentJson(envConf, env.id);
+    } else {
+        console.warn('env.environmentJson is undefined!');
+    }
+    }, [envConf]);
+
 
     const Direction = [
         {value:'N', id:5},
