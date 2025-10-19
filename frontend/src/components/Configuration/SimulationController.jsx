@@ -135,7 +135,7 @@ export default function SimulationController() {
         <EnvironmentConfiguration
           environmentJSONSetState={setEnvJson}
           id='environment'
-          mainJSON={mainJson}
+          mainJsonValue={mainJson}
           environmentJSON={envJson}
           mainJSONSetState={setMainJson}
           tabIndex={0}

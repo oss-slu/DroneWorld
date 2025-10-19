@@ -31,8 +31,51 @@ import Checkbox from '@mui/material/Checkbox';
 import { DeleteOutline } from '@mui/icons-material';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { EnvironmentModel } from '../model/EnvironmentModel';
+
+const buildEnvironmentModel = (conf, baseModel) => {
+  const model = EnvironmentModel.getReactStateBasedUpdate(baseModel ?? new EnvironmentModel());
+
+  const originSource = conf?.Origin ?? conf?._Origin ?? {};
+  const windSource = conf?.Wind ?? conf?._Wind ?? model.Wind;
+
+  const latitude =
+    originSource.Latitude ?? originSource.latitude ?? model.getOriginLatitude() ?? 0;
+  const longitude =
+    originSource.Longitude ?? originSource.longitude ?? model.getOriginLongitude() ?? 0;
+  const height = originSource.Height ?? originSource.height ?? model.getOriginHeight() ?? 0;
+  const name = originSource.Name ?? originSource.name ?? model.getOriginName() ?? '';
+  const radius = originSource.Radius ?? originSource.radius ?? model.getOriginRadius();
+
+  const originImage = originSource.image ?? model.getOriginImage();
+  model.Origin = {
+    latitude: Number(latitude),
+    longitude: Number(longitude),
+    height: Number(height),
+    name,
+    radius: Number(radius),
+    image: originImage,
+  };
+
+  model.TimeOfDay = conf?.TimeOfDay ?? conf?._TimeOfDay ?? model.TimeOfDay;
+  model.time = conf?.time ?? conf?._time ?? model.time;
+  model.enableFuzzy = Boolean(conf?.enableFuzzy ?? conf?._enableFuzzy ?? model.enableFuzzy);
+  model.timeOfDayFuzzy = Boolean(
+    conf?.timeOfDayFuzzy ?? conf?._timeOfDayFuzzy ?? model.timeOfDayFuzzy
+  );
+  model.positionFuzzy = Boolean(
+    conf?.positionFuzzy ?? conf?._positionFuzzy ?? model.positionFuzzy
+  );
+  model.windFuzzy = Boolean(conf?.windFuzzy ?? conf?._windFuzzy ?? model.windFuzzy);
+  model.UseGeo = conf?.UseGeo ?? conf?._UseGeo ?? model.UseGeo;
+  model.Wind = windSource;
+
+  return model;
+};
+
 
 export default function EnvironmentConfiguration (env) {  
+    console.log('EnvironmentConfiguration props', env);
     const [backendInfo, setBackendInfo] = useState({ 
         numQueuedTasks: 0,
         backendStatus: 'idle'
@@ -100,28 +143,19 @@ export default function EnvironmentConfiguration (env) {
     }    
     
     React.useEffect(() => {
-        console.log("Passing data up")
+        //console.log("Passing data up", envConf);
+        const model = buildEnvironmentModel(envConf, env.environmentJSON);
+        //console.log('Model origin lat/long', model.getOriginLatitude?.(), model.getOriginLongitude?.(), model._Origin);
+
         if (env.environmentJSONSetState){
-            env.environmentJSONSetState(envConf, env.id);
+            env.environmentJSONSetState(model, env.id);
         }
 
-        if (env.mainJSONSetState){
-        env.mainJSONSetState(prevMainJson => ({
-            ...prevMainJson,
-            environment: envConf
-        }));
-    }
-    }, [envConf])
-
-    useEffect(() => {
-    console.log('envConf updated:', envConf);
-    if (env.environmentJson) {
-        console.log('Calling environmentJson()');
-        env.environmentJson(envConf, env.id);
-    } else {
-        console.warn('env.environmentJson is undefined!');
-    }
-    }, [envConf]);
+        if (env.environmentJson){
+            env.environmentJson(envConf, env.id);
+        }
+        
+    }, [envConf, env.environmentJSON]);
 
 
     const Direction = [
