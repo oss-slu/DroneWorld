@@ -10,7 +10,8 @@ RUN apt-get update && apt-get install -y \
     portaudio19-dev \
     libjpeg-dev \
     zlib1g-dev \
-    libgl1-mesa-glx \
+    # libglx-mesa0 \
+    libgl1 \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 

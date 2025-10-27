@@ -1,8 +1,15 @@
 import requests
 import time
+import os
 
-post_url = 'http://172.18.126.222:5001/wind'
-get_url = 'http://172.18.126.222:5001/'
+WIND_SERVICE_HOST = os.getenv('WIND_SERVICE_HOST', '172.18.126.222')
+WIND_SERVICE_PORT = os.getenv('WIND_SERVICE_PORT', '5001')
+
+# This is a mess waiting to be cleaned up.
+post_url = f'http://{WIND_SERVICE_HOST}:{WIND_SERVICE_PORT}/wind'
+get_url = f'http://{WIND_SERVICE_HOST}:{WIND_SERVICE_PORT}/'
+
+
 
 def measure_delay_post():
     start_time = time.time()

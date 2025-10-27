@@ -1,16 +1,18 @@
 name: DroneWorld
 services:
   backend:
-    image: mohamdlog/droneworld-backend:v1.0.0
+    image: droneworld/droneworld-backend:v1.0.0
     build: ./backend
     ports:
       - "5000:5000"
     volumes:
       - ./backend:/app  # Mount backend code
       - ./config/airsim:/root/Documents/AirSim  # Mount the AirSim folder
+    # depends_on:
+    #   - DRV-Unreal
 
   frontend:
-    image: mohamdlog/droneworld-frontend:v1.0.0
+    image: droneworld/droneworld-frontend:v1.0.0
     build: ./frontend
     ports:
       - "3000:3000"

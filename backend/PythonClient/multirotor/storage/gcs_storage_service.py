@@ -9,7 +9,8 @@ class GCSStorageService(StorageServiceInterface):
 
     def __init__(self, bucket_name='your_bucket_name'):
         """Initializes the GCS client and bucket."""
-        self.storage_client = storage.Client.from_service_account_json('key.json')
+        credentials_path = os.getenv('GCS_CREDENTIALS_PATH', 'key.json')
+        self.storage_client = storage.Client.from_service_account_json(credentials_path)
         self.bucket = self.storage_client.bucket(bucket_name)
 
     def upload_to_service(self, file_name, content, content_type='text/plain'):

@@ -1,3 +1,6 @@
+# Ignore .env files
+.env
+
 # Ignore Visual Studio files
 .vs/
 
