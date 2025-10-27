@@ -6,7 +6,7 @@ import Wizard from './pages/Wizard';
 import FuzzyDashboard from './components/FuzzyDashboard';
 import ReportDashboard from './components/ReportDashboard';
 import LandingPage from './LandingPage';
-import AboutUs from './components/AboutUs';
+import AboutUs from './pages/AboutUs';
 import NavigationBar from './pages/NavigationBar';
 import Footer from './pages/Footer';
 import './styles.css';
@@ -14,10 +14,10 @@ import NotFound from './pages/NotFound';
 
 function App() {
   return (
-    <MainJsonProvider>  {/* Wrap everything inside MainJsonProvider */}
-      <div>
-        <NavigationBar />
-        <Router>
+    <MainJsonProvider>
+      <Router>
+        <div>
+          <NavigationBar />
           <Routes>
             <Route exact path='/home' element={<Home />} />
             <Route exact path='/simulation' element={<Wizard />} />
@@ -29,10 +29,12 @@ function App() {
             
           </Routes>
           <Footer />
-        </Router>
-      </div>
+        </div>
+      </Router>
     </MainJsonProvider>
   );
 }
 
+
 export default App;
+
