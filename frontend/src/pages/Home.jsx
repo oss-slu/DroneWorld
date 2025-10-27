@@ -86,15 +86,14 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const callOnOpen = () => {
-      fetch('http://localhost:5000/currentRunning')
+    const fetchBackendStatus = () => {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL;
+      fetch(`${backendUrl}/currentRunning`)
         .then((res) => {
-          if (!res.ok) {
-            throw new Error('No response from server/something went wrong');
-          }
+          if (!res.ok) throw new Error('No response from server/something went wrong');
           return res.text();
         })
-        .then((data) => {
+        .then((data) => { 
           const [status, queueSize] = data.split(', ');
           if (status === 'None') {
             setBackendInfo({ numQueuedTasks: 0, backendStatus: 'idle' });
@@ -107,7 +106,11 @@ const Home = () => {
           setBackendInfo({ numQueuedTasks: -1, backendStatus: 'error' });
         });
     };
-    callOnOpen();
+
+    fetchBackendStatus(); // fetch immediately
+    const intervalId = setInterval(fetchBackendStatus, 5000); // fetch every 5 seconds
+
+    return () => clearInterval(intervalId); // cleanup on unmount
   }, []);
 
   // Modal styles
