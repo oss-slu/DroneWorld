@@ -7,10 +7,13 @@ services:
       - "5000:5000"
     volumes:
       - ./backend:/app  # Mount backend code
+      - ./credentials:/app/credentials  # Mount credentials folder
       - ./config/airsim:/root/Documents/AirSim  # Mount the AirSim folder
-    # depends_on:
-    #   - DRV-Unreal
-
+    depends_on:
+      fake-gcs:
+        condition: service_healthy
+    env_file:
+      - ./backend/.env  # Load environment variables from .env file
   frontend:
     image: droneworld/droneworld-frontend:v1.0.0
     build: ./frontend
@@ -23,3 +26,34 @@ services:
       - CHOKIDAR_USEPOLLING=true  # Necessary for live-reload in Docker
     depends_on:
       - backend
+
+  fake-gcs:
+    image: fsouza/fake-gcs-server
+    ports:
+      - "4443:4443"
+    command: -scheme http -port 4443 -external-url http://fake-gcs:4443
+    volumes:
+      - ./fake-gcs-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:4443/storage/v1/b"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  init-storage:
+    image: curlimages/curl:latest
+    depends_on:
+      fake-gcs:
+        condition: service_healthy
+    command: 
+    - sh
+    - -c
+    - |
+      curl -X POST http://fake-gcs:4443/storage/v1/b \
+        -H 'Content-Type: application/json' \
+        -d '{"name":"droneworld"}'
+    networks:
+      - default
+      
+volumes:
+  fake-gcs-data:

@@ -10,7 +10,22 @@ class GCSStorageService(StorageServiceInterface):
     def __init__(self, bucket_name='your_bucket_name'):
         """Initializes the GCS client and bucket."""
         credentials_path = os.getenv('GCS_CREDENTIALS_PATH', 'key.json')
-        self.storage_client = storage.Client.from_service_account_json(credentials_path)
+
+        # Check if using emulator
+        emulator_host = os.getenv('STORAGE_EMULATOR_HOST')
+        
+        if emulator_host:
+            # For fake-gcs-server, use anonymous credentials
+            from google.auth.credentials import AnonymousCredentials
+            self.storage_client = storage.Client(
+                credentials=AnonymousCredentials(),
+                project='test-project',
+                client_options={"api_endpoint": emulator_host}
+            )
+        else:
+            # Production: use service account
+            self.storage_client = storage.Client.from_service_account_json(credentials_path)
+        
         self.bucket = self.storage_client.bucket(bucket_name)
 
     def upload_to_service(self, file_name, content, content_type='text/plain'):

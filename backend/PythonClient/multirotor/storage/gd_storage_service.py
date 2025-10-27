@@ -18,8 +18,9 @@ class GoogleDriveStorageService(StorageServiceInterface):
     def __init__(self, folder_id='your_root_folder_id'):
         """Initializes the Google Drive client."""
         SCOPES = ['https://www.googleapis.com/auth/drive']
+        credentials_path = os.getenv('GDRIVE_CREDENTIALS_PATH', 'key.json')
         self.credentials = service_account.Credentials.from_service_account_file(
-            'key.json', scopes=SCOPES)
+            credentials_path, scopes=SCOPES)
         self.service = build('drive', 'v3', credentials=self.credentials)
         self.folder_id = folder_id
 

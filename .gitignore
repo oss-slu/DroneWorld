@@ -53,4 +53,4 @@ desktop.ini
 key.json
 
 # Ignore config directory; so that changes wont be made to it 
-config/
+config/fake-gcs-data/
