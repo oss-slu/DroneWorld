@@ -33,7 +33,7 @@ services:
       - "4443:4443"
     command: -scheme http -port 4443 -external-url http://fake-gcs:4443
     volumes:
-      - ./fake-gcs-data:/data
+      - ./config/fake-gcs-data:/data
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:4443/storage/v1/b"]
       interval: 5s
@@ -54,6 +54,6 @@ services:
         -d '{"name":"droneworld"}'
     networks:
       - default
-      
+
 volumes:
   fake-gcs-data:
