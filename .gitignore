@@ -55,3 +55,6 @@ key.json
 # Ignore config directory; so that changes wont be made to it 
 config/
 config/fake-gcs-data/
+
+# MaOS system files
+.DS_Store

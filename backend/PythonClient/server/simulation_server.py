@@ -227,6 +227,10 @@ def get_map():
     """
     return task_dispatcher.load_cesium_setting(), 200
 
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "ok", "message": "Backend is reachable!"})
+
 # === Run the Flask App ===
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)  # Makes it discoverable by other devices in the network
