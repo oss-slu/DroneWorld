@@ -151,7 +151,7 @@ switch ($Command) {
     }
     "dev" {
         Write-Host "🔧 Starting development services (frontend + backend only)..." -ForegroundColor Green
-        docker-compose -f docker-compose.dev.yml up
+        docker-compose -f docker-compose.dev.yaml up
     }
     "frontend" {
         Write-Host "⚛️  Starting frontend only..." -ForegroundColor Green
@@ -174,7 +174,7 @@ switch ($Command) {
     }
     "logs" {
         Write-Host "📋 Following development service logs..." -ForegroundColor Green
-        docker-compose -f docker-compose.dev.yml logs -f frontend backend
+        docker-compose -f docker-compose.dev.yaml logs -f frontend backend
     }
     "logs-all" {
         Write-Host "📋 Following all service logs..." -ForegroundColor Green
@@ -186,12 +186,12 @@ switch ($Command) {
     }
     "stop-dev" {
         Write-Host "🛑 Stopping development services..." -ForegroundColor Yellow
-        docker-compose -f docker-compose.dev.yml down
+        docker-compose -f docker-compose.dev.yaml down
     }
     "clean" {
         Write-Host "🧹 Cleaning up all containers and volumes..." -ForegroundColor Yellow
         docker-compose down -v
-        docker-compose -f docker-compose.dev.yml down -v
+        docker-compose -f docker-compose.dev.yaml down -v
         Write-Host "✅ Cleanup complete" -ForegroundColor Green
     }
     { $_ -eq "help" -or $_ -eq "" -or $null -eq $_ } {

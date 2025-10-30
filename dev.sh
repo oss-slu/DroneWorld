@@ -115,7 +115,7 @@ case "$1" in
         ;;
     dev)
         echo "🔧 Starting development services (frontend + backend only)..."
-        docker-compose -f docker-compose.dev.yml up
+        docker-compose -f docker-compose.dev.yaml up
         ;;
     frontend)
         echo "⚛️  Starting frontend only..."
@@ -139,7 +139,7 @@ case "$1" in
         ;;
     logs)
         echo "📋 Following development service logs..."
-        docker-compose -f docker-compose.dev.yml logs -f frontend backend
+        docker-compose -f docker-compose.dev.yaml logs -f frontend backend
         ;;
     logs-all)
         echo "📋 Following all service logs..."
@@ -151,12 +151,12 @@ case "$1" in
         ;;
     stop-dev)
         echo "🛑 Stopping development services..."
-        docker-compose -f docker-compose.dev.yml down
+        docker-compose -f docker-compose.dev.yaml down
         ;;
     clean)
         echo "🧹 Cleaning up all containers and volumes..."
         docker-compose down -v
-        docker-compose -f docker-compose.dev.yml down -v
+        docker-compose -f docker-compose.dev.yaml down -v
         echo "✅ Cleanup complete"
         ;;
     help|"")
