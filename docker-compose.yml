@@ -16,6 +16,8 @@ services:
       - ./backend/.env  # Load environment variables from .env file
     environment:
       # DRV-Unreal service connection
+      - FLASK_ENV=development  # Enable debug mode
+      - FLASK_DEBUG=1          # Enable hot reload
       - DRV_UNREAL_HOST=drv-unreal
       - DRV_UNREAL_API_PORT=3001  # DRV API port (if available)
       - DRV_PIXELSTREAM_PORT=8888
@@ -32,6 +34,9 @@ services:
       - /app/node_modules # Separate node_modules to avoid host overwrite
     environment:
       - CHOKIDAR_USEPOLLING=true  # Necessary for live-reload in Docker
+      - CHOKIDAR_INTERVAL=1000  # Poll every 1 second
+      - WATCHPACK_POLLING=true   # Webpack 5 polling
+      - FAST_REFRESH=true        # Ensure fast refresh is on
       # PixelStreaming connection - frontend connects directly to DRV
       - PIXELSTREAM_URL=ws://localhost:8888
       - BACKEND_URL=http://backend:5000

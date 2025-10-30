@@ -53,7 +53,7 @@ const BackendHealthTitle = ({ classes }) => {
       style={titleStyle}
       title={isChecking ? 'Checking backend...' : (isHealthy ? 'Backend connected' : 'Backend disconnected')}
     >
-      Drone World
+      Drone World 🚁
     </Link>
   );
 };

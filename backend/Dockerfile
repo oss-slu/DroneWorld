@@ -28,4 +28,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 5000
 
 # Command to start the backend server  
-CMD ["python", "./PythonClient/server/simulation_server.py"]
+CMD ["flask", "--app", "PythonClient.server.simulation_server", "run", "--host=0.0.0.0", "--port=5000", "--debug"]
