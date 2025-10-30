@@ -3,10 +3,82 @@
 
 set -e
 
+check_token() {
+    # Check if token is in environment
+    if [ -n "$GITHUB_TOKEN" ]; then
+        return 0
+    fi
+    
+    # Check if token is in .env file and auto-export it
+    if [ -f .env ] && grep -q "^GITHUB_TOKEN=" .env; then
+        token=$(grep "^GITHUB_TOKEN=" .env | cut -d '=' -f2-)
+        if [ -n "$token" ]; then
+            export GITHUB_TOKEN="$token"
+            echo "✅ Loaded GITHUB_TOKEN from .env"
+            return 0
+        fi
+    fi
+    
+    echo "⚠️  GITHUB_TOKEN not found."
+    echo "Run './dev.sh token' to set it up."
+    return 1
+}
+
+set_token() {
+    echo "🔑 Setting up GITHUB_TOKEN..."
+    echo ""
+    
+    # Check if token already exists in .env
+    if [ -f .env ] && grep -q "^GITHUB_TOKEN=" .env; then
+        current_token=$(grep "^GITHUB_TOKEN=" .env | cut -d '=' -f2-)
+        if [ -n "$current_token" ]; then
+            echo "✅ Found existing token in .env: ${current_token:0:10}..."
+            read -p "Use existing token? (Y/n): " -n 1 -r
+            echo ""
+            if [[ $REPLY =~ ^[Yy]$ ]] || [[ -z $REPLY ]]; then
+                export GITHUB_TOKEN="$current_token"
+                echo "✅ Token exported for current session"
+                return 0
+            fi
+        fi
+    fi
+    
+    # Prompt for new token
+    read -sp "Enter your GitHub Personal Access Token: " token
+    echo ""
+    
+    if [ -z "$token" ]; then
+        echo "❌ No token provided"
+        return 1
+    fi
+    
+    export GITHUB_TOKEN="$token"
+    
+    # Save to .env file in root
+    if [ -f .env ] && grep -q "^GITHUB_TOKEN=" .env; then
+        # Update existing token
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # macOS
+            sed -i '' "s|^GITHUB_TOKEN=.*|GITHUB_TOKEN=$token|" .env
+        else
+            # Linux
+            sed -i "s|^GITHUB_TOKEN=.*|GITHUB_TOKEN=$token|" .env
+        fi
+        echo "✅ Updated GITHUB_TOKEN in .env"
+    else
+        # Add new token
+        echo "GITHUB_TOKEN=$token" >> .env
+        echo "✅ Added GITHUB_TOKEN to .env"
+    fi
+    
+    echo "✅ Token exported for current session"
+}
+
 print_usage() {
     echo "Usage: ./dev.sh [command]"
     echo ""
     echo "Commands:"
+    echo "  token       - Set GITHUB_TOKEN for building simulator (required for 'full' and 'simulator')"
     echo "  full        - Start all services (frontend, backend, simulator)"
     echo "  dev         - Start development services only (frontend, backend)"
     echo "  frontend    - Start frontend only"
@@ -18,10 +90,26 @@ print_usage() {
     echo "  stop-dev    - Stop development services only"
     echo "  clean       - Stop and remove all containers and volumes"
     echo "  help        - Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  ./dev.sh token        # Set GitHub token (needed before 'full' or 'simulator')"
+    echo "  ./dev.sh dev          # Quick start for development"
+    echo "  ./dev.sh full         # Start everything including simulator"
 }
 
 case "$1" in
+    token)
+        set_token
+        ;;
     full)
+        if ! check_token; then
+            echo ""
+            read -p "Continue without token? The simulator will fail to build. (y/N): " -n 1 -r
+            echo ""
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                exit 1
+            fi
+        fi
         echo "🚀 Starting full stack (frontend + backend + simulator)..."
         docker-compose up
         ;;
@@ -38,6 +126,14 @@ case "$1" in
         docker-compose up backend
         ;;
     simulator)
+        if ! check_token; then
+            echo ""
+            read -p "Continue without token? The simulator will fail to build. (y/N): " -n 1 -r
+            echo ""
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                exit 1
+            fi
+        fi
         echo "🎮 Starting simulator only..."
         docker-compose up drv-unreal
         ;;

@@ -37,9 +37,9 @@ Check out our [Wiki](https://github.com/oss-slu/DroneWorld/wiki) for detailed an
 
 DroneReqValidator has 3 main components:
 
-1. **DRV-Unreal** - Unreal Engine 5.5 simulation environment with AirSim plugin (headless mode)
-2. **Python Backend** - Flask server-based simulation controller and monitoring service
-3. **React Frontend** - React web-based user interface for configuration and visualization
+1. **DRV-Unreal** - Unreal-based simulation engine (headless mode)
+2. **Flask Backend** - Python-based simulation controller and monitoring service
+3. **React Frontend** - JavaScript-based user interface for configuration and visualization
 
 ## Quick Start (Docker)
 
@@ -47,11 +47,18 @@ DroneReqValidator has 3 main components:
 
 Ensure Docker and Docker Compose are installed on your system.
 
+### GitHub Token (Required for Simulator)
+
+The simulator (`drv-unreal`) requires a GitHub Personal Access Token to build. If you're only working on frontend/backend, you can skip this step. See setup instructions in [Troubleshooting](#set-up-github-token).
+
 ### Using Helper Scripts (Recommended)
 
 **Linux/macOS:**
 
 ```bash
+# First time: Set GitHub token (only needed for simulator)
+./dev.sh token
+
 # Development mode (frontend + backend only)
 ./dev.sh dev
 
@@ -68,6 +75,9 @@ Ensure Docker and Docker Compose are installed on your system.
 **Windows (PowerShell):**
 
 ```powershell
+# First time: Set GitHub token (only needed for simulator)
+.\dev.ps1 token
+
 # Development mode (frontend + backend only)
 .\dev.ps1 dev
 
@@ -85,7 +95,7 @@ Run `./dev.sh help` or `.\dev.ps1 help` to see all available commands.
 
 ### Option 1: Full Stack (Recommended for Testing)
 
-Run all services including the simulator:
+Run all services including the simulation engine:
 
 ```bash
 ./dev.sh full           # Linux/macOS
@@ -99,12 +109,12 @@ docker-compose up
 
 - Frontend UI (http://localhost:3000)
 - Backend API (http://localhost:5000)
-- Simulation Server (http://localhost:3001)
+- Simulation Engine (http://localhost:3001)
 - Storage services
 
 ### Option 2: Frontend/Backend Only (Recommended for Development)
 
-Run without the Simulation engine for faster development:
+Run without the simulation engine for faster development:
 
 ```bash
 ./dev.sh dev            # Linux/macOS
@@ -215,7 +225,7 @@ docker-compose up
 ### Start Individual Services
 
 ```bash
-# Unreal simulation only
+# Simulation engine only
 docker-compose up drv-unreal
 
 # Backend only
@@ -230,14 +240,14 @@ docker-compose up frontend
 - **Frontend UI**: http://localhost:3000
 - **Backend API**: http://localhost:5000
 - **Backend Health Check**: http://localhost:5000/api/health
-- **Simulation Server API**: http://localhost:3001
-- **Simulation PixelStream**: http://localhost:8888 
+- **Simulation Engine API**: http://localhost:3001
+- **Simulation Engine PixelStream**: http://localhost:8888 
 
 ## Architecture Notes
 
 ### Headless Simulation
 
-The Unreal-powered Simulation Engine runs in **headless mode** using the `-nullrhi` flag, which:
+The DRV-Unreal simulation engine runs in **headless mode** using the `-nullrhi` flag, which:
 
 - Bypasses GPU rendering requirements
 - Enables deployment on servers without graphics hardware
@@ -246,8 +256,8 @@ The Unreal-powered Simulation Engine runs in **headless mode** using the `-nullr
 
 ### Network Communication
 
-- The Simulation server exposes AirSim's API on port 3000
-- Backend communicates with Simulation via this TCP connection
+- The simulation engine exposes AirSim's API on port 3001
+- Backend communicates with the simulation engine via this TCP connection
 - Frontend communicates with backend via REST API
 
 ## Development
@@ -255,7 +265,7 @@ The Unreal-powered Simulation Engine runs in **headless mode** using the `-nullr
 ### Building Custom Images
 
 ```bash
-# Build Unreal simulation image
+# Build DRV-Unreal simulation engine image
 docker-compose build drv-unreal
 
 # Build backend image
@@ -307,14 +317,40 @@ To begin using DroneReqValidator with traditional installation, refer to our [Ge
 
 ## Troubleshooting
 
+### Set Up GitHub Token
+
+**Linux/macOS:**
+```bash
+./dev.sh token
+# Enter your token when prompted
+# Token is automatically saved and loaded for future sessions
+```
+
+**Windows (PowerShell):**
+```powershell
+.\dev.ps1 token
+# Enter your token when prompted
+# Token is automatically saved and loaded for future sessions
+```
+
+**Creating a GitHub Personal Access Token:**
+1. Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. Click "Generate new token (classic)"
+3. Give it a descriptive name (e.g., "DroneWorld Simulator")
+4. Select scopes: `repo` (Full control of private repositories)
+5. Click "Generate token"
+6. Copy the token and use it with the `token` command above
+
+**Note:** Once saved, the token is automatically loaded from `.env` when you run `./dev.sh full` or `./dev.sh simulator`.
+
 ### Port Already in Use
-If you see errors about ports 3000, 3001, or 8000 already being in use:
+If you see errors about ports 3000, 3001, or 5000 already being in use:
 ```bash
 # Stop conflicting services or change ports in docker-compose.yml
 docker-compose down
 ```
 
-### Simulation Server Not Responding
+### Simulation Engine Not Responding
 
 Check logs for initialization:
 
@@ -329,7 +365,7 @@ Look for messages like:
 
 ### Memory Issues
 
-If the Simulation container crashes with memory errors, increase Docker's memory limit:
+If the simulation engine container crashes with memory errors, increase Docker's memory limit:
 
 - **Docker Desktop**: Settings → Resources → Memory (set to 8GB+)
 - **Linux**: No limit by default, but ensure system has sufficient RAM
