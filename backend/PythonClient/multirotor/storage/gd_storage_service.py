@@ -6,6 +6,7 @@ import threading
 import base64
 from io import BytesIO
 import logging
+import os
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

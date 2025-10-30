@@ -1,5 +1,6 @@
 import math
 import requests
+import os
 
 class Vector:
     """
