@@ -38,8 +38,8 @@ Check out our [Wiki](https://github.com/oss-slu/DroneWorld/wiki) for detailed an
 DroneReqValidator has 3 main components:
 
 1. **DRV-Unreal** - Unreal Engine 5.5 simulation environment with AirSim plugin (headless mode)
-2. **Python Backend** - FastAPI-based simulation controller and monitoring service
-3. **React Frontend** - Web-based user interface for configuration and visualization
+2. **Python Backend** - Flask server-based simulation controller and monitoring service
+3. **React Frontend** - React web-based user interface for configuration and visualization
 
 ## Quick Start (Docker)
 
@@ -103,10 +103,11 @@ docker-compose up frontend
 
 ### Access the Application
 
-- **Frontend UI**: http://localhost:3001
-- **Backend API**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs
-- **Unreal Server**: localhost:3000
+- **Frontend UI**: http://localhost:3000
+- **Backend API**: http://localhost:5000
+- **Backend Health Check**: http://localhost:5000/api/health
+- **Simulation Server API**: http://localhost:3001
+- **Simulation PixelStream**: http://localhost:8888 
 
 ## Architecture Notes
 
@@ -121,8 +122,8 @@ The Unreal Engine simulation runs in **headless mode** using the `-nullrhi` flag
 
 ### Network Communication
 
-- The Unreal server exposes AirSim's API on port 3000
-- Backend communicates with Unreal via this TCP connection
+- The Simulation server exposes AirSim's API on port 3000
+- Backend communicates with Simulation via this TCP connection
 - Frontend communicates with backend via REST API
 
 ## Development
@@ -161,6 +162,20 @@ docker-compose down
 # Stop and remove volumes
 docker-compose down -v
 ```
+### Hot Reload
+
+Both frontend and backend support automatic hot reload during development:
+
+- **Frontend**: Changes to files in `frontend/src/` trigger automatic recompilation
+- **Backend**: Changes to Python files automatically restart the Flask server
+
+Verify hot reload is working:
+```bash
+# Watch logs for recompilation/restart messages
+docker-compose logs -f frontend backend
+```
+
+For detailed development workflows and contribution guidelines, see our [Contributing Guide](https://github.com/oss-slu/DroneWorld/wiki/Contributing-Guide).
 
 ## Traditional Usage (Non-Docker)
 
@@ -175,7 +190,7 @@ If you see errors about ports 3000, 3001, or 8000 already being in use:
 docker-compose down
 ```
 
-### Unreal Server Not Responding
+### Simulation Server Not Responding
 
 Check logs for initialization:
 
@@ -190,7 +205,7 @@ Look for messages like:
 
 ### Memory Issues
 
-If the Unreal container crashes with memory errors, increase Docker's memory limit:
+If the Simulation container crashes with memory errors, increase Docker's memory limit:
 
 - **Docker Desktop**: Settings → Resources → Memory (set to 8GB+)
 - **Linux**: No limit by default, but ensure system has sufficient RAM
