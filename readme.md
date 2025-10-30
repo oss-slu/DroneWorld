@@ -47,6 +47,130 @@ DroneReqValidator has 3 main components:
 
 Ensure Docker and Docker Compose are installed on your system.
 
+### Using Helper Scripts (Recommended)
+
+**Linux/macOS:**
+
+```bash
+# Development mode (frontend + backend only)
+./dev.sh dev
+
+# Full stack (includes simulator)
+./dev.sh full
+
+# View logs
+./dev.sh logs
+
+# Stop services
+./dev.sh stop
+```
+
+**Windows (PowerShell):**
+
+```powershell
+# Development mode (frontend + backend only)
+.\dev.ps1 dev
+
+# Full stack (includes simulator)
+.\dev.ps1 full
+
+# View logs
+.\dev.ps1 logs
+
+# Stop services
+.\dev.ps1 stop
+```
+
+Run `./dev.sh help` or `.\dev.ps1 help` to see all available commands.
+
+### Option 1: Full Stack (Recommended for Testing)
+
+Run all services including the simulator:
+
+```bash
+./dev.sh full           # Linux/macOS
+.\dev.ps1 full          # Windows
+
+# Or directly:
+docker-compose up
+```
+
+**Services started:**
+
+- Frontend UI (http://localhost:3000)
+- Backend API (http://localhost:5000)
+- Simulation Server (http://localhost:3001)
+- Storage services
+
+### Option 2: Frontend/Backend Only (Recommended for Development)
+
+Run without the Simulation engine for faster development:
+
+```bash
+./dev.sh dev            # Linux/macOS
+.\dev.ps1 dev           # Windows
+
+# Or directly:
+docker-compose -f docker-compose.dev.yml up
+```
+
+**Services started:**
+
+- Frontend UI (http://localhost:3000)
+- Backend API (http://localhost:5000)
+- Storage services
+
+**Use this when:**
+
+- Working on frontend UI/UX
+- Developing backend API endpoints
+- Testing frontend ↔ backend integration
+- You don't have access to build the simulator
+- You want faster startup times
+
+### Start Individual Services
+
+```bash
+./dev.sh frontend       # Frontend only
+./dev.sh backend        # Backend only
+./dev.sh simulator      # Simulator only
+
+# Or directly:
+docker-compose up frontend
+docker-compose up backend
+docker-compose up drv-unreal
+```
+
+### Viewing Logs
+
+**Using helper scripts:**
+
+```bash
+./dev.sh logs           # Linux/macOS
+.\dev.ps1 logs          # Windows
+```
+
+**Using docker-compose directly:**
+
+```bash
+docker-compose -f docker-compose.dev.yml logs -f frontend backend
+```
+
+### Stopping Development Services
+
+**Using helper scripts:**
+
+```bash
+./dev.sh stop-dev       # Linux/macOS
+.\dev.ps1 stop-dev      # Windows
+```
+
+**Using docker-compose directly:**
+
+```bash
+docker-compose -f docker-compose.dev.yml down
+```
+
 ### Configuration
 
 1. Configure AirSim settings in `config/airsim/`:
@@ -113,7 +237,7 @@ docker-compose up frontend
 
 ### Headless Simulation
 
-The Unreal Engine simulation runs in **headless mode** using the `-nullrhi` flag, which:
+The Unreal-powered Simulation Engine runs in **headless mode** using the `-nullrhi` flag, which:
 
 - Bypasses GPU rendering requirements
 - Enables deployment on servers without graphics hardware
