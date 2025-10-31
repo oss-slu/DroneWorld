@@ -317,6 +317,51 @@ To begin using DroneReqValidator with traditional installation, refer to our [Ge
 
 ## Troubleshooting
 
+### Sample `.env` Files
+
+The contents of `.env` might include the following variables:
+
+```sh
+GITHUB_TOKEN=ghp_xxxxxxx
+```
+
+The contents of `./sim/.env` might include the following variables:
+
+```sh
+GITHUB_TOKEN=ghp_xxxxxxx
+```
+
+The contents of `./backend/.env` should include the following variables:
+
+```sh
+# Storage Configuration
+STORAGE_TYPE=gcs
+GCS_BUCKET_NAME=droneworld
+GDRIVE_FOLDER_ID=your_folder_id_here
+
+# Credentials
+GCS_CREDENTIALS_PATH=/app/credentials/gcs-key.json
+GDRIVE_CREDENTIALS_PATH=/app/credentials/gdrive-key.json
+
+# External APIs
+GOOGLE_MAPS_API_KEY=your_api_key_here
+
+# Wind Service Configuration
+WIND_SERVICE_HOST=hostname.or.ip.address
+WIND_SERVICE_PORT=5001
+
+# Storage Emulator Host
+STORAGE_EMULATOR_HOST=localhost:4443
+
+```
+
+The contents of `./frontend/.env` should include the following variables:
+
+```sh
+REACT_APP_DEMO_USER_EMAIL='name@domain.tld'
+REACT_APP_CESIUM_ION_ACCESS_TOKEN='yaddayaddayadda'
+```
+
 ### Set Up GitHub Token
 
 **Linux/macOS:**
