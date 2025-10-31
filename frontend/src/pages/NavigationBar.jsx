@@ -10,6 +10,8 @@ import Tooltip from '@mui/material/Tooltip';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import BackendHealthTitle from '../components/BackendHealthTitle'
+
 const useStyles = makeStyles((theme) => ({
   nav: {
     display: 'flex',
@@ -84,9 +86,7 @@ function NavigationBar() {
   return (
     <div>
       <nav className={classes.nav}>
-        <Link to="/" className={classes.siteTitle}>
-          Drone World
-        </Link>
+        <BackendHealthTitle classes={classes} />
 
         <ul className={classes.navList}>
           <li className={classes.navListItem}>

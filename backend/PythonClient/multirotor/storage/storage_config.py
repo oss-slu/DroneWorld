@@ -1,13 +1,23 @@
+import os
+
 def get_storage_service():
     """
     Returns an instance of the configured storage service.
     Modify this function to switch between different storage services.
     """
-    # Uncomment the storage service you want to use and comment out the others.
+    # Only GCS is implemented for now
+    
+    storage_type = os.getenv('STORAGE_TYPE', 'gcs')  # 'gcs' or 'gdrive'
 
     # For Google Cloud Storage
-    from .gcs_storage_service import GCSStorageService
-    return GCSStorageService(bucket_name='droneworld')
+    if storage_type == 'gcs':
+        from .gcs_storage_service import GCSStorageService
+        bucket_name = os.getenv('GCS_BUCKET_NAME', 'droneworld')
+        return GCSStorageService(bucket_name=bucket_name)
+    elif storage_type == 'gdrive':
+        from .gd_storage_service import GoogleDriveStorageService
+        folder_id = os.getenv('GDRIVE_FOLDER_ID', 'google drive folder ID')
+        return GoogleDriveStorageService(folder_id=folder_id)
 
     # For Google Drive Storage
     # from .gd_storage_service import GoogleDriveStorageService
