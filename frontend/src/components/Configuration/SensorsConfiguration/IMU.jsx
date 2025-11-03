@@ -16,6 +16,8 @@ export default function IMU(sensor) {
   }, [imu]);
 
   const closeModal = () => {
+    // sends local state to the parent.
+    // fixed async state issue in SensorConfiguration.jsx's handleClose function.
     sensor.closeModal(imu, sensor.name);
   };
 

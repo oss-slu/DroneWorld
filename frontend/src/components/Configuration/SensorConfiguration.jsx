@@ -99,12 +99,13 @@ export default function SensorConfiguration(param) {
     setVisibleSensor(sensr);
   };
   const handleClose = (e, name) => {
-    if (name != 'Camera') {
-      setSensor((prevState) => ({
-        ...prevState,
+    if (name !== 'Camera') {
+      const updatedSensor = {
+        ...sensor,
         [name]: e,
-      }));
-      param.setSensor(sensor);
+      };
+      setSensor(updatedSensor);
+      param.setSensor(updatedSensor);
     } else {
       param.setCamera(e);
     }
@@ -113,12 +114,13 @@ export default function SensorConfiguration(param) {
 
   const updateSensorOjb = (e, name) => {
     console.log('in sensor config--- updateSensorOjb----', e, 'gghgg---', name);
-    if (name != 'Camera') {
-      setSensor((prevState) => ({
-        ...prevState,
+    if (name !== 'Camera') {
+      const updatedSensor = {
+        ...sensor,
         [name]: e,
-      }));
-      param.setSensor(sensor);
+      };
+      setSensor(updatedSensor);
+      param.setSensor(updatedSensor);
     } else {
       param.setCamera(e);
     }
