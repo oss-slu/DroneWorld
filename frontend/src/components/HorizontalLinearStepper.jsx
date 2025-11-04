@@ -73,7 +73,7 @@ export default function HorizontalLinearStepper(data) {
     // }
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     setSkipped(newSkipped);
-    invokePostAPI();
+    addTask();
   };
 
   const handleBack = () => {
@@ -157,7 +157,7 @@ export default function HorizontalLinearStepper(data) {
 
   //meat and potatoes, this function actually makes the call
   //the other end is simulation_server.py line 139
-  async function invokePostAPI() {
+  async function addTask() {
     if (activeStep !== steps.length - 1) return;
 
     const dronesToSend = getDronesForPayload(mainJson);
