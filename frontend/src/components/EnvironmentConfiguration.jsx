@@ -687,7 +687,7 @@ const handleSnackBarVisibility = (val) => {
                                 variant="standard" type="number" 
                                 onChange={handleWindChange} 
                                 value={envConf.Wind.Force} 
-                                inputProps={{ min: 0, max: 50, }}
+                                inputProps={{ min: 0, max: 50, 'data-testid': 'wind-force-input' }}
                                 helperText={`Allowed range: 0-50 m/s`}/>
                         </Grid>
                     </Tooltip>
