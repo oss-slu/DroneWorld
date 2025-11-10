@@ -1,22 +1,34 @@
+/* eslint-env jest */
+
 import React from 'react';
+import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import EnvironmentConfiguration from '../components/EnvironmentConfiguration';
 
 jest.mock('@react-google-maps/api', () => {
   const mapClickMock = { handler: null };
+  const GoogleMapMock = ({ onClick, children }) => {
+    mapClickMock.handler = onClick;
+    return <div data-testid='google-map'>{children}</div>;
+  };
+  GoogleMapMock.propTypes = {
+    onClick: PropTypes.func,
+    children: PropTypes.node,
+  };
+
+  const LoadScriptMock = ({ children }) => <div>{children}</div>;
+  LoadScriptMock.propTypes = {
+    children: PropTypes.node,
+  };
+
+  const MarkerMock = () => <div data-testid='marker' />;
+
   return {
     __esModule: true,
-    GoogleMap: ({ onClick, children }) => {
-      mapClickMock.handler = onClick;
-      return (
-        <div data-testid='google-map'>
-          {children}
-        </div>
-      );
-    },
-    LoadScript: ({ children }) => <div>{children}</div>,
-    Marker: () => <div data-testid='marker' />,
+    GoogleMap: GoogleMapMock,
+    LoadScript: LoadScriptMock,
+    Marker: MarkerMock,
     __triggerMapClick: (event) => {
       if (mapClickMock.handler) {
         mapClickMock.handler(event);
@@ -25,7 +37,6 @@ jest.mock('@react-google-maps/api', () => {
   };
 });
 
-// eslint-disable-next-line import/namespace
 import { __triggerMapClick } from '@react-google-maps/api';
 
 const buildProps = () => ({
