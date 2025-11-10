@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT" || exit 1
+
+# Ensure backend linters are available when backend Python files are staged
+# The git+grep check looks at staged paths; if any Python file is in backend/, extra checks run.
+if git diff --cached --name-only | grep -E '^backend/.*\.py' >/dev/null 2>&1; then
+  if ! command -v black >/dev/null 2>&1; then
+    echo 'pre-commit: Black is not available.'
+    exit 1
+  fi
+  if ! command -v flake8 >/dev/null 2>&1; then
+    echo 'pre-commit: flake8 is not available.'
+    exit 1
+  fi
+fi
+
+cd frontend
+npm run precommit

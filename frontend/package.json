@@ -44,7 +44,9 @@
     "lint:fix": "eslint --fix src/**/*.{js,jsx,ts,tsx,json}",
     "format": "prettier --write src/**/*.{js,jsx,ts,tsx,css,md,json,scss} --config ./.prettierrc",
     "cypress:open": "cypress open",
-    "cypress:run": "cypress run"
+    "cypress:run": "cypress run",
+    "prepare": "husky",
+    "precommit": "lint-staged"
   },
   "eslintConfig": {
     "extends": [
@@ -71,7 +73,25 @@
     "eslint": "^8.32.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-react": "^7.32.1",
+    "husky": "^9.1.7",
     "jest": "^27.5.1",
+    "lint-staged": "^16.2.6",
     "prettier": "2.8.3"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx}": [
+      "echo \"Running ESLint on staged frontend JS/TS files...\"",
+      "eslint --max-warnings=0",
+      "echo \"Formatting staged frontend JS/TS files with Prettier...\"",
+      "prettier --write",
+      "echo \"Frontend checks complete.\""
+    ],
+    "../backend/**/*.{py,pyt,pyx,pyw,pyi}": [
+      "echo \"Formatting staged backend Python files with Black...\"",
+      "black",
+      "echo \"Linting staged backend Python files with flake8...\"",
+      "flake8 --max-line-length=160 --ignore=E127,E251,E302,E501,E261,E262,E265,F401,F403,F405,F841,W293,E128,E303,E305,W292,E122,W391,E111,E117,E301,E125,E222,E226,E201,E203,E202,E721,W503,W504,E272,E126,E225,W291,E211,E231,E722,W191,E712,F523,E402,E306",
+      "echo \"Backend Python checks complete.\""
+    ]
   }
 }
