@@ -262,6 +262,26 @@ The DRV-Unreal simulation engine runs in **headless mode** using the `-nullrhi` 
 
 ## Development
 
+### Pre-commit Hooks
+
+This project uses [Husky](https://typicode.github.io/husky/) and [lint-staged](https://github.com/okonet/lint-staged) to automatically format and lint code before commits. Hooks are automatically installed when you run `npm install` in the `frontend/` directory.
+
+**What the hooks do:**
+- **Frontend files** (`.js`, `.jsx`, `.ts`, `.tsx`): Runs ESLint and Prettier
+- **Backend files** (`.py`): Runs Black formatter and flake8 linter
+
+**Setup:**
+1. Install frontend dependencies: `cd frontend && npm install`
+2. For backend Python files, ensure `black` and `flake8` are installed:
+   ```bash
+   pip install black flake8
+   ```
+   Or add them to your virtual environment if you're using one.
+
+**Note:** If you commit backend Python files without `black` and `flake8` available, the commit will be blocked.
+
+For detailed contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ### Building Custom Images
 
 ```bash

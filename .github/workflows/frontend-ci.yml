@@ -55,8 +55,7 @@ jobs:
         run: |
           cd frontend
           npm install -g wait-on
-          npm run start &                        # start the frontend in the background
-          npx wait-on http://localhost:3000      # wait for the frontend to be ready
+          npm run start & wait-on http://localhost:3000  
           npm run cypress:run
 
       - name: Run ESLint Security Checks
