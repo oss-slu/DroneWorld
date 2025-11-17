@@ -1,7 +1,6 @@
 /* eslint-env jest */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import EnvironmentConfiguration from '../components/EnvironmentConfiguration';
@@ -12,15 +11,7 @@ jest.mock('@react-google-maps/api', () => {
     mapClickMock.handler = onClick;
     return <div data-testid='google-map'>{children}</div>;
   };
-  GoogleMapMock.propTypes = {
-    onClick: PropTypes.func,
-    children: PropTypes.node,
-  };
-
   const LoadScriptMock = ({ children }) => <div>{children}</div>;
-  LoadScriptMock.propTypes = {
-    children: PropTypes.node,
-  };
 
   const MarkerMock = () => <div data-testid='marker' />;
 
