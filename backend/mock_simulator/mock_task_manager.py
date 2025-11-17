@@ -62,4 +62,3 @@ class MockTaskManager:
         except FileNotFoundError:
             print("Cesium file not found")
         return cesium_setting
-
