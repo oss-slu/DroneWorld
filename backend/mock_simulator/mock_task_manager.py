@@ -28,7 +28,7 @@ class MockTaskManager:
 
     def runMockTest(self, json, uuid):
         print("running mock test")
-        time.sleep(1) #simulate running sim
+        time.sleep(.1) #simulate running sim
         self.createFakeReport(uuid)   
         return 1
  
