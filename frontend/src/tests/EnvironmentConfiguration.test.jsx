@@ -1,4 +1,5 @@
 /* eslint-env jest */
+/* eslint-disable react/prop-types */
 
 import React from 'react';
 import dayjs from 'dayjs';
