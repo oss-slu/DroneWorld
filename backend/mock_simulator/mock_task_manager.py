@@ -9,7 +9,7 @@ class MockTaskManager:
     def __init__(self):
         self.storage_service = get_storage_service()
         self.mission_queue = queue.Queue()
-        self.currentTaskBatch = "None" # I know that this doesnt match the original syntax but i believe in camelCase supremacy
+        self.currentTaskBatch = "None"
         self.state = True
         self.unreal_state = {"state": "idle (mock)"}
         self.__user_directory = os.path.join(os.path.expanduser('~'), "Documents", "AirSim")
