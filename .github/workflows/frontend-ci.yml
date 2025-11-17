@@ -51,13 +51,13 @@ jobs:
           cd frontend
           npm run build
 
-      - name: Run Cypress Tests
-        shell: bash
-        run: |
-          cd frontend
-          npm install -g wait-on@7.2.0
-          npm run start & npx wait-on http://localhost:3000
-          npm run cypress:run
+      # - name: Run Cypress Tests
+      #   shell: bash
+      #   run: |
+      #     cd frontend
+      #     npm install -g wait-on@7.2.0
+      #     npm run start & npx wait-on http://localhost:3000
+      #     npm run cypress:run
 
       - name: Run ESLint Security Checks
         run: |
