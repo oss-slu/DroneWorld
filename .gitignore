@@ -58,3 +58,6 @@ config/fake-gcs-data/
 
 # MaOS system files
 .DS_Store
+
+# Ignore coverage reports
+coverage/
