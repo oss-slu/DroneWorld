@@ -240,6 +240,7 @@ docker-compose up frontend
 - **Frontend UI**: http://localhost:3000
 - **Backend API**: http://localhost:5000
 - **Backend Health Check**: http://localhost:5000/api/health
+- **API Documentation (Swagger UI)**: http://localhost:5000/api/docs
 - **Simulation Engine API**: http://localhost:3001
 - **Simulation Engine PixelStream**: http://localhost:8888 
 
