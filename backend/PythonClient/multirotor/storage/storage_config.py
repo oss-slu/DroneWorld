@@ -5,7 +5,8 @@ def get_storage_service():
     Returns an instance of the configured storage service.
     Modify this function to switch between different storage services.
     """
-    # Only GCS is implemented for now
+
+
     
     storage_type = os.getenv('STORAGE_TYPE', 'gcs')  # 'gcs' or 'gdrive'
 
@@ -18,6 +19,11 @@ def get_storage_service():
         from .gd_storage_service import GoogleDriveStorageService
         folder_id = os.getenv('GDRIVE_FOLDER_ID', 'google drive folder ID')
         return GoogleDriveStorageService(folder_id=folder_id)
+    elif storage_type == 'local':
+        from .local_storage_service import LocalStorageService
+        return LocalStorageService()
+
+
 
     # For Google Drive Storage
     # from .gd_storage_service import GoogleDriveStorageService
