@@ -1,0 +1,13 @@
+# Ignore local logs
+npm-debug.log
+yarn-debug.log
+
+# Ignore temporary files
+*.log
+.cache
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Ignore Git repository
+.git

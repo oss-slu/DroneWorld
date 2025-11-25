@@ -73,7 +73,7 @@ export default function HorizontalLinearStepper(data) {
     // }
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     setSkipped(newSkipped);
-    invokePostAPI();
+    addTask();
   };
 
   const handleBack = () => {
@@ -104,80 +104,107 @@ export default function HorizontalLinearStepper(data) {
     }
   }, [mainJson]);
 
-  const invokePostAPI = () => {
-    console.log('mainJson-----', mainJson);
-    if (activeStep === steps.length - 1) {
-      mainJson.Drones.map((drone) => {
-        delete drone['id'];
-        delete drone['droneName'];
-        delete drone.Sensors.Barometer['Key'];
-        delete drone.Sensors.Magnetometer['Key'];
-        delete drone.Sensors.GPS['Key'];
-        // delete drone.Sensors.GPS["EphTimeConstant"]
-        // drone.Sensors.GPS["EpvTimeConstant"] ? delete drone.Sensors.GPS["EpvTimeConstant"]: null
-        // drone.Sensors.GPS["EphInitial"] ? delete drone.Sensors.GPS["EphInitial"]: null
-        // drone.Sensors.GPS["EpvInitial"] ? delete drone.Sensors.GPS["EpvInitial"]: null
-        // drone.Sensors.GPS["EphFinal"] ? delete drone.Sensors.GPS["EphFinal"]: null
-        // drone.Sensors.GPS["EpvFinal"] ? delete drone.Sensors.GPS["EpvFinal"]: null
-        // drone.Sensors.GPS["EphMin3d"] ? delete drone.Sensors.GPS["EphMin3d"]: null
-        // drone.Sensors.GPS["EphMin2d"] ? delete drone.Sensors.GPS["EphMin2d"]: null
-        // drone.Sensors.GPS["UpdateLatency"] ? delete drone.Sensors.GPS["UpdateLatency"]: null
-        // drone.Sensors.GPS["StartupDelay"] ? delete drone.Sensors.GPS["StartupDelay"]: null
-        // delete drone.Cameras.CaptureSettings.map(capt => {
-        //   delete capt["key"]
-        // })
+  //Start Logic For Calling POST
+
+  //This function goes in and gets the drone data from main JSON and formats it all pretty for the POST Call
+  function getDronesForPayload(mainJson) {
+    return Array.isArray(mainJson?.Drones)
+      ? mainJson.Drones.map((d) => {
+          const { id, droneName, Sensors, ...rest } = d || {};
+          const sanitizedSensors = Sensors
+            ? {
+                ...Sensors,
+                Barometer: Sensors.Barometer
+                  ? (({ Key, ...b }) => b)(Sensors.Barometer)
+                  : undefined,
+                Magnetometer: Sensors.Magnetometer
+                  ? (({ Key, ...m }) => m)(Sensors.Magnetometer)
+                  : undefined,
+                GPS: Sensors.GPS
+                  ? (({ Key, ...g }) => g)(Sensors.GPS)
+                  : undefined,
+              }
+            : undefined;
+          return { ...rest, Sensors: sanitizedSensors };
+        })
+      : [];
+  }
+
+  //this function goes in and gets the data for the environment from mainJSON
+  function getEnvironmentForPayload(env) {
+    if (!env) return null;
+
+    const useGeo = !!env.UseGeo;
+
+    const origin = env.Origin || {};
+    const lat = origin.Latitude ?? origin.latitude;
+    const lon = origin.Longitude ?? origin.longitude;
+
+    const environmentToSend = {
+      UseGeo: useGeo,
+      Origin: {
+        Latitude: lat,
+        Longitude: lon,
+      },
+    };
+
+    if (env.Wind) environmentToSend.Wind = env.Wind;
+    if (env.TimeOfDay) environmentToSend.TimeOfDay = env.TimeOfDay;
+    if (env.Sades) environmentToSend.Sades = env.Sades;
+
+    return environmentToSend;
+  }
+
+  //meat and potatoes, this function actually makes the call
+  //the other end is simulation_server.py line 139
+  async function addTask() {
+    if (activeStep !== steps.length - 1) return;
+
+    const dronesToSend = getDronesForPayload(mainJson);
+    if (dronesToSend.length === 0) {
+      console.warn('No drones configured; not submitting.');
+      return;
+    }
+
+    const environmentToSend = getEnvironmentForPayload(mainJson.environment);
+    if (
+      !environmentToSend ||
+      (environmentToSend.UseGeo &&
+        (environmentToSend.Origin.Latitude == null ||
+        environmentToSend.Origin.Longitude == null))
+    ) {
+      console.warn('Environment incomplete; not submitting.');
+      return;
+    }
+
+    const payload = {
+      Drones: dronesToSend,
+      environment: environmentToSend,
+      ...(mainJson.monitors ? { monitors: mainJson.monitors } : {}),
+      ...(mainJson.FuzzyTest ? { FuzzyTest: mainJson.FuzzyTest } : {}),
+    };
+
+    try {
+      console.log('POST /addTask payload:', payload);
+      const res = await fetch('http://127.0.0.1:5000/addTask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
-      delete mainJson.environment['time'];
-      mainJson.monitors.circular_deviation_monitor['enable'] == true
-        ? delete mainJson.monitors.circular_deviation_monitor['enable']
-        : delete mainJson.monitors.circular_deviation_monitor;
-      mainJson.monitors.collision_monitor['enable'] == true
-        ? delete mainJson.monitors.collision_monitor['enable']
-        : delete mainJson.monitors.collision_monitor;
-      mainJson.monitors.unordered_waypoint_monitor['enable'] == true
-        ? delete mainJson.monitors.unordered_waypoint_monitor['enable']
-        : delete mainJson.monitors.unordered_waypoint_monitor;
-      mainJson.monitors.ordered_waypoint_monitor['enable'] == true
-        ? delete mainJson.monitors.ordered_waypoint_monitor['enable']
-        : delete mainJson.monitors.ordered_waypoint_monitor;
-      mainJson.monitors.point_deviation_monitor['enable'] == true
-        ? delete mainJson.monitors.point_deviation_monitor['enable']
-        : delete mainJson.monitors.point_deviation_monitor;
-      mainJson.monitors.min_sep_dist_monitor['enable'] == true
-        ? delete mainJson.monitors.min_sep_dist_monitor['enable']
-        : delete mainJson.monitors.min_sep_dist_monitor;
-      mainJson.monitors.landspace_monitor['enable'] == true
-        ? delete mainJson.monitors.landspace_monitor['enable']
-        : delete mainJson.monitors.landspace_monitor;
-      mainJson.monitors.no_fly_zone_monitor['enable'] == true
-        ? delete mainJson.monitors.no_fly_zone_monitor['enable']
-        : delete mainJson.monitors.no_fly_zone_monitor;
-      mainJson.monitors.drift_monitor['enable'] == true
-        ? delete mainJson.monitors.drift_monitor['enable']
-        : delete mainJson.monitors.drift_monitor;
-      mainJson.monitors.battery_monitor['enable'] == true
-        ? delete mainJson.monitors.battery_monitor['enable']
-        : delete mainJson.monitors.battery_monitor;
-      delete mainJson.environment['enableFuzzy'];
-      delete mainJson.environment['timeOfDayFuzzy'];
-      delete mainJson.environment['windFuzzy'];
-      delete mainJson.environment['positionFuzzy'];
-      console.log('mainJson-----', JSON.stringify(mainJson));
-      navigate('/report-dashboard', {
-        state: { mainJson: mainJson },
-      });
-      fetch('http://127.0.0.1:5000/addTask', {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-        },
-        body: JSON.stringify(mainJson),
-      })
-        .then((res) => res.json())
-        .then((res) => console.log(res));
+      const bodyText = await res.text(); 
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${bodyText}`);
+
+      let data;
+      try { data = JSON.parse(bodyText); } catch { data = { raw: bodyText }; }
+      console.log('Task queued:', data); 
+
+    } catch (err) {
+      console.error('Submit failed:', err);
+
     }
-  };
+  }
+
   const stepsComponent = [
     {
       name: 'Environment Configuration',

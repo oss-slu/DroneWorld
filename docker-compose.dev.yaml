@@ -1,0 +1,79 @@
+# Development docker-compose that excludes the simulator
+# Use this when working on frontend/backend without needing the Unreal simulation
+
+name: DroneWorld
+services:
+  backend:
+    image: droneworld/droneworld-backend:v1.0.0
+    build: ./backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - ./credentials:/app/credentials
+      - ./config/airsim:/root/Documents/AirSim
+    depends_on:
+      fake-gcs:
+        condition: service_healthy
+    env_file:
+      - ./backend/.env
+    environment:
+      - DRV_UNREAL_HOST=drv-unreal
+      - DRV_UNREAL_API_PORT=3001
+      - DRV_PIXELSTREAM_PORT=8888
+    networks:
+      - droneworld-network
+
+  frontend:
+    image: droneworld/droneworld-frontend:v1.0.0
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - PIXELSTREAM_URL=ws://localhost:8888
+      - REACT_APP_BACKEND_URL=http://localhost:5000
+    depends_on:
+      - backend
+    networks:
+      - droneworld-network
+
+  fake-gcs:
+    image: fsouza/fake-gcs-server
+    ports:
+      - "4443:4443"
+    command: -scheme http -port 4443 -external-url http://fake-gcs:4443 -log-level error
+    volumes:
+      - ./fake-gcs-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:4443/storage/v1/b"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - droneworld-network
+
+  init-storage:
+    image: curlimages/curl:latest
+    depends_on:
+      fake-gcs:
+        condition: service_healthy
+    command: 
+    - sh
+    - -c
+    - |
+      curl -X POST http://fake-gcs:4443/storage/v1/b \
+        -H 'Content-Type: application/json' \
+        -d '{"name":"droneworld"}'
+    networks:
+      - droneworld-network
+
+networks:
+  droneworld-network:
+    driver: bridge
+      
+volumes:
+  fake-gcs-data:

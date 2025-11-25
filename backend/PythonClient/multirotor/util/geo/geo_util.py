@@ -1,5 +1,6 @@
 import math
 import requests
+import os
 
 class Vector:
     """
@@ -189,8 +190,9 @@ class GeoUtil:
 
     @staticmethod
     def get_elevation(lat, lng):
-        #curl -L -X GET 'https://maps.googleapis.com/maps/api/elevation/json?locations=39.7391536%2C-104.9847034&key=AIzaSyAZg02ECdzNzTvjTLbIRr61eh-P9mCq2ac'
-        url = f"https://maps.googleapis.com/maps/api/elevation/json?locations={lat}%2C{lng}&key=AIzaSyAZg02ECdzNzTvjTLbIRr61eh-P9mCq2ac"
+        #curl -L -X GET 'https://maps.googleapis.com/maps/api/elevation/json?locations={lat=39.7391536}%2C{long=-104.9847034}&key={api_key}'
+        api_key = os.getenv('GOOGLE_MAPS_API_KEY', 'google maps api key')
+        url = f"https://maps.googleapis.com/maps/api/elevation/json?locations={lat}%2C{lng}&key={api_key}"
         response = requests.get(url).json()
         
         # Check if the request was successful
