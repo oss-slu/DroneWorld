@@ -418,7 +418,27 @@ If the simulation engine container crashes with memory errors, increase Docker's
 
 ## Contributing
 
-Contributions to this project are welcome! For details on how to contribute, please follow our [Contributing Guide](https://github.com/oss-slu/DroneWorld/wiki/Contributing-Guide).
+Contributions to this project are welcome! We've made it easy to get started:
+
+- 📖 **[Contributing Guide](CONTRIBUTING.md)** - Complete guide for contributors
+- 🏗️ **[Architecture Documentation](ARCHITECTURE.md)** - System design and extension points
+- 💻 **[Developer Setup](DEVELOPER_SETUP.md)** - Local development environment setup
+- 📝 **[Code Style Guide](CODE_STYLE.md)** - Coding standards and conventions
+- 🤝 **[Code of Conduct](CODE_OF_CONDUCT.md)** - Community standards
+
+### Quick Start for Contributors
+
+1. Read the [Contributing Guide](CONTRIBUTING.md)
+2. Set up your development environment using [Developer Setup](DEVELOPER_SETUP.md)
+3. Review the [Architecture Documentation](ARCHITECTURE.md) to understand the system
+4. Check out issues labeled `good-first-issue` to get started
+5. Follow our [Code Style Guide](CODE_STYLE.md) when making changes
+
+### Resources
+
+- [Wiki](https://github.com/oss-slu/DroneWorld/wiki) - Additional documentation and guides
+- [API Documentation](http://localhost:5000/api/docs) - Interactive API documentation (when running locally)
+- [Contributors](CONTRIBUTORS.md) - Recognition of project contributors
 
 ## License
 This project is licensed under the MIT license. See the LICENSE file for more information.
