@@ -12,18 +12,16 @@ const style = {
   p: 4,
 };
 
-const requirementsArray = [
-  {}
-]
+const requirementsArray = [{}];
 
 const Wizard = () => {
   const accordionList = [];
-  const location = useLocation()
- console.log({location });
+  const location = useLocation();
+  console.log({ location });
   return (
     <>
       <Box sx={style}>
-        <HorizontalLinearStepper desc={location.state.descs} title={location.state.title}/>
+        <HorizontalLinearStepper desc={location.state.descs} title={location.state.title} />
       </Box>
     </>
   );

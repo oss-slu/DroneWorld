@@ -1,12 +1,7 @@
-
-
 export class MonitorModel {
+  constructor() {}
 
-    constructor(){
-    }
-
-    toJSONString(){
-        return {};
-    }
-
+  toJSONString() {
+    return {};
+  }
 }

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import * as React from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
@@ -9,63 +9,73 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
 
+export default function Camera(sensor) {
+  const [camera, setCamera] = React.useState({
+    Enabled: true,
+    key: 'Camera',
+    ImageType: 0,
+    Width: 256,
+    Height: 144,
+    FOV_Degrees: 90,
+    AutoExposureSpeed: 100,
+    AutoExposureBias: 0,
+    AutoExposureMaxBrightness: 0.64,
+    AutoExposureMinBrightness: 0.03,
+    MotionBlurAmount: 0,
+    TargetGamma: 1.0,
+    ProjectionMode: '',
+    OrthoWidth: 5.12,
+  });
 
-export default function Camera (sensor) {
-    const [camera, setCamera] = React.useState({
-        Enabled: true,
-        key:"Camera",
-        ImageType: 0, 
-        Width: 256, 
-        Height: 144, 
-        FOV_Degrees: 90, 
-        AutoExposureSpeed: 100, 
-        AutoExposureBias: 0, 
-        AutoExposureMaxBrightness: 0.64, 
-        AutoExposureMinBrightness: 0.03, 
-        MotionBlurAmount: 0, 
-        TargetGamma: 1.0, 
-        ProjectionMode: "", 
-        OrthoWidth: 5.12
-    })
+  const handleChangeSwitch = (val) => {
+    setCamera((prevState) => ({
+      ...prevState,
+      Enabled: val.target.checked,
+    }));
+  };
 
-    const handleChangeSwitch = (val) => {
-        setCamera(prevState => ({
-                ...prevState,
-                Enabled: val.target.checked
-        }))
-    }
+  const closeModal = () => {
+    sensor.closeModal(camera, sensor.name);
+  };
 
-    const closeModal = () => {
-        sensor.closeModal(camera, sensor.name)
-    }
+  const handleChange = (val) => {
+    setCamera((prevState) => ({
+      ...prevState,
+      [val.target.id]: val.target.value,
+    }));
+  };
 
-    const handleChange = (val) => {
-        setCamera(prevState => ({
-            ...prevState,
-            [val.target.id]: val.target.value
-        }))
-    }
-
-    return (
-        <div>
-            <Box>
-                <Typography variant="h6" component="h2">
-                    {camera.key}
-                </Typography>
-                <Typography>
-                    <Grid container spacing={2} direction="row">
-                        <Grid item xs={3}>
-                            <FormGroup>
-                                <FormControlLabel disabled value={camera.Enabled} control={<Switch defaultChecked onChange={handleChangeSwitch} inputProps={{ 'aria-label': 'controlled' }} />} label="Enabled" />
-                            </FormGroup>
-                            </Grid>
-                        {/* <Grid item xs={3}>
+  return (
+    <div>
+      <Box>
+        <Typography variant='h6' component='h2'>
+          {camera.key}
+        </Typography>
+        <Typography>
+          <Grid container spacing={2} direction='row'>
+            <Grid item xs={3}>
+              <FormGroup>
+                <FormControlLabel
+                  disabled
+                  value={camera.Enabled}
+                  control={
+                    <Switch
+                      defaultChecked
+                      onChange={handleChangeSwitch}
+                      inputProps={{ 'aria-label': 'controlled' }}
+                    />
+                  }
+                  label='Enabled'
+                />
+              </FormGroup>
+            </Grid>
+            {/* <Grid item xs={3}>
                             <TextField id="key" onChange={handleChange} label="Name" variant="standard" value={camera.key}/>
                         </Grid> */}
-                        {/* <Grid item xs={3}>
+            {/* <Grid item xs={3}>
                             <TextField id="ImageType" onChange={handleChange} label="ImageType" variant="standard" value={camera.ImageType}/>
                         </Grid> */}
-                        {/* <Grid item xs={3}>
+            {/* <Grid item xs={3}>
                         <Tooltip title="Specify the desired resolution of image width in pixels" placement="top">
                                 
                         <TextField id="Width" onChange={handleChange} label="Image Width (Pixels)" variant="standard" value={camera.Width}/>         
@@ -82,7 +92,7 @@ export default function Camera (sensor) {
                             <TextField id="FOV_Degrees" onChange={handleChange} label="Field-of-View (Degrees)" variant="standard" value={camera.FOV_Degrees}/>
                         </Tooltip>
                         </Grid> */}
-                        {/* <Grid item xs={3}>
+            {/* <Grid item xs={3}>
                             <TextField id="AutoExposureSpeed" onChange={handleChange} label="AutoExposureSpeed" variant="standard" value={camera.AutoExposureSpeed}/>
                         </Grid>
                         <Grid item xs={3}>
@@ -106,13 +116,21 @@ export default function Camera (sensor) {
                         <Grid item xs={3}>
                             <TextField id="OrthoWidth" onChange={handleChange} label="OrthoWidth" variant="standard" value={camera.OrthoWidth}/>
                         </Grid> */}
-                    </Grid>
-                    <Grid container direction="row" justifyContent="flex-end" alignItems="center" style={{paddingTop:'15px', marginTop:'15px'}}>
-                        <Button variant="outlined" onClick={closeModal}>Ok</Button> &nbsp;&nbsp;&nbsp;
-                    </Grid>
-                </Typography>
-            </Box>
-        </div>
-    )
-
-} 
+          </Grid>
+          <Grid
+            container
+            direction='row'
+            justifyContent='flex-end'
+            alignItems='center'
+            style={{ paddingTop: '15px', marginTop: '15px' }}
+          >
+            <Button variant='outlined' onClick={closeModal}>
+              Ok
+            </Button>{' '}
+            &nbsp;&nbsp;&nbsp;
+          </Grid>
+        </Typography>
+      </Box>
+    </div>
+  );
+}

@@ -5,7 +5,7 @@ export const HOME_LABEL = {
 
 // export const BASE_URL = 'http://localhost:5000';
 let API_URL = 'http://localhost:8000';
-if(process.env.REACT_APP_API_URL){
+if (process.env.REACT_APP_API_URL) {
   API_URL = process.env.REACT_APP_API_URL;
 }
 export const BASE_URL = API_URL;

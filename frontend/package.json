@@ -45,7 +45,7 @@
     "format": "prettier --write src/**/*.{js,jsx,ts,tsx,css,md,json,scss} --config ./.prettierrc",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "prepare": "husky",
+    "prepare": "cd .. && git config core.hooksPath .husky || true",
     "precommit": "lint-staged"
   },
   "eslintConfig": {
@@ -73,13 +73,13 @@
     "eslint": "^8.32.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-react": "^7.32.1",
-    "husky": "^9.1.7",
+    "husky": "^8.0.3",
     "jest": "^27.5.1",
-    "lint-staged": "^16.2.6",
+    "lint-staged": "^13.3.0",
     "prettier": "2.8.3"
   },
   "lint-staged": {
-    "**/*.{js,jsx,ts,tsx}": [
+    "src/**/*.{js,jsx,ts,tsx}": [
       "echo \"Running ESLint on staged frontend JS/TS files...\"",
       "eslint --max-warnings=0",
       "echo \"Formatting staged frontend JS/TS files with Prettier...\"",

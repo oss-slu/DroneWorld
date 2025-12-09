@@ -147,7 +147,7 @@ export class EnvironmentModel {
   getOriginImage() {
     return this._Origin.image;
   }
-  
+
   setOriginLatitude(value) {
     this._Origin.latitude = value;
   }

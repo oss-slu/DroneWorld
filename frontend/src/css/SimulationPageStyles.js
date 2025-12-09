@@ -7,10 +7,11 @@ import Accordion from '@mui/material/Accordion';
 import InputLabel from '@mui/material/InputLabel';
 
 export const simulationMainBoxstyle = {
-  backgroundImage: 'linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.7), rgba(128, 128, 128, 0.5)), url("/images/google-earth-3D.png")',
+  backgroundImage:
+    'linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.7), rgba(128, 128, 128, 0.5)), url("/images/google-earth-3D.png")',
   backgroundSize: 'cover',
   backgroundPosition: 'center',
-  backgroundAttachment: 'fixed', /* Keeps the background fixed during scrolling */
+  backgroundAttachment: 'fixed' /* Keeps the background fixed during scrolling */,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -18,15 +19,14 @@ export const simulationMainBoxstyle = {
   height: '100vh',
 };
 
-
 export const StyledButton = styled(Button)`
   font-size: 18px;
   font-weight: bolder;
   color: white;
-  background-color: #8B4513;
+  background-color: #8b4513;
   width: 200px;
   &:hover {
-    background-color: #A0522D;
+    background-color: #a0522d;
   }
 `;
 
@@ -35,7 +35,7 @@ export const StyledSelect = styled(Select)(({ theme }) => ({
   '& .MuiInputBase-input': {
     padding: '6px 8px',
     height: '1em',
-  }
+  },
 }));
 
 export const StyledTab = styled(Tab)({
@@ -65,13 +65,11 @@ export const StyledTabs = styled(Tabs)({
   },
 });
 
-
 export const AccordionStyled = styled(Accordion)({
   width: '100%',
   padding: '5px',
-  backgroundColor: 'transparent !important'
-})
-
+  backgroundColor: 'transparent !important',
+});
 
 export const StyledInputLabel = styled(InputLabel)(({ theme }) => ({
   marginRight: 2,
@@ -79,5 +77,6 @@ export const StyledInputLabel = styled(InputLabel)(({ theme }) => ({
   flexShrink: 0,
   color: '#F5F5DC',
   width: '200px',
-  fontSize: '1.2rem', fontFamily: 'Roboto, sans-serif',
+  fontSize: '1.2rem',
+  fontFamily: 'Roboto, sans-serif',
 }));

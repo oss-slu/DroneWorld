@@ -61,7 +61,7 @@ export class SimulationConfigurationModel {
   popLastDrone() {
     this._drones.pop();
   }
-  
+
   static getReactStateBasedUpdate(instance) {
     let model = new SimulationConfigurationModel();
     model.environment = instance.environment;

@@ -102,7 +102,6 @@ const DroneDragAndDrop = ({ viewerReady, viewerRef, setCameraByPosition }) => {
             <Entity
               position={position}
               billboard={{
-                
                 image: imageUrls.drone_thick_orange,
                 scale: labelVisible ? 1 : 0.75,
                 disableDepthTestDistance: Number.POSITIVE_INFINITY,

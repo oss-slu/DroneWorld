@@ -1,5 +1,5 @@
-import React from "react";
-import { MainJsonProvider } from './contexts/MainJsonContext';  
+import React from 'react';
+import { MainJsonProvider } from './contexts/MainJsonContext';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Wizard from './pages/Wizard';
@@ -34,6 +34,4 @@ function App() {
   );
 }
 
-
 export default App;
-

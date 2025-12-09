@@ -9,7 +9,7 @@ const BackendHealthTitle = ({ classes }) => {
   useEffect(() => {
     const checkBackendHealth = async () => {
       const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
-      
+
       try {
         const response = await fetch(`${backendUrl}/api/health`, {
           method: 'GET',
@@ -17,7 +17,7 @@ const BackendHealthTitle = ({ classes }) => {
             'Content-Type': 'application/json',
           },
         });
-        
+
         if (response.ok) {
           setIsHealthy(true);
         } else {
@@ -47,11 +47,17 @@ const BackendHealthTitle = ({ classes }) => {
   };
 
   return (
-    <Link 
-      to="/" 
+    <Link
+      to='/'
       className={classes.siteTitle}
       style={titleStyle}
-      title={isChecking ? 'Checking backend...' : (isHealthy ? 'Backend connected' : 'Backend disconnected')}
+      title={
+        isChecking
+          ? 'Checking backend...'
+          : isHealthy
+          ? 'Backend connected'
+          : 'Backend disconnected'
+      }
     >
       Drone World 🚁
     </Link>

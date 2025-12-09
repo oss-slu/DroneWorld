@@ -113,7 +113,7 @@ export default function ReportDashboard() {
   const [isLoading, setIsloading] = React.useState(false);
   // const isFuzzy = file.filename.includes('Fuzzy');
   const classes = useStyles();
-  const location = useLocation();  
+  const location = useLocation();
 
   const isReportDashboard = location.pathname.includes('/report-dashboard');
 

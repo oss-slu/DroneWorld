@@ -94,9 +94,9 @@ const CesiumMap = ({ activeConfigStep }) => {
     const viewer = viewerRef.current.cesiumElement;
     const { longitude, latitude, name } = envJson.Origin;
 
-    flyPending.current = true
+    flyPending.current = true;
     if (!name || longitude === 0 || latitude === 0) {
-      flyPending.current = false
+      flyPending.current = false;
     }
 
     // If the user is currently on the sUAS screen, Set the camera
@@ -120,9 +120,8 @@ const CesiumMap = ({ activeConfigStep }) => {
 
   // Move camera to the origin whenever the origin's changed
   useEffect(() => {
-
     const { longitude, latitude, name } = envJson.Origin;
-    flyPending.current = true
+    flyPending.current = true;
     if (!name || longitude === 0 || latitude === 0) {
       return;
     }
@@ -195,12 +194,12 @@ const CesiumMap = ({ activeConfigStep }) => {
       <Cesium3DTileset url={IonResource.fromAssetId(google3DTilesAssetId)} />
       {flyPending.current && (
         <CameraFlyTo
-        destination={cameraPosition.destination}
-        orientation={cameraPosition.orientation}
-        duration={2}
-        onComplete={() => {
-          flyPending.current = false
-        }}
+          destination={cameraPosition.destination}
+          orientation={cameraPosition.orientation}
+          duration={2}
+          onComplete={() => {
+            flyPending.current = false;
+          }}
         />
       )}
 
