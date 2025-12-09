@@ -103,35 +103,6 @@ This project uses pre-commit hooks to ensure code quality and consistency. Hooks
 
 Hooks are automatically installed via the `prepare` script in `frontend/package.json`. When you run `npm install`, Husky sets up the Git hooks directory.
 
-**Verification:**
-```bash
-git config core.hooksPath
-# Should output: frontend/.husky
-```
-
-If it doesn't, manually set it:
-```bash
-git config core.hooksPath frontend/.husky
-```
-
-### Manual Setup (if needed)
-
-If hooks aren't working after `npm install`:
-
-1. Ensure you're in the repository root
-2. Run: `cd frontend && npm install`
-3. Verify hook path: `git config core.hooksPath` should show `frontend/.husky`
-4. Make hook executable (if needed):
-   ```bash
-   # Windows (Git Bash) or Linux/macOS
-   git update-index --chmod=+x frontend/.husky/pre-commit
-   ```
-
-**Platform-specific notes:**
-- **Windows**: If using Git Bash or PowerShell, hooks work automatically. CMD is not recommended.
-- **macOS/Linux**: Hooks work automatically after `npm install`.
-- **All platforms**: The hook uses standard shell commands (`sh`) compatible with Git's shell environment.
-
 ### Backend Tools Setup
 
 For commits that include Python files, you must have `black` and `flake8` installed:
@@ -159,11 +130,6 @@ source venv/bin/activate
 The pre-commit hook will check for these tools and provide helpful error messages if they're missing.
 
 ### Troubleshooting Hooks
-
-**Hooks not running:**
-- Verify `git config core.hooksPath` returns `frontend/.husky`
-- Check that `frontend/.husky/pre-commit` exists and is executable
-- Ensure you've run `npm install` in the `frontend/` directory
 
 **"lint-staged could not find any staged files":**
 - This is normal if you're only committing non-code files (e.g., documentation, config files)

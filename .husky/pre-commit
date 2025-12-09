@@ -1,0 +1,27 @@
+#!/usr/bin/env sh
+# This hook works on macOS, Linux, and Windows (Git Bash/PowerShell)
+# For Windows CMD, use Git Bash or PowerShell for Git operations
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT" || exit 1
+
+# Ensure backend linters are available when backend Python files are staged
+# The git+grep check looks at staged paths; if any Python file is in backend/, extra checks run.
+if git diff --cached --name-only | grep -E '^backend/.*\.py' >/dev/null 2>&1; then
+  if ! command -v black >/dev/null 2>&1; then
+    echo 'pre-commit: Black is not available.'
+    echo 'Install with: pip install black'
+    echo 'Or activate your virtual environment if using one.'
+    exit 1
+  fi
+  if ! command -v flake8 >/dev/null 2>&1; then
+    echo 'pre-commit: flake8 is not available.'
+    echo 'Install with: pip install flake8'
+    echo 'Or activate your virtual environment if using one.'
+    exit 1
+  fi
+fi
+
+cd frontend || exit 1
+npm run precommit
+

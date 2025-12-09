@@ -1,7 +1,6 @@
 # Development docker-compose that excludes the simulator
 # Use this when working on frontend/backend without needing the Unreal simulation
 
-name: DroneWorld
 services:
   backend:
     image: droneworld/droneworld-backend:v1.0.0
