@@ -272,27 +272,31 @@ This project uses [pre-commit](https://pre-commit.com/) to automatically run cod
 
 #### Setup (One-time)
 
-1. **Install pre-commit** (Python package):
+**Prerequisites:** Make sure you have installed the project dependencies first:
+
+1. **Install Python dependencies** (including dev dependencies):
    ```bash
-   pip install pre-commit
+   pip install -r backend/requirements.txt -r backend/requirements-dev.txt
    ```
 
-2. **Install the git hooks**:
-   ```bash
-   pre-commit install
-   ```
-
-3. **Install frontend dependencies** (for ESLint and Prettier):
+2. **Install frontend dependencies** (required for ESLint and Prettier hooks):
    ```bash
    cd frontend
    npm install
    cd ..
    ```
 
-4. **Optional: Install Python dev dependencies** (Black and Flake8 will be installed automatically by pre-commit, but you can install them manually if needed):
+3. **Install pre-commit** (Python package):
    ```bash
-   pip install -r backend/requirements-dev.txt
+   pip install pre-commit
    ```
+
+4. **Install the git hooks**:
+   ```bash
+   pre-commit install
+   ```
+
+**Note:** Pre-commit will automatically install its own versions of Black and Flake8 in isolated environments, but having them installed locally (via requirements-dev.txt) is recommended for manual usage.
 
 #### Usage
 
