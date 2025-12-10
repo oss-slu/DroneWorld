@@ -241,6 +241,7 @@ docker-compose up frontend
 - **Backend API**: http://localhost:5000
 - **Backend Health Check**: http://localhost:5000/api/health
 - **API Documentation (Swagger UI)**: http://localhost:5000/api/docs
+- **OpenAPI Specification (JSON)**: http://localhost:5000/apispec.json
 - **Simulation Engine API**: http://localhost:3001
 - **Simulation Engine PixelStream**: http://localhost:8888 
 
@@ -438,7 +439,29 @@ Contributions to this project are welcome! We've made it easy to get started:
 
 - [Wiki](https://github.com/oss-slu/DroneWorld/wiki) - Additional documentation and guides
 - [API Documentation](http://localhost:5000/api/docs) - Interactive API documentation (when running locally)
+- [OpenAPI Spec](http://localhost:5000/apispec.json) - Export OpenAPI 3.x specification for use in Postman, code generators, or API clients
 - [Contributors](CONTRIBUTORS.md) - Recognition of project contributors
+
+### API Documentation
+
+The DroneWorld backend API is fully documented using OpenAPI 3.x (Swagger). 
+
+**Access the documentation:**
+- **Swagger UI**: http://localhost:5000/api/docs (interactive documentation)
+- **OpenAPI JSON Spec**: http://localhost:5000/apispec.json (export for tools)
+
+**Using the OpenAPI spec:**
+- Import into Postman: Use the `/apispec.json` URL or download the file
+- Generate client SDKs: Use tools like `openapi-generator` or `swagger-codegen`
+- API testing: Import into tools like Insomnia, HTTPie, or curl
+- Code generation: Generate server stubs or client libraries in various languages
+
+**Features:**
+- All endpoints documented with request/response schemas
+- Request validation using Marshmallow schemas
+- Example requests and responses
+- Error response documentation
+- Authentication schemes (currently none required, reserved for future use)
 
 ## License
 This project is licensed under the MIT license. See the LICENSE file for more information.
