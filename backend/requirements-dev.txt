@@ -1,0 +1,12 @@
+# Development dependencies
+# These are used for code formatting and linting
+# Install with: pip install -r backend/requirements-dev.txt
+
+# Code formatter
+black==23.12.1
+
+# Code linter
+flake8==7.0.0
+
+# Pre-commit framework (install at project root, not in backend/)
+# Install with: pip install pre-commit

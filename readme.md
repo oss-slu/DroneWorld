@@ -262,6 +262,52 @@ The DRV-Unreal simulation engine runs in **headless mode** using the `-nullrhi` 
 
 ## Development
 
+### Pre-commit Hooks
+
+This project uses [pre-commit](https://pre-commit.com/) to automatically run code quality checks before commits. The hooks run:
+- **Black** - Python code formatter
+- **Flake8** - Python linter
+- **Prettier** - JavaScript/TypeScript/CSS formatter
+- **ESLint** - JavaScript/TypeScript linter
+
+#### Setup (One-time)
+
+1. **Install pre-commit** (Python package):
+   ```bash
+   pip install pre-commit
+   ```
+
+2. **Install the git hooks**:
+   ```bash
+   pre-commit install
+   ```
+
+3. **Install frontend dependencies** (for ESLint and Prettier):
+   ```bash
+   cd frontend
+   npm install
+   cd ..
+   ```
+
+4. **Optional: Install Python dev dependencies** (Black and Flake8 will be installed automatically by pre-commit, but you can install them manually if needed):
+   ```bash
+   pip install -r backend/requirements-dev.txt
+   ```
+
+#### Usage
+
+Pre-commit hooks run automatically on `git commit`. To manually run all hooks:
+
+```bash
+pre-commit run --all-files
+```
+
+To skip hooks for a specific commit (not recommended):
+
+```bash
+git commit --no-verify
+```
+
 ### Building Custom Images
 
 ```bash
