@@ -5,6 +5,7 @@ import time
 import sys
 from flask import Flask, request, abort, render_template, Response, jsonify
 from flask_cors import CORS
+from flasgger import Swagger
 
 # Add parent directories to the Python path for module imports
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -21,6 +22,32 @@ app = Flask(__name__, template_folder="./templates")
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 CORS(app)
+
+# Initialize Swagger for API documentation
+swagger_config = {
+    "headers": [],
+    "specs": [
+        {
+            "endpoint": "apispec",
+            "route": "/apispec.json",
+            "rule_filter": lambda rule: True,
+            "model_filter": lambda tag: True,
+        }
+    ],
+    "static_url_path": "/flasgger_static",
+    "swagger_ui": True,
+    "specs_route": "/api/docs"
+}
+
+swagger_template = {
+    "info": {
+        "title": "DroneWorld API",
+        "description": "API documentation for DroneWorld simulation platform",
+        "version": "1.0.0"
+    }
+}
+
+swagger = Swagger(app, config=swagger_config, template=swagger_template)
 
 # Initialize the SimulationTaskManager
 task_dispatcher = SimulationTaskManager()
@@ -229,6 +256,28 @@ def get_map():
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
+    """
+    Health check endpoint
+    ---
+    tags:
+      - Health
+    summary: Check backend health status
+    description: Returns the health status of the backend API
+    responses:
+      200:
+        description: Backend is healthy and reachable
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: "ok"
+                message:
+                  type: string
+                  example: "Backend is reachable!"
+    """
     return jsonify({"status": "ok", "message": "Backend is reachable!"})
 
 # === Run the Flask App ===

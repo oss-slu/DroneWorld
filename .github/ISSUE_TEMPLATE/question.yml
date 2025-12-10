@@ -1,0 +1,68 @@
+name: Question
+description: Ask a question about DroneWorld
+title: "[QUESTION] "
+labels: ["question", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a question about DroneWorld? We're here to help! Please provide as much context as possible.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What would you like to know?
+      placeholder: Your question here...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: What area does your question relate to?
+      options:
+        - Setup/Installation
+        - Usage/Configuration
+        - Development/Contributing
+        - Architecture/Design
+        - API/Integration
+        - Troubleshooting
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Provide any relevant context about what you're trying to do
+      placeholder: |
+        - What are you trying to accomplish?
+        - What have you tried so far?
+        - Any relevant code snippets or configuration?
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment (if applicable)
+      description: Your environment details if relevant to the question
+      placeholder: |
+        - OS: [e.g., Windows 11, macOS 14, Ubuntu 22.04]
+        - Docker version: [e.g., 24.0.0]
+        - Python version: [e.g., 3.10.0]
+        - Node.js version: [e.g., 20.0.0]
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have checked the README and Wiki
+          required: true
+        - label: I have searched existing issues and discussions
+          required: true
+        - label: I have provided all relevant information
+          required: true
+
