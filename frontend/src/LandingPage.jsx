@@ -120,7 +120,8 @@ export default function LandingPage() {
     const fetchData = async () => {
       setIsloading(true);
       try {
-        const response = await fetch('http://localhost:5000/list-reports', { method: 'GET' });
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+        const response = await fetch(`${backendUrl}/list-reports`, { method: 'GET' });
         const data = await response.json();
         const batchFiles = data.reports.filter((file) => file.filename.includes('Batch'));
         setFilesPresent(batchFiles.length > 0);

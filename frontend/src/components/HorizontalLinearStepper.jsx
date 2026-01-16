@@ -185,8 +185,9 @@ export default function HorizontalLinearStepper(data) {
     };
 
     try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
       console.log('POST /addTask payload:', payload);
-      const res = await fetch('http://127.0.0.1:5000/addTask', {
+      const res = await fetch(`${backendUrl}/addTask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
