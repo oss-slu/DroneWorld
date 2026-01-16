@@ -7,7 +7,7 @@ from flask import Flask, request, render_template, Response, jsonify
 from flask_cors import CORS
 
 # Add parent directories to the Python path for module imports
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
 from PythonClient.server.error_handling import (
     ResourceNotFoundError,
@@ -17,7 +17,9 @@ from PythonClient.server.error_handling import (
     register_error_handlers,
 )
 # Import the SimulationTaskManager
+# Import the SimulationTaskManager and MockTaskManager
 from PythonClient.multirotor.control.simulation_task_manager import SimulationTaskManager
+from mock_simulator.mock_task_manager import MockTaskManager
 
 # Import the storage service from the configuration module
 from PythonClient.multirotor.storage.storage_config import get_storage_service
@@ -30,8 +32,14 @@ log.setLevel(logging.ERROR)
 CORS(app)
 register_error_handlers(app)
 
-# Initialize the SimulationTaskManager
-task_dispatcher = SimulationTaskManager()
+# Initialize the SimulationTaskManager or the fake, depending on .env variables
+simulator_type = os.getenv('SIMULATOR_TYPE', 'real')
+if simulator_type == 'mock':
+    print("Using mock task manager")
+    task_dispatcher = MockTaskManager()
+else:
+    task_dispatcher = SimulationTaskManager()
+
 threading.Thread(target=task_dispatcher.start, daemon=True).start()
 
 task_number = 1  # Global task counter
@@ -155,6 +163,7 @@ def add_task():
     """
     Adds a new simulation task to the queue.
     """
+    print("Backend recieved addTask")
     global task_number
     try:
         task_data = request.get_json(silent=True)

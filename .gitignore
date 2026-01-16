@@ -61,3 +61,5 @@ config/fake-gcs-data/
 
 # Ignore coverage reports
 coverage/
+# VS Code workspace files
+*.code-workspace

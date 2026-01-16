@@ -2,6 +2,9 @@
 __pycache__/
 *.pyc
 *.pyo
+.pytest_cache/
+.venv/
+venv/
 
 # Ignore local logs and temporary files
 *.log
@@ -14,3 +17,6 @@ Thumbs.db
 
 # Ignore Git repository
 .git
+
+# Secrets
+.env

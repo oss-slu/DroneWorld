@@ -85,30 +85,31 @@ const Home = () => {
     }
   };
 
+  //display the backend status on the home page
   useEffect(() => {
-    const callOnOpen = () => {
-      fetch('http://localhost:5000/currentRunning')
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error('No response from server/something went wrong');
-          }
-          return res.text();
-        })
-        .then((data) => {
-          const [status, queueSize] = data.split(', ');
-          if (status === 'None') {
-            setBackendInfo({ numQueuedTasks: 0, backendStatus: 'idle' });
-          } else if (status === 'Running') {
-            setBackendInfo({ numQueuedTasks: parseInt(queueSize), backendStatus: 'running' });
-          }
-        })
-        .catch((error) => {
-          console.error('Error fetching data:', error);
-          setBackendInfo({ numQueuedTasks: -1, backendStatus: 'error' });
-        });
+    const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+    const fetchStatus = () => {
+      Promise.all([
+      fetch(`${backendUrl}/currentRunning`).then((res) => res.json()),
+      fetch(`${backendUrl}/state`).then((res) => res.json()),
+    ])
+      .then(([queueInfo, simState]) => {
+        const queueSize = parseInt(queueInfo.queue_size, 10) || 0;
+        const status = simState.state || (queueInfo.current_task === 'Running' ? 'running' : 'idle');
+        setBackendInfo({ numQueuedTasks: queueSize, backendStatus: status });
+      })
+      .catch(() => setBackendInfo({ numQueuedTasks: -1, backendStatus: 'error' }));
     };
-    callOnOpen();
+
+    fetchStatus();
+
+    const intervalId = setInterval(fetchStatus, 1000); // poll every 5s
+
+    return () => clearInterval(intervalId); // cleanup on unmount
+
+
   }, []);
+
 
   // Modal styles
   const modalStyle = {

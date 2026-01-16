@@ -116,6 +116,12 @@ docker-compose up
 - Simulation Engine (http://localhost:3001)
 - Storage services
 
+**Using Mock Simulator**
+
+In backend .env, set 
+SIMULATOR_TYPE=mock
+
+
 ### Option 2: Frontend/Backend Only (Recommended for Development)
 
 Run without the simulation engine for faster development:
