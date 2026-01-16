@@ -41,6 +41,10 @@ DroneReqValidator has 3 main components:
 2. **Flask Backend** - Python-based simulation controller and monitoring service
 3. **React Frontend** - JavaScript-based user interface for configuration and visualization
 
+### API Error Handling
+
+All backend endpoints return a standardized error envelope with `code`, `message`, `details`, `timestamp`, and `request_id` (also echoed in the `X-Request-ID` header). Standard codes are documented in `backend/ERRORS.md` alongside example responses for common endpoints.
+
 ## Quick Start (Docker)
 
 ### Prerequisites
