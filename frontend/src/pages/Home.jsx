@@ -14,6 +14,7 @@ import {
 import { Link } from 'react-router-dom';
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import { BASE_URL } from '../utils/const';
 
 const StyledButton = styled(Button)`
   align-items: center;
@@ -87,11 +88,10 @@ const Home = () => {
 
   //display the backend status on the home page
   useEffect(() => {
-    const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
     const fetchStatus = () => {
       Promise.all([
-      fetch(`${backendUrl}/currentRunning`).then((res) => res.json()),
-      fetch(`${backendUrl}/state`).then((res) => res.json()),
+      fetch(`${BASE_URL}/currentRunning`).then((res) => res.json()),
+      fetch(`${BASE_URL}/state`).then((res) => res.json()),
     ])
       .then(([queueInfo, simState]) => {
         const queueSize = parseInt(queueInfo.queue_size, 10) || 0;

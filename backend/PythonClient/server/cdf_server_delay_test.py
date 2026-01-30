@@ -3,7 +3,9 @@ import time
 import os
 
 WIND_SERVICE_HOST = os.getenv('WIND_SERVICE_HOST', '172.18.126.222')
-WIND_SERVICE_PORT = os.getenv('WIND_SERVICE_PORT', '5001')
+WIND_SERVICE_PORT = os.getenv('WIND_SERVICE_PORT')
+if not WIND_SERVICE_PORT:
+    raise RuntimeError("WIND_SERVICE_PORT must be set (from .env) to run delay tests.")
 
 # This is a mess waiting to be cleaned up.
 post_url = f'http://{WIND_SERVICE_HOST}:{WIND_SERVICE_PORT}/wind'
@@ -41,4 +43,3 @@ def test_post_delay():
 def test_get_delay():
     delay = measure_delay_get()
     assert delay <= 1.0, f"GET delay exceeded 1 second. Actual delay: {delay} seconds"
-

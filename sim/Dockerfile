@@ -118,10 +118,10 @@ RUN mkdir -p /home/ue4/Documents/AirSim && \
 # Switch to non-root user
 USER ue4
 
-# Expose ports
-# Port 3000 for the UI (from DRV docs)
-# Port 8888 for PixelStreaming (if using that feature)
-EXPOSE 3000 8888
+# Expose ports (configurable via build args)
+ARG SIM_INTERNAL_PORT
+ARG PIXELSTREAM_PORT
+EXPOSE ${SIM_INTERNAL_PORT} ${PIXELSTREAM_PORT}
 
 # Default command - run with graphicsadapter flag as shown in docs
 CMD ["./Blocks.sh", "-RenderOffscreen", "-graphicsadapter=0"]

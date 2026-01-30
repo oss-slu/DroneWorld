@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { BASE_URL } from '../utils/const';
 
 const BackendHealthTitle = ({ classes }) => {
   const [isHealthy, setIsHealthy] = useState(true);
@@ -8,10 +9,8 @@ const BackendHealthTitle = ({ classes }) => {
 
   useEffect(() => {
     const checkBackendHealth = async () => {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
-      
       try {
-        const response = await fetch(`${backendUrl}/api/health`, {
+        const response = await fetch(`${BASE_URL}/api/health`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

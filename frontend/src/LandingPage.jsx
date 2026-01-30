@@ -18,6 +18,7 @@ import LandscapeIcon from '@mui/icons-material/Landscape';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import GroupWorkIcon from '@mui/icons-material/GroupWork';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
+import { BASE_URL } from './utils/const';
 
 const useStyles = makeStyles((theme) => ({
   landingPage: {
@@ -120,8 +121,7 @@ export default function LandingPage() {
     const fetchData = async () => {
       setIsloading(true);
       try {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
-        const response = await fetch(`${backendUrl}/list-reports`, { method: 'GET' });
+        const response = await fetch(`${BASE_URL}/list-reports`, { method: 'GET' });
         const data = await response.json();
         const batchFiles = data.reports.filter((file) => file.filename.includes('Batch'));
         setFilesPresent(batchFiles.length > 0);

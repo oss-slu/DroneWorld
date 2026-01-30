@@ -8,6 +8,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import List from '@mui/material/List'
 import ClearIcon from '@mui/icons-material/Clear';
 import InfoIcon from '@mui/icons-material/Info';
+import { BASE_URL } from '../utils/const';
 import { useLocation } from "react-router-dom";
 import { Container } from '@mui/material';
 import Grid from '@mui/material/Grid';
@@ -1364,7 +1365,7 @@ export default function FuzzyDashboard() {
               resp.htmlFiles.map((htmlFile, index) => (
                 <li key={index}>
                   <Link
-                    href={`http://localhost:5000${encodeURI(htmlFile.url)}`}
+                    href={`${BASE_URL}${encodeURI(htmlFile.url)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     sx={{ textDecoration: 'none', color: 'blue' }}

@@ -24,8 +24,13 @@ COPY . .
 # Install the Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Configure port from build args to avoid hardcoding
+ARG BACKEND_PORT
+ENV BACKEND_PORT=${BACKEND_PORT}
+ENV FLASK_RUN_PORT=${BACKEND_PORT}
+
 # Expose the port the backend will use
-EXPOSE 5000
+EXPOSE ${BACKEND_PORT}
 
 # Command to start the backend server  
-CMD ["flask", "--app", "PythonClient.server.simulation_server", "run", "--host=0.0.0.0", "--port=5000", "--debug"]
+CMD ["sh", "-c", "flask --app PythonClient.server.simulation_server run --host=0.0.0.0 --port=${BACKEND_PORT} --debug"]
