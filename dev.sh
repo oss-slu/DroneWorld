@@ -3,6 +3,22 @@
 
 set -e
 
+# Prefer docker compose v2 plugin, fallback to docker-compose v1 binary.
+resolve_compose() {
+    if command -v docker-compose >/dev/null 2>&1; then
+        DOCKER_COMPOSE=(docker-compose)
+        return 0
+    fi
+    if command -v docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
+        DOCKER_COMPOSE=(docker compose)
+        return 0
+    fi
+    echo "❌ Docker Compose not found. Install Docker Compose or enable the Docker Compose plugin."
+    exit 1
+}
+
+resolve_compose
+
 check_token() {
     # Check if token is in environment
     if [ -n "$GITHUB_TOKEN" ]; then
@@ -111,19 +127,19 @@ case "$1" in
             fi
         fi
         echo "🚀 Starting full stack (frontend + backend + simulator)..."
-        docker-compose up
+        "${DOCKER_COMPOSE[@]}" up
         ;;
     dev)
         echo "🔧 Starting development services (frontend + backend only)..."
-        docker-compose -f docker-compose.dev.yaml up
+        "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml up
         ;;
     frontend)
         echo "⚛️  Starting frontend only..."
-        docker-compose up frontend
+        "${DOCKER_COMPOSE[@]}" up frontend
         ;;
     backend)
         echo "🐍 Starting backend only..."
-        docker-compose up backend
+        "${DOCKER_COMPOSE[@]}" up backend
         ;;
     simulator)
         if ! check_token; then
@@ -135,28 +151,28 @@ case "$1" in
             fi
         fi
         echo "🎮 Starting simulator only..."
-        docker-compose up drv-unreal
+        "${DOCKER_COMPOSE[@]}" up drv-unreal
         ;;
     logs)
         echo "📋 Following development service logs..."
-        docker-compose -f docker-compose.dev.yaml logs -f frontend backend
+        "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml logs -f frontend backend
         ;;
     logs-all)
         echo "📋 Following all service logs..."
-        docker-compose logs -f
+        "${DOCKER_COMPOSE[@]}" logs -f
         ;;
     stop)
         echo "🛑 Stopping all services..."
-        docker-compose down
+        "${DOCKER_COMPOSE[@]}" down
         ;;
     stop-dev)
         echo "🛑 Stopping development services..."
-        docker-compose -f docker-compose.dev.yaml down
+        "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml down
         ;;
     clean)
         echo "🧹 Cleaning up all containers and volumes..."
-        docker-compose down -v
-        docker-compose -f docker-compose.dev.yaml down -v
+        "${DOCKER_COMPOSE[@]}" down -v
+        "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml down -v
         echo "✅ Cleanup complete"
         ;;
     help|"")
