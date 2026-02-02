@@ -21,6 +21,8 @@ services:
       - DRV_UNREAL_HOST=drv-unreal
       - DRV_UNREAL_API_PORT=3001  # DRV API port (if available)
       - DRV_PIXELSTREAM_PORT=8888
+      - AIRSIM_HOST=drv-unreal
+      - AIRSIM_PORT=3001 # Changed from 41451
     networks:
       - droneworld-network
 
@@ -31,7 +33,6 @@ services:
       - "3000:3000"  # Frontend keeps port 3000
     volumes:
       - ./frontend:/app  # Mount frontend code for live editing
-      - /app/node_modules # Separate node_modules to avoid host overwrite
     environment:
       - CHOKIDAR_USEPOLLING=true  # Necessary for live-reload in Docker
       - CHOKIDAR_INTERVAL=1000  # Poll every 1 second
@@ -41,39 +42,45 @@ services:
       - PIXELSTREAM_URL=ws://localhost:8888
       - BACKEND_URL=http://backend:5000
       - REACT_APP_BACKEND_URL=http://localhost:5000 # For frontend to reach backend
+    command: sh -c "npm install && npm start"
     depends_on:
       - backend
     networks:
       - droneworld-network
 
   drv-unreal:
-    image: droneworld/drv-unreal:v2.0.0
+    image: droneworld/drv-unreal:v2.1.0
     build:
       context: ./sim  # Build context is now sim directory
       dockerfile: Dockerfile
-      args:
-        VERSION: v2.0.0
-        GITHUB_REPO: UAVLab-SLU/DRV-Unreal
-        GITHUB_TOKEN: ${GITHUB_TOKEN}  # Pass token from environment
     env_file:
       - ./.env  # Load environment variables from sim/.env for runtime
     ports:
-      - "3001:3000"  # Map DRV's port 3000 to host 3001 to avoid conflict
+      - "3001:3001"  # AirSim, was 3001:3000
       - "8888:8888"  # PixelStreaming - exposed for direct frontend access
-    command: 
-      - "./Blocks.sh"
-      - "-server"
-      - "-log"
-      - "-nullrhi"
-      - "-nosound"
-      - "-unattended"
-      - "-Port=3000"
+      #- "41451:41451"  # AirSim RPC
+    gpus: all
+    privileged: true
+    command:
+      - sh
+      - -c
+      - |
+        sleep "${DRV_START_DELAY:-120}"
+        exec ./Blocks.sh -RenderOffscreen -graphicsadapter=0 -log -stdout
+    devices:
+      - /dev/dri:/dev/dri
+    group_add:
+      - render
+      - video
     environment:
-      - DISPLAY=${DISPLAY:-:0}
+      #- AIRSIM_HOST=drv-unreal
+      #- AIRSIM_PORT=3001  # Changed from 41451
+      - DISPLAY=:99
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics,display
     volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix:ro  # X11 display support
       - drv-data:/app/data  # Persistent data for simulation results
-      - ./config/airsim:/home/ue4/Documents/AirSim:ro
+      - ./config/airsim:/home/ue4/Documents/AirSim
     # Uncomment below for GPU access (requires nvidia-docker2)
     # deploy:
     #   resources:
@@ -85,11 +92,11 @@ services:
     networks:
       - droneworld-network
     healthcheck:
-      test: ["CMD", "sh", "-c", "netstat -an | grep -q 3000 || exit 1"]
+      test: ["CMD", "sh", "-c", "netstat -lnt | grep -q 41451 || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 30s
+      retries: 20
+      start_period: 60s
 
   fake-gcs:
     image: fsouza/fake-gcs-server

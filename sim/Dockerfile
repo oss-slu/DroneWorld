@@ -1,65 +1,5 @@
-# Stage 1: Download and extract the binary
-FROM ubuntu:22.04 AS downloader
-
-# Prevent interactive prompts during installation
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Install download tools
-RUN apt-get update && apt-get install -y \
-    wget \
-    unzip \
-    ca-certificates \
-    jq \
-    && rm -rf /var/lib/apt/lists/*
-
-# Set working directory
-WORKDIR /tmp/download
-
-# Download the DRV-Unreal Linux binary from GitHub releases
-ARG VERSION=v2.0.0
-ARG GITHUB_REPO=UAVLab-SLU/DRV-Unreal
-ARG GITHUB_TOKEN
-
-# Download and extract the Linux release
-# For private repos, must use GitHub API asset endpoint
-RUN if [ -n "$GITHUB_TOKEN" ]; then \
-        echo "Downloading from private repo via GitHub API..." && \
-        # Get the asset ID for Linux.zip using jq
-        ASSET_ID=$(wget -qO- \
-                   --header="Authorization: Bearer ${GITHUB_TOKEN}" \
-                   "https://api.github.com/repos/${GITHUB_REPO}/releases/tags/${VERSION}" | \
-                   jq -r '.assets[] | select(.name=="Linux.zip") | .id') && \
-        echo "Found Linux.zip asset ID: $ASSET_ID" && \
-        # Download using API endpoint (required for private repos)
-        wget --header="Authorization: Bearer ${GITHUB_TOKEN}" \
-             --header="Accept: application/octet-stream" \
-             "https://api.github.com/repos/${GITHUB_REPO}/releases/assets/$ASSET_ID" \
-             -O linux.zip; \
-    else \
-        echo "Downloading from public repo..." && \
-        wget https://github.com/${GITHUB_REPO}/releases/download/${VERSION}/Linux.zip \
-             -O linux.zip; \
-    fi \
-    && echo "Download complete, extracting..." \
-    && unzip -q linux.zip -d /tmp/extract \
-    && rm linux.zip \
-    && echo "Searching for Blocks.sh..." \
-    && BLOCKS_DIR=$(find /tmp/extract -name "Blocks.sh" -type f | head -1 | xargs dirname) \
-    && echo "Found in: $BLOCKS_DIR" \
-    && echo "Contents:" \
-    && ls -la "$BLOCKS_DIR" \
-    && echo "Moving contents to /app..." \
-    && cp -r "$BLOCKS_DIR"/. /app/ \
-    && rm -rf /tmp/extract \
-    && echo "Files in /app:" \
-    && ls -la /app/ | head -20
-
-# Make the binary executable
-RUN chmod +x /app/Blocks.sh
-
-# Stage 2: Runtime environment with Vulkan drivers
-# Force x86_64 platform for Apple Silicon compatibility
-FROM --platform=linux/amd64 ubuntu:22.04 AS runtime
+# Runtime environment with Vulkan drivers (native Linux + NVIDIA)
+FROM nvidia/cuda:12.8.0-base-ubuntu24.04 AS runtime
 
 # Prevent interactive prompts during installation
 ENV DEBIAN_FRONTEND=noninteractive
@@ -71,7 +11,10 @@ RUN apt-get update && apt-get install -y \
     vulkan-tools \
     libvulkan1 \
     libgl1 \
+    libgl1-mesa-dri \
+    libglx-mesa0 \
     libglu1-mesa \
+    mesa-utils \
     libxrandr2 \
     libxinerama1 \
     libxcursor1 \
@@ -87,21 +30,79 @@ RUN apt-get update && apt-get install -y \
     libxau6 \
     libxdmcp6 \
     libxcb1 \
-    libasound2 \
+    libasound2t64 \
     libpulse0 \
     ca-certificates \
+    xdg-user-dirs \
+    xvfb \
+    sudo \
+    net-tools \
+    gosu \
     && rm -rf /var/lib/apt/lists/*
 
-# Create non-root user for running Unreal Engine
-RUN useradd -m -s /bin/bash -u 1000 ue4 && \
-    echo "ue4 ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+# Headless-friendly defaults
+ENV SDL_HEADLESS=1 \
+    XDG_RUNTIME_DIR=/tmp/runtime-ue4
+
+# Provide runtime dirs so XDG/X11 lookups don't fail at startup
+RUN mkdir -p /tmp/runtime-ue4 /tmp/.X11-unix && \
+    chmod 700 /tmp/runtime-ue4 && \
+    chmod 1777 /tmp/.X11-unix
+
+# Vulkan ICD (helps driver discovery inside container)
+COPY HelperFiles/nvidia_icd.json /etc/vulkan/icd.d/nvidia_icd.json
+
+# Create non-root user for running Unreal Engine (handle base images with UID 1000 already taken)
+RUN id -u ue4 >/dev/null 2>&1 || useradd -m -s /bin/bash ue4 && \
+    echo "ue4 ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+    chown -R ue4:ue4 /tmp/runtime-ue4 && \
+    if getent group render >/dev/null; then groupmod -g 992 render || true; else groupadd -r -g 992 render; fi && \
+    if getent group video >/dev/null; then groupmod -g 44 video || true; else groupadd -r -g 44 video; fi && \
+    usermod -aG render,video ue4
 
 
 # Set working directory
 WORKDIR /app
 
-# Copy the extracted binary from downloader stage
-COPY --from=downloader /app /app
+# Copy the local DRV-Unreal Linux build from the repo
+COPY ["(Linux)DRV_2.1.0/Linux/", "/app/"]
+
+# Ensure entry script and binary are executable
+RUN chmod +x /app/DRV.sh /app/DRV/Binaries/Linux/DRV-Linux-Shipping
+
+# Lightweight Xvfb wrapper for headless runs
+RUN printf '%s\n' \
+  '#!/bin/sh' \
+  'set -e' \
+  'XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp/runtime-ue4}"' \
+  'mkdir -p "$XDG_RUNTIME_DIR"' \
+  'chmod 700 "$XDG_RUNTIME_DIR"' \
+  'Xvfb :99 -screen 0 1024x768x24 -ac +extension GLX +render -noreset &' \
+  'export DISPLAY=:99' \
+  'sleep 2' \
+  'exec /app/DRV.sh "$@"' \
+  > /app/Blocks.sh && chmod +x /app/Blocks.sh
+
+# Entrypoint: fix /dev/dri permissions at runtime, then drop to ue4
+RUN printf '%s\n' \
+  '#!/bin/sh' \
+  'set -e' \
+  'if [ -d /dev/dri ]; then' \
+  '  for dev in /dev/dri/card*; do [ -e "$dev" ] || continue; chgrp video "$dev" || true; chmod 660 "$dev" || true; done' \
+  '  for dev in /dev/dri/renderD*; do [ -e "$dev" ] || continue; chgrp render "$dev" || true; chmod 660 "$dev" || true; done' \
+  'fi' \
+  'if [ -n "${XDG_RUNTIME_DIR:-}" ]; then' \
+  '  mkdir -p "$XDG_RUNTIME_DIR"' \
+  '  chown ue4:ue4 "$XDG_RUNTIME_DIR" || true' \
+  '  chmod 700 "$XDG_RUNTIME_DIR" || true' \
+  'fi' \
+  'exec gosu ue4 "$@"' \
+  > /usr/local/bin/entrypoint.sh && chmod +x /usr/local/bin/entrypoint.sh
+
+# Ensure log directory exists and is writable
+RUN mkdir -p /app/DRV/Saved/Logs && \
+    chown -R ue4:ue4 /app/DRV/Saved && \
+    chmod -R u+w /app/DRV/Saved
 
 # Change ownership to non-root user
 RUN chown -R ue4:ue4 /app
@@ -109,19 +110,23 @@ RUN chown -R ue4:ue4 /app
 # Verify Vulkan installation (optional, for debugging)
 RUN vulkaninfo --summary || echo "Vulkan info check complete"
 
-RUN mkdir -p /home/ue4/Documents/AirSim && \ 
+# OpenSSL 1.1 compatibility for older UE builds/plugins
+COPY --from=python:3.8.1-buster /usr/lib/x86_64-linux-gnu/libssl.so.1.1 /usr/lib/x86_64-linux-gnu/libssl.so.1.1
+COPY --from=python:3.8.1-buster /usr/lib/x86_64-linux-gnu/libcrypto.so.1.1 /usr/lib/x86_64-linux-gnu/libcrypto.so.1.1
+
+RUN mkdir -p /home/ue4/Documents/AirSim && \
     touch /home/ue4/Documents/AirSim/settings.json && \
     touch /home/ue4/Documents/AirSim/cesium.json && \
     ln -sf /home/ue4/Documents/AirSim/settings.json /home/ue4/Documents/AirSim\\settings.json && \
     ln -sf /home/ue4/Documents/AirSim/cesium.json /home/ue4/Documents/AirSim\\cesium.json
 
-# Switch to non-root user
-USER ue4
-
 # Expose ports
 # Port 3000 for the UI (from DRV docs)
 # Port 8888 for PixelStreaming (if using that feature)
-EXPOSE 3000 8888
+EXPOSE 3000 8888 41451
 
-# Default command - run with graphicsadapter flag as shown in docs
+# Entrypoint runs as root, then drops to ue4
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+# Default command - run with graphicsadapter flag
 CMD ["./Blocks.sh", "-RenderOffscreen", "-graphicsadapter=0"]
