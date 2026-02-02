@@ -9,11 +9,19 @@ import msgpack
 import time
 import math
 import logging
+import os
 
 class VehicleClient:
     def __init__(self, ip = "", port = 41451, timeout_value = 3600):
         if (ip == ""):
-            ip = "host.docker.internal"
+            ip = os.getenv("AIRSIM_HOST") or os.getenv("DRV_UNREAL_HOST") or "host.docker.internal"
+        if port == 41451:
+            env_port = os.getenv("AIRSIM_PORT") or os.getenv("DRV_UNREAL_PORT")
+            if env_port:
+                try:
+                    port = int(env_port)
+                except ValueError:
+                    pass
         self.client = msgpackrpc.Client(msgpackrpc.Address(ip, port), timeout = timeout_value, pack_encoding = 'utf-8', unpack_encoding = 'utf-8')
 
 #----------------------------------- Common vehicle APIs ---------------------------------------------

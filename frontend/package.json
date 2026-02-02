@@ -26,13 +26,13 @@
     "dayjs": "^1.11.7",
     "html-webpack-plugin": "^5.6.0",
     "install": "^0.13.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.8.1",
     "react-scripts": "5.0.1",
     "redux": "^4.2.0",
-    "resium": "^1.17.3",
+    "resium": "1.17.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -82,5 +82,9 @@
     "eslint-plugin-react": "^7.32.1",
     "jest": "^27.5.1",
     "prettier": "2.8.3"
+  },
+  "overrides": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   }
 }
