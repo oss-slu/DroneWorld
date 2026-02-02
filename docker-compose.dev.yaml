@@ -31,11 +31,11 @@ services:
       - "3000:3000"
     volumes:
       - ./frontend:/app
-      - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
       - PIXELSTREAM_URL=ws://localhost:8888
       - REACT_APP_BACKEND_URL=http://localhost:5000
+    command: sh -c "npm install && npm start"
     depends_on:
       - backend
     networks:
