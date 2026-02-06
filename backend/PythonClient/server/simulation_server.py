@@ -261,7 +261,5 @@ def health_check():
 # === Run the Flask App ===
 if __name__ == '__main__':
     print("Starting DroneWorld API Server...")
-    backend_port = os.getenv("BACKEND_PORT") or os.getenv("FLASK_RUN_PORT")
-    if not backend_port:
-        raise RuntimeError("BACKEND_PORT (or FLASK_RUN_PORT) must be set for the server to start.")
+    backend_port = os.getenv("BACKEND_PORT") or os.getenv("FLASK_RUN_PORT") or "5000"
     app.run(host='0.0.0.0', port=int(backend_port))  # Makes it discoverable by other devices in the networkecho 

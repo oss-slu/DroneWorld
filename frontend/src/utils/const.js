@@ -3,15 +3,17 @@ export const HOME_LABEL = {
   partsecond: `Describe one or more requirements you would like to test by simulating a scenario`,
 };
 
-const backendHost = process.env.REACT_APP_BACKEND_HOST || process.env.BACKEND_HOST;
-const backendPort = process.env.REACT_APP_BACKEND_PORT || process.env.BACKEND_PORT;
+const backendHost =
+  process.env.REACT_APP_BACKEND_HOST ||
+  process.env.BACKEND_HOST ||
+  'localhost';
+const backendPort =
+  process.env.REACT_APP_BACKEND_PORT ||
+  process.env.BACKEND_PORT ||
+  '5000';
 export const BASE_URL =
   process.env.REACT_APP_BACKEND_URL ||
-  (backendHost && backendPort ? `http://${backendHost}:${backendPort}` : null);
-
-if (!BASE_URL) {
-  throw new Error('BACKEND_HOST/BACKEND_PORT or REACT_APP_BACKEND_URL must be set in .env to build the frontend.');
-}
+  `http://${backendHost}:${backendPort}`;
 
 export const UAV_DESCRIPTION = {
   'UAV-301': {

@@ -2,11 +2,9 @@
 describe('DroneWorld Application Flow', () => {
   it('should complete the full scenario configuration flow', () => {
     const backendUrl = Cypress.env('BACKEND_URL');
-    if (!backendUrl) {
-      throw new Error('BACKEND_URL must be provided via Cypress env (comes from root .env).');
-    }
+    const finalBackendUrl = backendUrl || 'http://localhost:5000';
     // Mock the backend API call so tests can run without the backend
-    cy.intercept('GET', `${backendUrl}/list-reports`, {
+    cy.intercept('GET', `${finalBackendUrl}/list-reports`, {
       statusCode: 200,
       body: { reports: [] }
     }).as('listReports');
@@ -23,10 +21,10 @@ describe('DroneWorld Application Flow', () => {
     cy.contains('Get Started').should('be.visible');
     cy.contains('Get Started').click();
     cy.url().should('include', '/home');
-    cy.url().should('eq', `${Cypress.config().baseUrl}/home`);
+    cy.url().should('eq', `${Cypress.config().baseUrl || 'http://localhost:3000'}/home`);
     
     // Mock the Home page API call
-    cy.intercept('GET', `${backendUrl}/currentRunning`, {
+    cy.intercept('GET', `${finalBackendUrl}/currentRunning`, {
       statusCode: 200,
       body: 'None, 0'
     }).as('getBackendStatus');
@@ -42,7 +40,7 @@ describe('DroneWorld Application Flow', () => {
     cy.contains('button', 'Start Scenario Configuration').should('not.be.disabled');
     cy.contains('button', 'Start Scenario Configuration').click();
     cy.url().should('include', '/simulation');
-    cy.url().should('eq', `${Cypress.config().baseUrl}/simulation`);
+    cy.url().should('eq', `${Cypress.config().baseUrl || 'http://localhost:3000'}/simulation`);
     
     // Step 5: Click the first "NEXT" button (moves from Environment Configuration to Mission Configuration)
     cy.contains('button', 'Next').click();

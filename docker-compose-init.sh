@@ -7,7 +7,7 @@ if [ -f ./.env ]; then
   source ./.env
   set +a
 fi
-: "${FAKE_GCS_PORT:?FAKE_GCS_PORT must be set in .env}"
+FAKE_GCS_PORT=${FAKE_GCS_PORT:-4443}
 
 # Wait for fake-gcs to be ready
 until curl -s "http://fake-gcs:${FAKE_GCS_PORT}/storage/v1/b" > /dev/null; do

@@ -11,9 +11,7 @@ import cv2
 import numpy as np
 
 BACKEND_HOST = os.getenv("BACKEND_HOST", "localhost")
-BACKEND_PORT = os.getenv("BACKEND_PORT") or os.getenv("FLASK_RUN_PORT")
-if not BACKEND_PORT:
-    raise RuntimeError("BACKEND_PORT (or FLASK_RUN_PORT) must be set for socket test server.")
+BACKEND_PORT = os.getenv("BACKEND_PORT") or os.getenv("FLASK_RUN_PORT") or "5000"
 
 client = airsim.MultirotorClient()
 client.confirmConnection()

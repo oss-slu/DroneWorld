@@ -245,13 +245,13 @@ docker-compose up backend
 docker-compose up frontend
 ```
 
-### Access the Application (uses root `.env`)
+### Access the Application (uses root `.env`, falls back to defaults)
 
-- **Frontend UI**: `http://${FRONTEND_HOST}:${FRONTEND_PORT}` (default `localhost:3000`)
-- **Backend API**: `http://${BACKEND_HOST}:${BACKEND_PORT}` (default `localhost:5000`)
-- **Backend Health Check**: `http://${BACKEND_HOST}:${BACKEND_PORT}/api/health`
-- **Simulation Engine API**: `http://${SIM_HOST}:${SIM_HOST_PORT}` (default `localhost:3001`)
-- **Simulation Engine PixelStream**: `ws://${SIM_HOST}:${PIXELSTREAM_PORT}` (default `localhost:8888`)
+- **Frontend UI**: `http://${FRONTEND_HOST:-localhost}:${FRONTEND_PORT:-3000}`
+- **Backend API**: `http://${BACKEND_HOST:-localhost}:${BACKEND_PORT:-5000}`
+- **Backend Health Check**: `http://${BACKEND_HOST:-localhost}:${BACKEND_PORT:-5000}/api/health`
+- **Simulation Engine API**: `http://${SIM_HOST:-localhost}:${SIM_HOST_PORT:-3001}`
+- **Simulation Engine PixelStream**: `ws://${SIM_HOST:-localhost}:${PIXELSTREAM_PORT:-8888}`
 
 ## Architecture Notes
 
@@ -266,7 +266,7 @@ The DRV-Unreal simulation engine runs in **headless mode** using the `-nullrhi` 
 
 ### Network Communication
 
-- Ports are set once in root `.env` (`FRONTEND_PORT`, `BACKEND_PORT`, `SIM_INTERNAL_PORT`, `SIM_HOST_PORT`, `PIXELSTREAM_PORT`, `FAKE_GCS_PORT`).
+- Ports are set once in root `.env` (`FRONTEND_PORT`, `BACKEND_PORT`, `SIM_INTERNAL_PORT`, `SIM_HOST_PORT`, `PIXELSTREAM_PORT`, `FAKE_GCS_PORT`) and default to 3000/5000/3000/3001/8888/4443 when unset.
 - The simulation engine exposes AirSim's API on `SIM_HOST_PORT` (default 3001).
 - Backend communicates with the simulation engine via this TCP connection.
 - Frontend communicates with backend via REST API.
@@ -361,8 +361,8 @@ GOOGLE_MAPS_API_KEY=your_api_key_here
 WIND_SERVICE_HOST=hostname.or.ip.address
 WIND_SERVICE_PORT=5001
 
-# Storage Emulator Host (kept in root .env as FAKE_GCS_PORT/host)
-STORAGE_EMULATOR_HOST=${BACKEND_HOST}:${FAKE_GCS_PORT}
+# Storage Emulator Host (kept in root .env as FAKE_GCS_PORT/host; defaults to localhost:4443)
+STORAGE_EMULATOR_HOST=${BACKEND_HOST:-localhost}:${FAKE_GCS_PORT:-4443}
 
 ```
 

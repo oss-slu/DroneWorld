@@ -119,8 +119,8 @@ RUN mkdir -p /home/ue4/Documents/AirSim && \
 USER ue4
 
 # Expose ports (configurable via build args)
-ARG SIM_INTERNAL_PORT
-ARG PIXELSTREAM_PORT
+ARG SIM_INTERNAL_PORT=3000
+ARG PIXELSTREAM_PORT=8888
 EXPOSE ${SIM_INTERNAL_PORT} ${PIXELSTREAM_PORT}
 
 # Default command - run with graphicsadapter flag as shown in docs

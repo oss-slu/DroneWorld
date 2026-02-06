@@ -25,7 +25,7 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Configure port from build args to avoid hardcoding
-ARG BACKEND_PORT
+ARG BACKEND_PORT=5000
 ENV BACKEND_PORT=${BACKEND_PORT}
 ENV FLASK_RUN_PORT=${BACKEND_PORT}
 
