@@ -14,7 +14,10 @@ RUN npm install
 COPY . .
 
 # Expose the port the app runs on
-EXPOSE 3000
+ARG FRONTEND_PORT=3000
+ENV FRONTEND_PORT=${FRONTEND_PORT}
+ENV PORT=${FRONTEND_PORT}
+EXPOSE ${FRONTEND_PORT}
 
 # Command to start the frontend
 CMD ["npm", "start"]

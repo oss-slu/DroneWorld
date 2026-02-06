@@ -109,12 +109,12 @@ Run all services including the simulation engine:
 docker-compose up
 ```
 
-**Services started:**
+**Services started (ports come from root `.env`):**
 
-- Frontend UI (http://localhost:3000)
-- Backend API (http://localhost:5000)
-- Simulation Engine (http://localhost:3001)
-- Storage services
+- Frontend UI → `http://${FRONTEND_HOST}:${FRONTEND_PORT}` (defaults: `localhost:3000`)
+- Backend API → `http://${BACKEND_HOST}:${BACKEND_PORT}` (defaults: `localhost:5000`)
+- Simulation Engine API → `http://${SIM_HOST}:${SIM_HOST_PORT}` (defaults: `localhost:3001`)
+- Storage services (fake GCS) → `http://${BACKEND_HOST}:${FAKE_GCS_PORT}` (defaults: `localhost:4443`)
 
 **Using Mock Simulator**
 
@@ -134,11 +134,11 @@ Run without the simulation engine for faster development:
 docker-compose -f docker-compose.dev.yml up
 ```
 
-**Services started:**
+**Services started (ports come from root `.env`):**
 
-- Frontend UI (http://localhost:3000)
-- Backend API (http://localhost:5000)
-- Storage services
+- Frontend UI → `http://${FRONTEND_HOST}:${FRONTEND_PORT}` (defaults: `localhost:3000`)
+- Backend API → `http://${BACKEND_HOST}:${BACKEND_PORT}` (defaults: `localhost:5000`)
+- Storage services (fake GCS) → `http://${BACKEND_HOST}:${FAKE_GCS_PORT}` (defaults: `localhost:4443`)
 
 **Use this when:**
 
@@ -245,13 +245,13 @@ docker-compose up backend
 docker-compose up frontend
 ```
 
-### Access the Application
+### Access the Application (uses root `.env`, falls back to defaults)
 
-- **Frontend UI**: http://localhost:3000
-- **Backend API**: http://localhost:5000
-- **Backend Health Check**: http://localhost:5000/api/health
-- **Simulation Engine API**: http://localhost:3001
-- **Simulation Engine PixelStream**: http://localhost:8888 
+- **Frontend UI**: `http://${FRONTEND_HOST:-localhost}:${FRONTEND_PORT:-3000}`
+- **Backend API**: `http://${BACKEND_HOST:-localhost}:${BACKEND_PORT:-5000}`
+- **Backend Health Check**: `http://${BACKEND_HOST:-localhost}:${BACKEND_PORT:-5000}/api/health`
+- **Simulation Engine API**: `http://${SIM_HOST:-localhost}:${SIM_HOST_PORT:-3001}`
+- **Simulation Engine PixelStream**: `ws://${SIM_HOST:-localhost}:${PIXELSTREAM_PORT:-8888}`
 
 ## Architecture Notes
 
@@ -266,9 +266,10 @@ The DRV-Unreal simulation engine runs in **headless mode** using the `-nullrhi` 
 
 ### Network Communication
 
-- The simulation engine exposes AirSim's API on port 3001
-- Backend communicates with the simulation engine via this TCP connection
-- Frontend communicates with backend via REST API
+- Ports are set once in root `.env` (`FRONTEND_PORT`, `BACKEND_PORT`, `SIM_INTERNAL_PORT`, `SIM_HOST_PORT`, `PIXELSTREAM_PORT`, `FAKE_GCS_PORT`) and default to 3000/5000/3000/3001/8888/4443 when unset.
+- The simulation engine exposes AirSim's API on `SIM_HOST_PORT` (default 3001).
+- Backend communicates with the simulation engine via this TCP connection.
+- Frontend communicates with backend via REST API.
 
 ## Development
 
@@ -360,8 +361,8 @@ GOOGLE_MAPS_API_KEY=your_api_key_here
 WIND_SERVICE_HOST=hostname.or.ip.address
 WIND_SERVICE_PORT=5001
 
-# Storage Emulator Host
-STORAGE_EMULATOR_HOST=localhost:4443
+# Storage Emulator Host (kept in root .env as FAKE_GCS_PORT/host; defaults to localhost:4443)
+STORAGE_EMULATOR_HOST=${BACKEND_HOST:-localhost}:${FAKE_GCS_PORT:-4443}
 
 ```
 
@@ -399,9 +400,9 @@ REACT_APP_CESIUM_ION_ACCESS_TOKEN='yaddayaddayadda'
 **Note:** Once saved, the token is automatically loaded from `.env` when you run `./dev.sh full` or `./dev.sh simulator`.
 
 ### Port Already in Use
-If you see errors about ports 3000, 3001, or 5000 already being in use:
+All service ports are defined once in root `.env`. If you see port-in-use errors:
 ```bash
-# Stop conflicting services or change ports in docker-compose.yml
+# Stop conflicting services or change the ports in .env, then rebuild (compose picks them up automatically)
 docker-compose down
 ```
 

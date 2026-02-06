@@ -16,6 +16,7 @@ import Tooltip from '@mui/material/Tooltip';
 import CesiumMap from './cesium/CesiumMap';
 import { mapControls } from '../constants/map';
 import ControlsDisplay from './Configuration/ControlsDisplay';
+import { BASE_URL } from '../utils/const';
 
 const StyledButton = styled(Button)`
   border-radius: 25px;
@@ -185,9 +186,8 @@ export default function HorizontalLinearStepper(data) {
     };
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
       console.log('POST /addTask payload:', payload);
-      const res = await fetch(`${backendUrl}/addTask`, {
+      const res = await fetch(`${BASE_URL}/addTask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

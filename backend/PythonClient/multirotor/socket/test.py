@@ -2,12 +2,16 @@
 This script is used to test the streaming of frames from AirSim to a web browser.
 It streams the default drone and first person view camera.
 """
+import os
 
 from flask import Flask, render_template_string, Response
 
 import PythonClient.airsim as airsim
 import cv2
 import numpy as np
+
+BACKEND_HOST = os.getenv("BACKEND_HOST", "localhost")
+BACKEND_PORT = os.getenv("BACKEND_PORT") or os.getenv("FLASK_RUN_PORT") or "5000"
 
 client = airsim.MultirotorClient()
 client.confirmConnection()
@@ -31,7 +35,7 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     return render_template_string(
-        """
+        f"""
             <html>
             <head>
                 <title>AirSim Streamer</title>
@@ -39,7 +43,7 @@ def index():
             <body>
                 <h1>AirSim Streamer</h1>
                 <hr />
-                Please use the following link: <a href="/video_feed">http://localhost:5000/video_feed</a>
+                Please use the following link: <a href="/video_feed">http://{BACKEND_HOST}:{BACKEND_PORT}/video_feed</a>
             </body>
             </html>
         """
@@ -53,4 +57,4 @@ def video_feed():
     )
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, port=5000)
+    app.run(host='0.0.0.0', debug=False, port=int(BACKEND_PORT))

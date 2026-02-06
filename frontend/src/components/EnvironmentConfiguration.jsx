@@ -417,7 +417,7 @@ export default function EnvironmentConfiguration (env) {
     //new added
     // useEffect(() => {
     //     const interval = setInterval(() => {
-    //       fetch('http://localhost:5000/currentRunning')
+    //       fetch(`${BASE_URL}/currentRunning`)
     //         .then((res) => {
     //           if (!res.ok) {
     //             throw new Error('No response from server/something went wrong');

@@ -5,9 +5,12 @@ name: DroneWorld
 services:
   backend:
     image: droneworld/droneworld-backend:v1.0.0
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+        BACKEND_PORT: ${BACKEND_PORT:-5000}
     ports:
-      - "5000:5000"
+      - "${BACKEND_PORT:-5000}:${BACKEND_PORT:-5000}"
     volumes:
       - ./backend:/app
       - ./credentials:/app/credentials
@@ -18,24 +21,36 @@ services:
     env_file:
       - ./backend/.env
     environment:
+      - BACKEND_HOST=${BACKEND_HOST:-backend}
+      - FLASK_RUN_PORT=${BACKEND_PORT:-5000}
       - DRV_UNREAL_HOST=drv-unreal
-      - DRV_UNREAL_API_PORT=3001
-      - DRV_PIXELSTREAM_PORT=8888
+      - DRV_UNREAL_API_PORT=${SIM_INTERNAL_PORT:-3000}
+      - DRV_PIXELSTREAM_PORT=${PIXELSTREAM_PORT:-8888}
+      - BACKEND_PORT=${BACKEND_PORT:-5000}
+      # Uncomment locally if you need Flask debug; DO NOT set in prod
+      # - FLASK_ENV=development
+      # - FLASK_DEBUG=1
     networks:
       - droneworld-network
 
   frontend:
     image: droneworld/droneworld-frontend:v1.0.0
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        FRONTEND_PORT: ${FRONTEND_PORT:-3000}
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT:-3000}:${FRONTEND_PORT:-3000}"
     volumes:
       - ./frontend:/app
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
-      - PIXELSTREAM_URL=ws://localhost:8888
-      - REACT_APP_BACKEND_URL=http://localhost:5000
+      - FRONTEND_HOST=${FRONTEND_HOST:-frontend}
+      - FRONTEND_PORT=${FRONTEND_PORT:-3000}
+      - PORT=${FRONTEND_PORT:-3000}
+      - PIXELSTREAM_URL=ws://${SIM_HOST:-drv-unreal}:${PIXELSTREAM_PORT:-8888}
+      - REACT_APP_BACKEND_URL=http://${BACKEND_HOST:-localhost}:${BACKEND_PORT:-5000}
     depends_on:
       - backend
     networks:
@@ -44,12 +59,12 @@ services:
   fake-gcs:
     image: fsouza/fake-gcs-server
     ports:
-      - "4443:4443"
-    command: -scheme http -port 4443 -external-url http://fake-gcs:4443 -log-level error
+      - "${FAKE_GCS_PORT:-4443}:${FAKE_GCS_PORT:-4443}"
+    command: -scheme http -port ${FAKE_GCS_PORT:-4443} -external-url http://fake-gcs:${FAKE_GCS_PORT:-4443} -log-level error
     volumes:
       - ./fake-gcs-data:/data
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:4443/storage/v1/b"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:${FAKE_GCS_PORT:-4443}/storage/v1/b"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -65,7 +80,7 @@ services:
     - sh
     - -c
     - |
-      curl -X POST http://fake-gcs:4443/storage/v1/b \
+      curl -X POST http://fake-gcs:${FAKE_GCS_PORT:-4443}/storage/v1/b \
         -H 'Content-Type: application/json' \
         -d '{"name":"droneworld"}'
     networks:

@@ -2,9 +2,12 @@ name: DroneWorld
 services:
   backend:
     image: droneworld/droneworld-backend:v1.0.0
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+        BACKEND_PORT: ${BACKEND_PORT:-5000}
     ports:
-      - "5000:5000"
+      - "${BACKEND_PORT:-5000}:${BACKEND_PORT:-5000}"
     volumes:
       - ./backend:/app  # Mount backend code
       - ./credentials:/app/credentials  # Mount credentials folder
@@ -16,19 +19,24 @@ services:
       - ./backend/.env  # Load environment variables from .env file
     environment:
       # DRV-Unreal service connection
-      - FLASK_ENV=development  # Enable debug mode
-      - FLASK_DEBUG=1          # Enable hot reload
+      # Debug can be enabled locally by setting FLASK_ENV/FLASK_DEBUG via .env; keep off by default
+      - BACKEND_HOST=${BACKEND_HOST:-backend}
+      - FLASK_RUN_PORT=${BACKEND_PORT:-5000}
       - DRV_UNREAL_HOST=drv-unreal
-      - DRV_UNREAL_API_PORT=3001  # DRV API port (if available)
-      - DRV_PIXELSTREAM_PORT=8888
+      - DRV_UNREAL_API_PORT=${SIM_INTERNAL_PORT:-3000}  # DRV API port (if available)
+      - DRV_PIXELSTREAM_PORT=${PIXELSTREAM_PORT:-8888}
+      - BACKEND_PORT=${BACKEND_PORT:-5000}
     networks:
       - droneworld-network
 
   frontend:
     image: droneworld/droneworld-frontend:v1.0.0
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        FRONTEND_PORT: ${FRONTEND_PORT:-3000}
     ports:
-      - "3000:3000"  # Frontend keeps port 3000
+      - "${FRONTEND_PORT:-3000}:${FRONTEND_PORT:-3000}"  # Frontend port
     volumes:
       - ./frontend:/app  # Mount frontend code for live editing
       - /app/node_modules # Separate node_modules to avoid host overwrite
@@ -37,10 +45,13 @@ services:
       - CHOKIDAR_INTERVAL=1000  # Poll every 1 second
       - WATCHPACK_POLLING=true   # Webpack 5 polling
       - FAST_REFRESH=true        # Ensure fast refresh is on
+      - FRONTEND_HOST=${FRONTEND_HOST:-frontend}
+      - FRONTEND_PORT=${FRONTEND_PORT:-3000}
+      - PORT=${FRONTEND_PORT:-3000}
       # PixelStreaming connection - frontend connects directly to DRV
-      - PIXELSTREAM_URL=ws://localhost:8888
-      - BACKEND_URL=http://backend:5000
-      - REACT_APP_BACKEND_URL=http://localhost:5000 # For frontend to reach backend
+      - PIXELSTREAM_URL=ws://${SIM_HOST:-drv-unreal}:${PIXELSTREAM_PORT:-8888}
+      - BACKEND_URL=http://backend:${BACKEND_PORT:-5000}
+      - REACT_APP_BACKEND_URL=http://${BACKEND_HOST:-localhost}:${BACKEND_PORT:-5000} # For frontend to reach backend
     depends_on:
       - backend
     networks:
@@ -55,11 +66,13 @@ services:
         VERSION: v2.0.0
         GITHUB_REPO: UAVLab-SLU/DRV-Unreal
         GITHUB_TOKEN: ${GITHUB_TOKEN}  # Pass token from environment
+        SIM_INTERNAL_PORT: ${SIM_INTERNAL_PORT:-3000}
+        PIXELSTREAM_PORT: ${PIXELSTREAM_PORT:-8888}
     env_file:
       - ./.env  # Load environment variables from sim/.env for runtime
     ports:
-      - "3001:3000"  # Map DRV's port 3000 to host 3001 to avoid conflict
-      - "8888:8888"  # PixelStreaming - exposed for direct frontend access
+      - "${SIM_HOST_PORT:-3001}:${SIM_INTERNAL_PORT:-3000}"  # Map internal sim port to host
+      - "${PIXELSTREAM_PORT:-8888}:${PIXELSTREAM_PORT:-8888}"  # PixelStreaming - exposed for direct frontend access
     command: 
       - "./Blocks.sh"
       - "-server"
@@ -67,7 +80,7 @@ services:
       - "-nullrhi"
       - "-nosound"
       - "-unattended"
-      - "-Port=3000"
+      - "-Port=${SIM_INTERNAL_PORT}"
     environment:
       - DISPLAY=${DISPLAY:-:0}
     volumes:
@@ -85,7 +98,7 @@ services:
     networks:
       - droneworld-network
     healthcheck:
-      test: ["CMD", "sh", "-c", "netstat -an | grep -q 3000 || exit 1"]
+      test: ["CMD", "sh", "-c", "netstat -an | grep -q ${SIM_INTERNAL_PORT:-3000} || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -94,12 +107,12 @@ services:
   fake-gcs:
     image: fsouza/fake-gcs-server
     ports:
-      - "4443:4443"
-    command: -scheme http -port 4443 -external-url http://fake-gcs:4443 -log-level error
+      - "${FAKE_GCS_PORT:-4443}:${FAKE_GCS_PORT:-4443}"
+    command: -scheme http -port ${FAKE_GCS_PORT:-4443} -external-url http://fake-gcs:${FAKE_GCS_PORT:-4443} -log-level error
     volumes:
       - ./fake-gcs-data:/data
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:4443/storage/v1/b"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:${FAKE_GCS_PORT:-4443}/storage/v1/b"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -115,7 +128,7 @@ services:
     - sh
     - -c
     - |
-      curl -X POST http://fake-gcs:4443/storage/v1/b \
+      curl -X POST http://fake-gcs:${FAKE_GCS_PORT:-4443}/storage/v1/b \
         -H 'Content-Type: application/json' \
         -d '{"name":"droneworld"}'
     networks:

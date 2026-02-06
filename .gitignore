@@ -63,3 +63,5 @@ config/fake-gcs-data/
 coverage/
 # VS Code workspace files
 *.code-workspace
+credentials/gcs-key.json
+credentials/gdrive-key.json

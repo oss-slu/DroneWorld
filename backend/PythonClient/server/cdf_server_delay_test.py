@@ -41,4 +41,3 @@ def test_post_delay():
 def test_get_delay():
     delay = measure_delay_get()
     assert delay <= 1.0, f"GET delay exceeded 1 second. Actual delay: {delay} seconds"
-

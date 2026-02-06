@@ -27,6 +27,7 @@ import FuzzyDashboard from './FuzzyDashboard';
 import React, { useEffect } from 'react';
 import { makeStyles } from '@mui/styles';
 import Snackbar from '@mui/material/Snackbar';
+import { BASE_URL } from '../utils/const';
 
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -128,7 +129,7 @@ export default function ReportDashboard() {
   useEffect(() => {
     const fetchData = () => {
       setIsloading(true);
-      fetch('http://localhost:5000/list-reports', { method: 'GET' })
+      fetch(`${BASE_URL}/list-reports`, { method: 'GET' })
         .then((res) => {
           if (!res.ok) {
             throw new Error('No response from server/something went wrong');
@@ -166,7 +167,7 @@ export default function ReportDashboard() {
     handleSnackBarVisibility(true);
   }, []);
   const getFolderContents = (file) => {
-    fetch(`http://localhost:5000/list-folder-contents/${file.filename}`, {
+    fetch(`${BASE_URL}/list-folder-contents/${file.filename}`, {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
       body: {},

@@ -3,12 +3,17 @@ export const HOME_LABEL = {
   partsecond: `Describe one or more requirements you would like to test by simulating a scenario`,
 };
 
-// export const BASE_URL = 'http://localhost:5000';
-let API_URL = 'http://localhost:8000';
-if(process.env.REACT_APP_API_URL){
-  API_URL = process.env.REACT_APP_API_URL;
-}
-export const BASE_URL = API_URL;
+const backendHost =
+  process.env.REACT_APP_BACKEND_HOST ||
+  process.env.BACKEND_HOST ||
+  'localhost';
+const backendPort =
+  process.env.REACT_APP_BACKEND_PORT ||
+  process.env.BACKEND_PORT ||
+  '5000';
+export const BASE_URL =
+  process.env.REACT_APP_BACKEND_URL ||
+  `http://${backendHost}:${backendPort}`;
 
 export const UAV_DESCRIPTION = {
   'UAV-301': {
