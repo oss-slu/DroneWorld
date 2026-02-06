@@ -27,6 +27,9 @@ services:
       - DRV_UNREAL_API_PORT=${SIM_INTERNAL_PORT:-3000}
       - DRV_PIXELSTREAM_PORT=${PIXELSTREAM_PORT:-8888}
       - BACKEND_PORT=${BACKEND_PORT:-5000}
+      # Uncomment locally if you need Flask debug; DO NOT set in prod
+      # - FLASK_ENV=development
+      # - FLASK_DEBUG=1
     networks:
       - droneworld-network
 

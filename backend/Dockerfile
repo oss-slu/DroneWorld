@@ -32,5 +32,5 @@ ENV FLASK_RUN_PORT=${BACKEND_PORT}
 # Expose the port the backend will use
 EXPOSE ${BACKEND_PORT}
 
-# Command to start the backend server  
-CMD ["sh", "-c", "flask --app PythonClient.server.simulation_server run --host=0.0.0.0 --port=${BACKEND_PORT} --debug"]
+# Command to start the backend server (debug must be enabled explicitly via env in dev-only compose)
+CMD ["sh", "-c", "flask --app PythonClient.server.simulation_server run --host=0.0.0.0 --port=${BACKEND_PORT}"]

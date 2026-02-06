@@ -19,8 +19,7 @@ services:
       - ./backend/.env  # Load environment variables from .env file
     environment:
       # DRV-Unreal service connection
-      - FLASK_ENV=development  # Enable debug mode
-      - FLASK_DEBUG=1          # Enable hot reload
+      # Debug can be enabled locally by setting FLASK_ENV/FLASK_DEBUG via .env; keep off by default
       - BACKEND_HOST=${BACKEND_HOST:-backend}
       - FLASK_RUN_PORT=${BACKEND_PORT:-5000}
       - DRV_UNREAL_HOST=drv-unreal
