@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { Box, Grid } from '@mui/material';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -120,6 +120,9 @@ export default function HorizontalLinearStepper(data) {
                   : undefined,
                 Magnetometer: Sensors.Magnetometer
                   ? (({ Key, ...m }) => m)(Sensors.Magnetometer)
+                  : undefined,
+                IMU: Sensors.IMU
+                  ? (({ Key, ...i }) => i)(Sensors.IMU)
                   : undefined,
                 GPS: Sensors.GPS
                   ? (({ Key, ...g }) => g)(Sensors.GPS)
