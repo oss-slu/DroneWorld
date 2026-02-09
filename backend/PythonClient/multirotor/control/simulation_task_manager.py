@@ -1,4 +1,4 @@
-import copy
+﻿import copy
 import importlib
 import json
 import math
@@ -187,6 +187,11 @@ class SimulationTaskManager:
                     diff_dict["Sensors"]["Barometer"] = single_drone_setting["Sensors"]["Barometer"]
                 if "Magnetometer" in single_drone_setting["Sensors"]:
                     diff_dict["Sensors"]["Magnetometer"] = single_drone_setting["Sensors"]["Magnetometer"]
+                if "IMU" in single_drone_setting["Sensors"]:
+                    diff_dict["Sensors"]["IMU"] = single_drone_setting["Sensors"]["IMU"]
+                    diff_dict["Sensors"]["Imu"] = single_drone_setting["Sensors"]["IMU"]
+                    # Defensive measure to ensure AirSim config accepts one of the casings
+                    # Since we are not yet able to test dockerized simulator.
                 if "GPS" in single_drone_setting["Sensors"]:
                     diff_dict["Sensors"]["GPS"] = single_drone_setting["Sensors"]["GPS"]
 
