@@ -65,3 +65,6 @@ coverage/
 *.code-workspace
 credentials/gcs-key.json
 credentials/gdrive-key.json
+
+# Local report outputs
+reports/
