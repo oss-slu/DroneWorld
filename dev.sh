@@ -127,7 +127,7 @@ case "$1" in
             fi
         fi
         echo "🚀 Starting full stack (frontend + backend + simulator)..."
-        "${DOCKER_COMPOSE[@]}" up
+        "${DOCKER_COMPOSE[@]}" --profile gcs up
         ;;
     dev)
         echo "🔧 Starting development services (frontend + backend only)..."

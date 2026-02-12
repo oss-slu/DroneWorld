@@ -346,7 +346,9 @@ The contents of `./backend/.env` should include the following variables:
 
 ```sh
 # Storage Configuration
-STORAGE_TYPE=gcs
+# Options: local (default), gcs, gdrive
+STORAGE_TYPE=local
+LOCAL_STORAGE_ROOT=/home/youruser  # optional; defaults to user home, falls back to project root if not writable
 GCS_BUCKET_NAME=droneworld
 GDRIVE_FOLDER_ID=your_folder_id_here
 
@@ -372,6 +374,22 @@ The contents of `./frontend/.env` should include the following variables:
 REACT_APP_DEMO_USER_EMAIL='name@domain.tld'
 REACT_APP_CESIUM_ION_ACCESS_TOKEN='yaddayaddayadda'
 ```
+
+### Local Storage (no cloud setup)
+
+- Set `STORAGE_TYPE=local` in `backend/.env` (default). Optionally set `LOCAL_STORAGE_ROOT` if you don't want to use your home directory; it will create a `reports/` folder there (or fall back to the project root if not writable).
+- Run backend with the mock simulator for a quick check:
+  ```bash
+  cd backend
+  SIMULATOR_TYPE=mock STORAGE_TYPE=local LOCAL_STORAGE_ROOT=$(pwd)/.. \
+    FLASK_APP=PythonClient/server/simulation_server.py flask run
+  ```
+- Trigger a mock run (creates a report under `reports/`):
+  ```bash
+  curl -X POST http://localhost:5000/addTask -H 'Content-Type: application/json' \
+    -d '{"Drones": [], "environment": {}}'
+  ```
+- Browse generated reports under the `reports/` folder; they are gitignored.
 
 ### Set Up GitHub Token
 

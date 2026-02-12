@@ -12,9 +12,6 @@ services:
       - ./backend:/app  # Mount backend code
       - ./credentials:/app/credentials  # Mount credentials folder
       - ./config/airsim:/root/Documents/AirSim  # Mount the AirSim folder
-    depends_on:
-      fake-gcs:
-        condition: service_healthy
     env_file:
       - ./backend/.env  # Load environment variables from .env file
     environment:
@@ -105,6 +102,7 @@ services:
       start_period: 30s
 
   fake-gcs:
+    profiles: ["gcs"]
     image: fsouza/fake-gcs-server
     ports:
       - "${FAKE_GCS_PORT:-4443}:${FAKE_GCS_PORT:-4443}"
@@ -120,6 +118,7 @@ services:
       - droneworld-network
 
   init-storage:
+    profiles: ["gcs"]
     image: curlimages/curl:latest
     depends_on:
       fake-gcs:
