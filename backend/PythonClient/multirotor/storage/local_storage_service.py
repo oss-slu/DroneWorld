@@ -1,5 +1,6 @@
 import base64
 import os
+import zipfile
 from pathlib import Path
 from typing import Dict, List, Tuple
 
@@ -13,6 +14,9 @@ class LocalStorageService(StorageServiceInterface):
         # Prefer the user's home directory ("root folder" experience); fall back to cwd if needed
         preferred_root = Path(os.path.expanduser("~"))
         chosen_root = Path(storage_root or os.getenv("LOCAL_STORAGE_ROOT", preferred_root))
+
+        # Track simulator type so we can tag mock reports even if filenames are ambiguous
+        self.simulator_type = os.getenv("SIMULATOR_TYPE", "real").lower()
 
         try:
             reports_dir = (chosen_root / "reports")
@@ -56,13 +60,20 @@ class LocalStorageService(StorageServiceInterface):
                     "drone_count": 0,
                     "pass": 0,
                     "fail": 0,
+                    # default tag; overridden below when mock artifacts detected
+                    "report_type": "mock" if self.simulator_type == "mock" else "real",
                 }
 
+                is_mock_report = report["report_type"] == "mock"
                 for file_path in batch_dir.rglob("*"):
                     if not file_path.is_file():
                         continue
 
                     rel_parts = file_path.relative_to(self.reports_dir).parts
+                    # If any nested folder hints at being mock, mark it so
+                    if any("mock" in part.lower() for part in rel_parts):
+                        is_mock_report = True
+
                     report["contains_fuzzy"] = report["contains_fuzzy"] or any(
                         "fuzzy" in part.lower() for part in rel_parts
                     )
@@ -74,6 +85,7 @@ class LocalStorageService(StorageServiceInterface):
                         report["pass"] += file_contents.count("PASS")
                         report["fail"] += file_contents.count("FAIL")
 
+                report["report_type"] = "mock" if is_mock_report else "real"
                 report_files.append(report)
 
             return {"reports": report_files}
@@ -97,6 +109,7 @@ class LocalStorageService(StorageServiceInterface):
                 "PointDeviationMonitor": [],
                 "MinSepDistMonitor": [],
                 "NoFlyZoneMonitor": [],
+                "MockMonitor": [],
                 "htmlFiles": [],
             }
 
@@ -172,6 +185,27 @@ class LocalStorageService(StorageServiceInterface):
             print(f"Error listing files locally: {exc}")
             return []
 
+    def get_report_archive(self, folder_name: str):
+        """Creates (or overwrites) a zip archive for the given report folder and returns its path and name."""
+        try:
+            target_folder = (self.reports_dir / folder_name).resolve()
+            if not target_folder.exists() or not target_folder.is_dir():
+                return None, None
+
+            archive_path = self.reports_dir / f"{folder_name}.zip"
+
+            with zipfile.ZipFile(archive_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+                for file_path in target_folder.rglob("*"):
+                    if file_path.is_file():
+                        # Store paths relative to reports root so zip structure mirrors storage
+                        arcname = file_path.relative_to(self.reports_dir)
+                        zipf.write(file_path, arcname=arcname)
+
+            return archive_path, archive_path.name
+        except Exception as exc:  # pragma: no cover - defensive
+            print(f"Error creating archive for folder {folder_name}: {exc}")
+            return None, None
+
     # --- Internal helpers ----------------------------------------------
     def _build_text_payload(self, name: str, contents: str, fuzzy_path_value: str):
         return {
@@ -189,6 +223,10 @@ class LocalStorageService(StorageServiceInterface):
         for monitor_key in result.keys():
             if monitor_key == "htmlFiles":
                 continue
+            # allow mock monitor bucket to catch generic mock entries
+            if monitor_key == "MockMonitor" and "mock" in rel_path.as_posix().lower():
+                result[monitor_key].append(file_data)
+                return
             if monitor_key in rel_path.as_posix():
                 result[monitor_key].append(file_data)
                 return

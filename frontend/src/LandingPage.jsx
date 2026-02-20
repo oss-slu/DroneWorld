@@ -499,7 +499,7 @@ export default function LandingPage() {
           {filesPresent && (
             <div onClick={handleAccordionToggle}>
               <h2 className={classes.reportDashboardTitle}>
-                <Link to='/report-dashboard' className={classes.reportDashboardTitle}>
+                <Link to='/reports' className={classes.reportDashboardTitle}>
                   <div style={{ textAlign: 'center' }}>{/* Content here */}</div>
                 </Link>
               </h2>

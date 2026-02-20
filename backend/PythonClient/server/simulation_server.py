@@ -3,7 +3,7 @@ import os
 import threading
 import time
 import sys
-from flask import Flask, request, render_template, Response, jsonify
+from flask import Flask, request, render_template, Response, jsonify, send_file
 from flask_cors import CORS
 
 # Add parent directories to the Python path for module imports
@@ -157,6 +157,25 @@ def serve_html(folder_name, relative_path):
     except Exception as e:
         print(f"Error serving HTML file: {e}")
         raise StorageError("Failed to serve HTML file", details={"exception": str(e), "folder": folder_name, "path": relative_path})
+
+@app.route('/download-report/<folder_name>', methods=['GET'])
+def download_report(folder_name):
+    """
+    Generates and streams a zip archive for a given report folder.
+    Only supported for storage backends that implement `get_report_archive`.
+    """
+    try:
+        if not hasattr(storage_service, "get_report_archive"):
+            raise StorageError("Download not supported for this storage backend", details={"folder": folder_name}, status_code=501)
+
+        archive_path, archive_name = storage_service.get_report_archive(folder_name)
+        if not archive_path:
+            raise ResourceNotFoundError("Report archive not found", details={"folder": folder_name})
+
+        return send_file(archive_path, as_attachment=True, download_name=archive_name)
+    except Exception as e:
+        print(f"Error downloading report archive: {e}")
+        raise StorageError("Failed to download report", details={"exception": str(e), "folder": folder_name})
 
 @app.route('/addTask', methods=['POST'])
 def add_task():
