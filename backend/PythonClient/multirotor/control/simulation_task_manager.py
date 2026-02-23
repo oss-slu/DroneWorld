@@ -166,7 +166,21 @@ class SimulationTaskManager:
             if "UseGeo" in raw_request_json["environment"] and raw_request_json["environment"]["UseGeo"]:
                 origin_latitude_ = raw_request_json["environment"]["Origin"]["Latitude"]
                 origin_longitude_ = raw_request_json["environment"]["Origin"]["Longitude"]
+                origin_payload = raw_request_json["environment"].get("Origin", {})
+                backup_altitude = 170.0
+                requested_altitude = origin_payload.get("Altitude", origin_payload.get("Height", None))
+                try:
+                    requested_altitude = float(requested_altitude)
+                except (TypeError, ValueError):
+                    requested_altitude = backup_altitude
+                if not math.isfinite(requested_altitude):
+                    requested_altitude = backup_altitude
+
                 origin_height_ = GeoUtil.get_elevation(origin_latitude_, origin_longitude_)
+                if origin_height_ is None:
+                    # Fallback to the client-provided altitude if elevation API is unavailable.
+                    origin_height_ = requested_altitude
+                    print("Warning, elevation lookup failed; using payload altitude:", origin_height_)
                 cesium_origin = [origin_latitude_, origin_longitude_, origin_height_]
                 new_setting_dot_json["OriginGeopoint"] = {
                     "Latitude": origin_latitude_,
@@ -178,6 +192,9 @@ class SimulationTaskManager:
                     single_drone_setting_copy, cesium_origin)
             else:
                 drone_name, drone_x, drone_y, drone_z = self.__handle_mission_settings(single_drone_setting_copy)
+
+            # Frontend-only field; do not emit into AirSim settings.json vehicle blocks.
+            single_drone_setting_copy.pop("MissionValue", None)
 
             diff_dict = self.__find_diff(single_drone_setting_copy, self.__DEFAULT_DRONE_FULL_LENGTH)
 
@@ -288,6 +305,20 @@ class SimulationTaskManager:
 
     @staticmethod
     def __save_settings_dot_json(new_setting_dot_json):
+        # Temporary crash-isolation mode: force a minimal static settings.json payload.
+        new_setting_dot_json = {
+            "SettingsVersion": 1.2,
+            "SimMode": "Multirotor",
+            "ViewMode": "SpringArmChase",
+            "Vehicles": {
+                "Drone 1": {
+                    "VehicleType": "SimpleFlight",
+                    "X": 41.8781,
+                    "Y": -87.6298,
+                    "Z": -550
+                }
+            }
+        }
         with open(os.path.join(os.path.expanduser('~'), "Documents", "AirSim") + os.sep + 'settings.json',
                   'w') as outfile:
             json.dump(new_setting_dot_json, outfile, indent=4)
@@ -580,4 +611,3 @@ class SimulationTaskManager:
                 #     self.stream_manager.set_drone_names(raw_request_json["streaming_settings"]["drone_names"])
         else:
             self.__is_streaming_enabled = False
-

@@ -50,7 +50,7 @@ export default function MissionConfiguration (mission) {
         Roll: 0, 
         Yaw: 0,
         Sensors: null,
-        MissionValue: null,
+        MissionValue: "fly_to_points",
         Mission : {
             name:"fly_to_points",
             param : []
@@ -134,7 +134,7 @@ export default function MissionConfiguration (mission) {
             Roll: 0, 
             Yaw: 0,
             Sensors: null,
-            MissionValue: null,
+            MissionValue: "fly_to_points",
             Mission : {
                 name:"fly_to_points",
                 param : []
