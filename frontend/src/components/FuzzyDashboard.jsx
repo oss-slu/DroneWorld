@@ -78,7 +78,7 @@ export default function FuzzyDashboard() {
   };
 
   const redirectToReportDashboard = () => {
-    navigate('/report-dashboard')
+    navigate('/reports')
   }
   // const getInfoContents = (fileContents, keyMatch, droneMap) => {
   //   const content_array = fileContents.split("\n");

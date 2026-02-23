@@ -119,7 +119,8 @@ class GoogleDriveStorageService(StorageServiceInterface):
                         'contains_fuzzy': False,
                         'drone_count': 0,
                         'pass': 0,
-                        'fail': 0
+                        'fail': 0,
+                        'report_type': 'real'
                     })
 
             for report in report_files:
