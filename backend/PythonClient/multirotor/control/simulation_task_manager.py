@@ -166,7 +166,20 @@ class SimulationTaskManager:
             if "UseGeo" in raw_request_json["environment"] and raw_request_json["environment"]["UseGeo"]:
                 origin_latitude_ = raw_request_json["environment"]["Origin"]["Latitude"]
                 origin_longitude_ = raw_request_json["environment"]["Origin"]["Longitude"]
+                origin_payload = raw_request_json["environment"].get("Origin", {})
+                backup_altitude = 170.0
+                requested_altitude = origin_payload.get("Altitude", origin_payload.get("Height", None))
+                try:
+                    requested_altitude = float(requested_altitude)
+                except (TypeError, ValueError):
+                    requested_altitude = backup_altitude
+                if not math.isfinite(requested_altitude):
+                    requested_altitude = backup_altitude
                 origin_height_ = GeoUtil.get_elevation(origin_latitude_, origin_longitude_)
+                if origin_height_ is None:
+                    # Fallback to the client-provided altitude if elevation API is unavailable.
+                    origin_height_ = requested_altitude
+                    print("Warning, elevation lookup failed; using payload altitude:", origin_height_)
                 cesium_origin = [origin_latitude_, origin_longitude_, origin_height_]
                 new_setting_dot_json["OriginGeopoint"] = {
                     "Latitude": origin_latitude_,
@@ -178,7 +191,10 @@ class SimulationTaskManager:
                     single_drone_setting_copy, cesium_origin)
             else:
                 drone_name, drone_x, drone_y, drone_z = self.__handle_mission_settings(single_drone_setting_copy)
-
+            
+            # Frontend-only field; do not emit into AirSim settings.json vehicle blocks.
+            single_drone_setting_copy.pop("MissionValue", None)
+            
             diff_dict = self.__find_diff(single_drone_setting_copy, self.__DEFAULT_DRONE_FULL_LENGTH)
 
             if "Sensors" in single_drone_setting:
@@ -288,9 +304,49 @@ class SimulationTaskManager:
 
     @staticmethod
     def __save_settings_dot_json(new_setting_dot_json):
+        if SimulationTaskManager.__is_json_debug_mode_enabled():
+            project_root = os.path.abspath(
+                os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")
+            )
+            project_root_settings_path = os.path.join(project_root, "settings.json")
+            if os.path.exists(project_root_settings_path):
+                try:
+                    with open(project_root_settings_path, 'r') as infile:
+                        new_setting_dot_json = json.load(infile)
+                except Exception as e:
+                    print(f"Failed to load debug settings.json from project root: {e}")
+
         with open(os.path.join(os.path.expanduser('~'), "Documents", "AirSim") + os.sep + 'settings.json',
                   'w') as outfile:
             json.dump(new_setting_dot_json, outfile, indent=4)
+
+    @staticmethod
+    def __is_json_debug_mode_enabled():
+        raw_value = os.getenv("JSON_DEBUG_MODE")
+        if raw_value is None:
+            raw_value = SimulationTaskManager.__read_backend_dotenv_var("JSON_DEBUG_MODE")
+        if raw_value is None:
+            return False
+        return raw_value.strip().lower() in {"1", "true", "yes", "on"}
+
+    @staticmethod
+    def __read_backend_dotenv_var(key):
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
+        dotenv_path = os.path.join(project_root, "backend", ".env")
+        if not os.path.exists(dotenv_path):
+            return None
+        try:
+            with open(dotenv_path, "r") as env_file:
+                for raw_line in env_file:
+                    line = raw_line.strip()
+                    if not line or line.startswith("#") or "=" not in line:
+                        continue
+                    env_key, env_value = line.split("=", 1)
+                    if env_key.strip() == key:
+                        return env_value.strip().strip("'").strip('"')
+        except Exception as e:
+            print(f"Failed to read {dotenv_path}: {e}")
+        return None
 
     @staticmethod
     def __save_cesium_dot_json(cesium_setting):

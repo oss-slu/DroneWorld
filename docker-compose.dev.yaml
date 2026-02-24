@@ -14,7 +14,7 @@ services:
     volumes:
       - ./backend:/app
       - ./credentials:/app/credentials
-      - ./config/airsim:/root/Documents/AirSim
+      - ${USERPROFILE}/Documents/AirSim:/root/Documents/AirSim
     env_file:
       - ./backend/.env
     environment:

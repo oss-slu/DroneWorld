@@ -62,13 +62,18 @@ export default function DroneConfiguration(droneData) {
       Roll: 0, 
       Yaw: 0,
       Sensors: null,
-      MissionValue: null,
+      MissionValue: "fly_to_points",
       Mission: {
         name: "fly_to_points",
         param: []
       }
     };
-    return { ...defaults, ...(droneData?.getDroneBasedOnIndex?.(id) || {}), ...droneObject };
+    //return { ...defaults, ...(droneData?.getDroneBasedOnIndex?.(id) || {}), ...droneObject };
+    const mergedDrone = { ...defaults, ...(droneData?.getDroneBasedOnIndex?.(id) || {}), ...droneObject };
+    if (mergedDrone.MissionValue == null) {
+      mergedDrone.MissionValue = mergedDrone.Mission?.name ?? defaults.Mission.name;
+    }
+    return mergedDrone;
   });
 
   const syncDroneLocation = React.useCallback((x, y, z) => {
@@ -128,13 +133,40 @@ export default function DroneConfiguration(droneData) {
 
 
   const handleMissionChange = (event) => {
-    setDrone(prevState => ({
-      ...prevState,
+    //setDrone(prevState => ({
+    //  ...prevState,
+    const missionName = event.target.value;
+    setDrone(prevState => {
+      const updatedDrone = {
+        ...prevState,
+        MissionValue: missionName,
+        Mission: {
+          ...(prevState.Mission || {}),
+          name: missionName,
+          param: Array.isArray(prevState?.Mission?.param) ? prevState.Mission.param : []
+        }
+      };
+      droneJson(updatedDrone, id);
+      return updatedDrone;
+    });
+
+    const currentDrone = mainJson.getDroneBasedOnIndex(id);
+    if (!currentDrone) return;
+
+    const updatedMainDrone = {
+      ...currentDrone,
+      MissionValue: missionName,
       Mission: {
-        ...prevState.Mission,
-        name: event.target.value
+        //...prevState.Mission,
+        //name: event.target.value
+        ...(currentDrone.Mission || {}),
+        name: missionName,
+        param: Array.isArray(currentDrone?.Mission?.param) ? currentDrone.Mission.param : []
       }
-    }));
+    };
+
+    mainJson.updateDroneBasedOnIndex(id, updatedMainDrone);
+    setMainJson(SimulationConfigurationModel.getReactStateBasedUpdate(mainJson));
   };
 
   const handleDroneTypeChange = (event) => {

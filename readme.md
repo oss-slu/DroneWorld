@@ -366,7 +366,28 @@ WIND_SERVICE_PORT=5001
 # Storage Emulator Host (kept in root .env as FAKE_GCS_PORT/host; defaults to localhost:4443)
 STORAGE_EMULATOR_HOST=${BACKEND_HOST:-localhost}:${FAKE_GCS_PORT:-4443}
 
+# Optional: when true, backend loads a local debug settings.json override before writing AirSim settings
+JSON_DEBUG_MODE=false
+
 ```
+
+### JSON Debug Mode (settings override)
+
+Use this when you want to bypass generated task settings and quickly test with a hand-crafted `settings.json`.
+
+1. In `backend/.env`, set:
+   ```sh
+   JSON_DEBUG_MODE=true
+   ```
+2. Create a debug `settings.json` in one of these locations:
+   - Recommended for local (non-Docker): `<repo>/settings.json`
+   - Recommended for Docker backend: `<repo>/backend/settings.json`
+3. Submit a task from the frontend as usual.
+
+Behavior:
+- If `JSON_DEBUG_MODE=true` and a debug `settings.json` is found, backend uses that file as the settings payload.
+- If `JSON_DEBUG_MODE=true` but no debug `settings.json` exists, backend falls back to normal generated settings.
+- Default is `false`, so normal settings generation is unchanged unless you opt in.
 
 The contents of `./frontend/.env` should include the following variables:
 

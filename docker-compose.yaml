@@ -11,7 +11,7 @@ services:
     volumes:
       - ./backend:/app  # Mount backend code
       - ./credentials:/app/credentials  # Mount credentials folder
-      - ./config/airsim:/root/Documents/AirSim  # Mount the AirSim folder
+      - ${USERPROFILE}/Documents/AirSim:/root/Documents/AirSim  
     env_file:
       - ./backend/.env  # Load environment variables from .env file
     environment:
@@ -55,23 +55,17 @@ services:
       - droneworld-network
 
   drv-unreal:
-    image: droneworld/drv-unreal:v2.0.0
+    image: droneworld/drv-unreal:v2.1.0
     build:
       context: ./sim  # Build context is now sim directory
       dockerfile: Dockerfile
-      args:
-        VERSION: v2.0.0
-        GITHUB_REPO: UAVLab-SLU/DRV-Unreal
-        GITHUB_TOKEN: ${GITHUB_TOKEN}  # Pass token from environment
-        SIM_INTERNAL_PORT: ${SIM_INTERNAL_PORT:-3000}
-        PIXELSTREAM_PORT: ${PIXELSTREAM_PORT:-8888}
     env_file:
       - ./.env  # Load environment variables from sim/.env for runtime
     ports:
       - "${SIM_HOST_PORT:-3001}:${SIM_INTERNAL_PORT:-3000}"  # Map internal sim port to host
       - "${PIXELSTREAM_PORT:-8888}:${PIXELSTREAM_PORT:-8888}"  # PixelStreaming - exposed for direct frontend access
     command: 
-      - "./Blocks.sh"
+      - "./DRV.sh"
       - "-server"
       - "-log"
       - "-nullrhi"
@@ -83,7 +77,10 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:ro  # X11 display support
       - drv-data:/app/data  # Persistent data for simulation results
-      - ./config/airsim:/home/ue4/Documents/AirSim:ro
+      - type: bind
+        source: ${USERPROFILE}/Documents/AirSim
+        target: /home/myuser/Documents/AirSim
+        read_only: true
     # Uncomment below for GPU access (requires nvidia-docker2)
     # deploy:
     #   resources:
