@@ -9,12 +9,17 @@ from datetime import datetime
 from queue import Queue
 from time import sleep
 
+from dotenv import load_dotenv
 from msgpackrpc.error import TransportError
 from numpy import random
 
 from PythonClient import airsim
 from PythonClient.multirotor.socket.stream_manager import StreamManager
 from PythonClient.multirotor.util.geo.geo_util import GeoUtil
+
+BACKEND_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+PROJECT_ROOT = os.path.abspath(os.path.join(BACKEND_ROOT, ".."))
+load_dotenv(dotenv_path=os.path.join(BACKEND_ROOT, ".env"), override=False)
 
 
 def str_to_number(s):
@@ -250,7 +255,10 @@ class SimulationTaskManager:
                     new_setting_dot_json['Wind'] = raw_request_json['environment']['Wind']
 
     def __populate_monitor_list(self, raw_request_json):
-        monitors = raw_request_json['monitors']
+        monitors = raw_request_json.get('monitors', {})
+        if not isinstance(monitors, dict):
+            print("Warning: monitors payload is not a dict, skipping monitor setup")
+            monitors = {}
         monitor_name_param_list = []
         for monitor, param in monitors.items():
             monitor_name_param_list.append((monitor, param['param']))
@@ -304,49 +312,36 @@ class SimulationTaskManager:
 
     @staticmethod
     def __save_settings_dot_json(new_setting_dot_json):
-        if SimulationTaskManager.__is_json_debug_mode_enabled():
-            project_root = os.path.abspath(
-                os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")
-            )
-            project_root_settings_path = os.path.join(project_root, "settings.json")
-            if os.path.exists(project_root_settings_path):
-                try:
-                    with open(project_root_settings_path, 'r') as infile:
-                        new_setting_dot_json = json.load(infile)
-                except Exception as e:
-                    print(f"Failed to load debug settings.json from project root: {e}")
+        debug_settings_candidates = [
+            os.path.join(PROJECT_ROOT, "settings.json"),
+            os.path.join(BACKEND_ROOT, "settings.json"),
+        ]
+        output_path = os.path.join(
+            os.path.expanduser("~"),
+            "Documents",
+            "AirSim",
+            "settings.json"
+        )
 
-        with open(os.path.join(os.path.expanduser('~'), "Documents", "AirSim") + os.sep + 'settings.json',
-                  'w') as outfile:
-            json.dump(new_setting_dot_json, outfile, indent=4)
+        json_debug_mode = os.getenv("JSON_DEBUG_MODE", "false").strip().lower() == "true"
 
-    @staticmethod
-    def __is_json_debug_mode_enabled():
-        raw_value = os.getenv("JSON_DEBUG_MODE")
-        if raw_value is None:
-            raw_value = SimulationTaskManager.__read_backend_dotenv_var("JSON_DEBUG_MODE")
-        if raw_value is None:
-            return False
-        return raw_value.strip().lower() in {"1", "true", "yes", "on"}
+        if json_debug_mode:
+            debug_settings_path = next((p for p in debug_settings_candidates if os.path.exists(p)), None)
+            if debug_settings_path:
+                with open(debug_settings_path, "r") as f:
+                    new_setting_dot_json = json.load(f)
+                print(f"[OK] JSON_DEBUG_MODE=true, using {debug_settings_path}")
+            else:
+                print(
+                    "[WARN] JSON_DEBUG_MODE=true but settings.json was not found in: "
+                    + ", ".join(debug_settings_candidates)
+                )
 
-    @staticmethod
-    def __read_backend_dotenv_var(key):
-        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
-        dotenv_path = os.path.join(project_root, "backend", ".env")
-        if not os.path.exists(dotenv_path):
-            return None
-        try:
-            with open(dotenv_path, "r") as env_file:
-                for raw_line in env_file:
-                    line = raw_line.strip()
-                    if not line or line.startswith("#") or "=" not in line:
-                        continue
-                    env_key, env_value = line.split("=", 1)
-                    if env_key.strip() == key:
-                        return env_value.strip().strip("'").strip('"')
-        except Exception as e:
-            print(f"Failed to read {dotenv_path}: {e}")
-        return None
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        with open(output_path, "w") as f:
+            json.dump(new_setting_dot_json, f, indent=4)
+
+        print(f"[OK] settings.json written to {output_path}")
 
     @staticmethod
     def __save_cesium_dot_json(cesium_setting):

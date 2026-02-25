@@ -84,9 +84,11 @@ The simulator (`drv-unreal`) requires a GitHub Personal Access Token to build. I
 
 # Development mode (frontend + backend only)
 .\dev.ps1 dev
+.\dev.ps1 dev-rebuild
 
 # Full stack (includes simulator)
 .\dev.ps1 full
+.\dev.ps1 full-rebuild
 
 # View logs
 .\dev.ps1 logs
@@ -94,6 +96,9 @@ The simulator (`drv-unreal`) requires a GitHub Personal Access Token to build. I
 # Stop services
 .\dev.ps1 stop
 ```
+
+`dev-rebuild` rebuilds frontend/backend images before starting dev mode.  
+`full-rebuild` rebuilds all images (including simulator) before starting full mode.
 
 Run `./dev.sh help` or `.\dev.ps1 help` to see all available commands.
 
@@ -381,7 +386,7 @@ Use this when you want to bypass generated task settings and quickly test with a
    ```
 2. Create a debug `settings.json` in one of these locations:
    - Recommended for local (non-Docker): `<repo>/settings.json`
-   - Recommended for Docker backend: `<repo>/backend/settings.json`
+   - Recommended for Docker backend: `<repo>/backend/settings.json` (the backend container mounts `./backend` as `/app`)
 3. Submit a task from the frontend as usual.
 
 Behavior:

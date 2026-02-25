@@ -114,7 +114,9 @@ function Show-Usage {
     Write-Host "Commands:" -ForegroundColor Yellow
     Write-Host "  token       - Set GITHUB_TOKEN for building simulator (required for 'full' and 'simulator')"
     Write-Host "  full        - Start all services (frontend, backend, simulator)"
+    Write-Host "  full-rebuild - Rebuild and start full stack (frontend, backend, simulator)"
     Write-Host "  dev         - Start development services only (frontend, backend)"
+    Write-Host "  dev-rebuild - Rebuild and start development services (frontend, backend)"
     Write-Host "  frontend    - Start frontend only"
     Write-Host "  backend     - Start backend only"
     Write-Host "  simulator   - Start simulator only"
@@ -128,7 +130,9 @@ function Show-Usage {
     Write-Host "Examples:" -ForegroundColor Cyan
     Write-Host "  .\dev.ps1 token        # Set GitHub token (needed before 'full' or 'simulator')"
     Write-Host "  .\dev.ps1 dev          # Quick start for development"
+    Write-Host "  .\dev.ps1 dev-rebuild  # Rebuild frontend/backend images, then start dev services"
     Write-Host "  .\dev.ps1 full         # Start everything including simulator"
+    Write-Host "  .\dev.ps1 full-rebuild # Rebuild all images, then start full stack"
     Write-Host ""
     Write-Host "If you get an execution policy error, run this once:" -ForegroundColor Red
     Write-Host ""
@@ -151,8 +155,27 @@ switch ($Command) {
         Write-Host " Starting full stack (frontend + backend + simulator)..." -ForegroundColor Green
         docker-compose up
     }
+    "full-rebuild" {
+        if (-not (Test-Token)) {
+            Write-Host ""
+            $response = Read-Host "Continue without token? The simulator will fail to build. (y/N)"
+            if ($response -notmatch "^[Yy]$") {
+                exit 1
+            }
+        }
+        Write-Host " Rebuilding and starting full stack (frontend + backend + simulator)..." -ForegroundColor Green
+        docker-compose down
+        docker-compose build
+        docker-compose up
+    }
     "dev" {
         Write-Host " Starting development services (frontend + backend only)..." -ForegroundColor Green
+        docker-compose -f docker-compose.dev.yaml up
+    }
+    "dev-rebuild" {
+        Write-Host " Rebuilding and starting development services (frontend + backend only)..." -ForegroundColor Green
+        docker-compose -f docker-compose.dev.yaml down
+        docker-compose -f docker-compose.dev.yaml build frontend backend
         docker-compose -f docker-compose.dev.yaml up
     }
     "frontend" {
