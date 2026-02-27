@@ -84,9 +84,11 @@ The simulator (`drv-unreal`) requires a GitHub Personal Access Token to build. I
 
 # Development mode (frontend + backend only)
 .\dev.ps1 dev
+.\dev.ps1 dev-rebuild
 
 # Full stack (includes simulator)
 .\dev.ps1 full
+.\dev.ps1 full-rebuild
 
 # View logs
 .\dev.ps1 logs
@@ -94,6 +96,9 @@ The simulator (`drv-unreal`) requires a GitHub Personal Access Token to build. I
 # Stop services
 .\dev.ps1 stop
 ```
+
+`dev-rebuild` rebuilds frontend/backend images before starting dev mode.  
+`full-rebuild` rebuilds all images (including simulator) before starting full mode.
 
 Run `./dev.sh help` or `.\dev.ps1 help` to see all available commands.
 
@@ -366,7 +371,30 @@ WIND_SERVICE_PORT=5001
 # Storage Emulator Host (kept in root .env as FAKE_GCS_PORT/host; defaults to localhost:4443)
 STORAGE_EMULATOR_HOST=${BACKEND_HOST:-localhost}:${FAKE_GCS_PORT:-4443}
 
+# Optional: when true, backend loads a local debug settings.json override before writing AirSim settings
+JSON_DEBUG_MODE=false
+
 ```
+
+### JSON Debug Mode (settings override)
+
+Note that this doesn't work when using SIMULATOR_TYPE=mock
+
+Use this when you want to bypass generated task settings and quickly test with a hand-crafted `settings.json`.
+
+1. In `backend/.env`, set:
+   ```sh
+   JSON_DEBUG_MODE=true
+   ```
+2. Create a debug `settings.json` in one of these locations:
+   - Recommended for local (non-Docker): `<repo>/settings.json`
+   - Recommended for Docker backend: `<repo>/backend/settings.json` (the backend container mounts `./backend` as `/app`)
+3. Submit a task from the frontend as usual.
+
+Behavior:
+- If `JSON_DEBUG_MODE=true` and a debug `settings.json` is found, backend uses that file as the settings payload.
+- If `JSON_DEBUG_MODE=true` but no debug `settings.json` exists, backend falls back to normal generated settings.
+- Default is `false`, so normal settings generation is unchanged unless you opt in.
 
 The contents of `./frontend/.env` should include the following variables:
 

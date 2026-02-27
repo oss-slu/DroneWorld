@@ -9,12 +9,17 @@ from datetime import datetime
 from queue import Queue
 from time import sleep
 
+from dotenv import load_dotenv
 from msgpackrpc.error import TransportError
 from numpy import random
 
 from PythonClient import airsim
 from PythonClient.multirotor.socket.stream_manager import StreamManager
 from PythonClient.multirotor.util.geo.geo_util import GeoUtil
+
+BACKEND_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+PROJECT_ROOT = os.path.abspath(os.path.join(BACKEND_ROOT, ".."))
+load_dotenv(dotenv_path=os.path.join(BACKEND_ROOT, ".env"), override=False)
 
 
 def str_to_number(s):
@@ -166,7 +171,20 @@ class SimulationTaskManager:
             if "UseGeo" in raw_request_json["environment"] and raw_request_json["environment"]["UseGeo"]:
                 origin_latitude_ = raw_request_json["environment"]["Origin"]["Latitude"]
                 origin_longitude_ = raw_request_json["environment"]["Origin"]["Longitude"]
+                origin_payload = raw_request_json["environment"].get("Origin", {})
+                backup_altitude = 170.0
+                requested_altitude = origin_payload.get("Altitude", origin_payload.get("Height", None))
+                try:
+                    requested_altitude = float(requested_altitude)
+                except (TypeError, ValueError):
+                    requested_altitude = backup_altitude
+                if not math.isfinite(requested_altitude):
+                    requested_altitude = backup_altitude
                 origin_height_ = GeoUtil.get_elevation(origin_latitude_, origin_longitude_)
+                if origin_height_ is None:
+                    # Fallback to the client-provided altitude if elevation API is unavailable.
+                    origin_height_ = requested_altitude
+                    print("Warning, elevation lookup failed; using payload altitude:", origin_height_)
                 cesium_origin = [origin_latitude_, origin_longitude_, origin_height_]
                 new_setting_dot_json["OriginGeopoint"] = {
                     "Latitude": origin_latitude_,
@@ -178,7 +196,10 @@ class SimulationTaskManager:
                     single_drone_setting_copy, cesium_origin)
             else:
                 drone_name, drone_x, drone_y, drone_z = self.__handle_mission_settings(single_drone_setting_copy)
-
+            
+            # Frontend-only field; do not emit into AirSim settings.json vehicle blocks.
+            single_drone_setting_copy.pop("MissionValue", None)
+            
             diff_dict = self.__find_diff(single_drone_setting_copy, self.__DEFAULT_DRONE_FULL_LENGTH)
 
             if "Sensors" in single_drone_setting:
@@ -234,7 +255,10 @@ class SimulationTaskManager:
                     new_setting_dot_json['Wind'] = raw_request_json['environment']['Wind']
 
     def __populate_monitor_list(self, raw_request_json):
-        monitors = raw_request_json['monitors']
+        monitors = raw_request_json.get('monitors', {})
+        if not isinstance(monitors, dict):
+            print("Warning: monitors payload is not a dict, skipping monitor setup")
+            monitors = {}
         monitor_name_param_list = []
         for monitor, param in monitors.items():
             monitor_name_param_list.append((monitor, param['param']))
@@ -288,9 +312,36 @@ class SimulationTaskManager:
 
     @staticmethod
     def __save_settings_dot_json(new_setting_dot_json):
-        with open(os.path.join(os.path.expanduser('~'), "Documents", "AirSim") + os.sep + 'settings.json',
-                  'w') as outfile:
-            json.dump(new_setting_dot_json, outfile, indent=4)
+        debug_settings_candidates = [
+            os.path.join(PROJECT_ROOT, "settings.json"),
+            os.path.join(BACKEND_ROOT, "settings.json"),
+        ]
+        output_path = os.path.join(
+            os.path.expanduser("~"),
+            "Documents",
+            "AirSim",
+            "settings.json"
+        )
+
+        json_debug_mode = os.getenv("JSON_DEBUG_MODE", "false").strip().lower() == "true"
+
+        if json_debug_mode:
+            debug_settings_path = next((p for p in debug_settings_candidates if os.path.exists(p)), None)
+            if debug_settings_path:
+                with open(debug_settings_path, "r") as f:
+                    new_setting_dot_json = json.load(f)
+                print(f"[OK] JSON_DEBUG_MODE=true, using {debug_settings_path}")
+            else:
+                print(
+                    "[WARN] JSON_DEBUG_MODE=true but settings.json was not found in: "
+                    + ", ".join(debug_settings_candidates)
+                )
+
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        with open(output_path, "w") as f:
+            json.dump(new_setting_dot_json, f, indent=4)
+
+        print(f"[OK] settings.json written to {output_path}")
 
     @staticmethod
     def __save_cesium_dot_json(cesium_setting):

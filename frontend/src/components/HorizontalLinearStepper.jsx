@@ -111,7 +111,7 @@ export default function HorizontalLinearStepper(data) {
   function getDronesForPayload(mainJson) {
     return Array.isArray(mainJson?.Drones)
       ? mainJson.Drones.map((d) => {
-          const { id, droneName, Sensors, ...rest } = d || {};
+          const { id, droneName, Sensors, Mission, MissionValue, ...rest } = d || {};
           const sanitizedSensors = Sensors
             ? {
                 ...Sensors,
@@ -129,7 +129,19 @@ export default function HorizontalLinearStepper(data) {
                   : undefined,
               }
             : undefined;
-          return { ...rest, Sensors: sanitizedSensors };
+          const missionName = Mission?.name ?? MissionValue ?? 'fly_to_points';
+          const missionParam = Array.isArray(Mission?.param) ? Mission.param : [];
+          const sanitizedMissionValue = MissionValue ?? missionName;
+
+          return {
+            ...rest,
+            MissionValue: sanitizedMissionValue,
+            Mission: {
+              name: missionName,
+              param: missionParam,
+            },
+            Sensors: sanitizedSensors,
+          };
         })
       : [];
   }
@@ -143,12 +155,15 @@ export default function HorizontalLinearStepper(data) {
     const origin = env.Origin || {};
     const lat = origin.Latitude ?? origin.latitude;
     const lon = origin.Longitude ?? origin.longitude;
+    const height = origin.Height ?? origin.height ?? 203;
+    //const altitude = origin.Altitude ?? origin.altitude;
 
     const environmentToSend = {
       UseGeo: useGeo,
       Origin: {
         Latitude: lat,
         Longitude: lon,
+        Altitude: height,
       },
     };
 
