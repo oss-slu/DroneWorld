@@ -378,6 +378,8 @@ JSON_DEBUG_MODE=false
 
 ### JSON Debug Mode (settings override)
 
+Note that this doesn't work when using SIMULATOR_TYPE=mock
+
 Use this when you want to bypass generated task settings and quickly test with a hand-crafted `settings.json`.
 
 1. In `backend/.env`, set:
