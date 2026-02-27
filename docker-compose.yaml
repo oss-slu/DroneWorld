@@ -11,7 +11,7 @@ services:
     volumes:
       - ./backend:/app  # Mount backend code
       - ./credentials:/app/credentials  # Mount credentials folder
-      - ${USERPROFILE}/Documents/AirSim:/root/Documents/AirSim  
+      - ${USERPROFILE:-$HOME}/Documents/AirSim:/root/Documents/AirSim
     env_file:
       - ./backend/.env  # Load environment variables from .env file
     environment:
@@ -78,7 +78,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:ro  # X11 display support
       - drv-data:/app/data  # Persistent data for simulation results
       - type: bind
-        source: ${USERPROFILE}/Documents/AirSim
+        source: ${USERPROFILE:-$HOME}/Documents/AirSim
         target: /home/myuser/Documents/AirSim
         read_only: true
     # Uncomment below for GPU access (requires nvidia-docker2)

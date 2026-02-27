@@ -2,12 +2,14 @@ const { defineConfig } = require('cypress');
 const fs = require('fs');
 const path = require('path');
 
+require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
+
 const frontendHost = process.env.FRONTEND_HOST || process.env.REACT_APP_FRONTEND_HOST || 'localhost';
 const frontendPort = process.env.FRONTEND_PORT || process.env.REACT_APP_FRONTEND_PORT || '3000';
 
 const backendHost = process.env.BACKEND_HOST || process.env.REACT_APP_BACKEND_HOST || 'localhost';
 const backendPort = process.env.BACKEND_PORT || process.env.REACT_APP_BACKEND_PORT || '5000';
-const backendUrl = process.env.REACT_APP_BACKEND_URL || `http://${backendHost}:${backendPort}`;
+const backendUrl = `http://${backendHost}:${backendPort}`;
 
 module.exports = defineConfig({
   e2e: {
