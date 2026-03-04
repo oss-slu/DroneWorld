@@ -141,23 +141,6 @@ export default function LandingPage() {
 
   return (
     <div className={classes.landingPage}>
-      <nav className={classes.nav}>
-        <Link to='/' className={classes.siteTitle}></Link>
-        <ul className={classes.navList}>
-          <li className={classes.navListItem}>
-            <Box component='span' onClick={handleAccordionToggle}></Box>
-
-            <Box component='span'>
-              <Button
-                className={classes.aboutLink}
-                onClick={() => setOpen(true)}
-                style={{ color: '#fff' }}
-              ></Button>
-            </Box>
-          </li>
-        </ul>
-      </nav>
-
       <Box
         component="section"
         sx={{
