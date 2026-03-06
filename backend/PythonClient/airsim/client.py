@@ -2,6 +2,7 @@ from .utils import *
 from .types import *
 import msgpackrpc  # install as admin: pip install rpc-msgpack
 import logging
+import sys
 
 
 class VehicleClient:
@@ -126,6 +127,10 @@ class VehicleClient:
             bool: If the simulation is paused
         """
         return self.client.call("simIsPaused")
+
+    # Compatibility alias for callers that use the natural past participle form.
+    def simIsPaused(self):
+        return self.simIsPause()
 
     def simContinueForTime(self, seconds):
         """
@@ -1380,6 +1385,20 @@ class VehicleClient:
             GpsData:
         """
         return GpsData.from_msgpack(self.client.call('getGpsData', gps_name, vehicle_name))
+
+    def getTripStats(self, vehicle_name=''):
+        """
+        Returns trip statistics for the vehicle.
+
+        Kept for backward compatibility with clients that used the Microsoft AirSim
+        Python API helper. If the RPC endpoint is unavailable, this returns a default
+        `TripStats` instance instead of raising.
+        """
+        try:
+            return TripStats.from_msgpack(self.client.call('getTripStats', vehicle_name))
+        except Exception as exc:
+            logging.warning("getTripStats RPC is unavailable (%s); returning default TripStats.", exc)
+            return TripStats()
 
     def getDistanceSensorData(self, distance_sensor_name='', vehicle_name=''):
         """

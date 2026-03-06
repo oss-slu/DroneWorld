@@ -56,13 +56,15 @@ class _ImageType(type):
 
 
     def __getattr__(self, key):
-        if key == 'DepthPlanar':
-            print('\033[31m'+"DepthPlanar has been (correctly) renamed to DepthPlanar. Please use ImageType.DepthPlanar instead."+'\033[0m')
-            raise AttributeError
+        if key == 'DepthPlanner':
+            print('\033[31m'+"DepthPlanner is deprecated. Please use ImageType.DepthPlanar instead."+'\033[0m')
+            return self.DepthPlanar
+        raise AttributeError(f"type object 'ImageType' has no attribute '{key}'")
 
 class ImageType(metaclass=_ImageType):
     Scene = 0
     DepthPlanar = 1
+    DepthPlanner = DepthPlanar
     DepthPerspective = 2
     DepthVis = 3
     DisparityNormalized = 4
@@ -85,6 +87,7 @@ class LandedState:
 class WeatherParameter:
     Rain = 0
     Roadwetness = 1
+    RoadWetness = Roadwetness
     Snow = 2
     RoadSnow = 3
     MapleLeaf = 4
@@ -434,6 +437,18 @@ class MultirotorState(MsgpackMixin):
     ready = False
     ready_message = ""
     can_arm = False
+
+
+class TripStats(MsgpackMixin):
+    # Keep compatibility with projects that still use VehicleClient.getTripStats().
+    state_of_charge = 100.0
+    voltage = 0.0
+    current = 0.0
+    energy_consumed = 0.0
+    distance_traveled = 0.0
+    flight_time = 0.0
+    collision_count = 0
+
 
 class RotorStates(MsgpackMixin):
     timestamp = np.uint64(0)
