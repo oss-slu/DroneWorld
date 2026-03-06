@@ -12,7 +12,7 @@ class SettingGenerator:
         self.min_separation_dist = min_separation_dist
         spawn_radius = math.ceil(drone_number ** 0.5)
         print("spawn_radius ", spawn_radius)
-        settings_template = {"SettingsVersion": 1.2, "SimMode": "Multirotor"}
+        settings_template = {"SettingsVersion": 2.0, "SimMode": "Multirotor"}
         one_drone_template = {"Drone1": {"VehicleType": "SimpleFlight", "X": 0, "Y": 0, "Z": 0}}
 
         break_flag = False

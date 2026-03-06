@@ -337,6 +337,9 @@ class SimulationTaskManager:
                     + ", ".join(debug_settings_candidates)
                 )
 
+        # Always emit Cosys-AirSim settings with the expected schema version.
+        new_setting_dot_json["SettingsVersion"] = 2.0
+
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         with open(output_path, "w") as f:
             json.dump(new_setting_dot_json, f, indent=4)
@@ -491,7 +494,7 @@ class SimulationTaskManager:
 
     @staticmethod
     def __create_default_empty_settings_dot_json():
-        return dict(SettingsVersion=1.2, SimMode="Multirotor", ViewMode="SpringArmChase", Vehicles={})
+        return dict(SettingsVersion=2.0, SimMode="Multirotor", ViewMode="SpringArmChase", Vehicles={})
 
     @staticmethod
     def __to_pascal_case(string):
@@ -577,11 +580,14 @@ class SimulationTaskManager:
         """
         Initialize json files if do not exist
         """
-        file_path = os.path.join(os.path.expanduser('~'), "Documents", "AirSim") + os.sep + 'settings.json'
+        airsim_dir = os.path.join(os.path.expanduser('~'), "Documents", "AirSim")
+        os.makedirs(airsim_dir, exist_ok=True)
+
+        file_path = os.path.join(airsim_dir, 'settings.json')
         if not os.path.exists(file_path):
             open(file_path, 'w').close()
             default_settings = {
-                "SettingsVersion": 1.2,
+                "SettingsVersion": 2.0,
                 "SimMode": "Multirotor",
                 "Vehicles": {
                     "Drone1": {
@@ -595,7 +601,7 @@ class SimulationTaskManager:
             with open(file_path, 'w') as outfile:
                 json.dump(default_settings, outfile, indent=4)
 
-        file_path = os.path.join(os.path.expanduser('~'), "Documents", "AirSim") + os.sep + 'cesium.json'
+        file_path = os.path.join(airsim_dir, 'cesium.json')
         if not os.path.exists(file_path):
             open(file_path, 'w').close()
             default_settings = {
@@ -605,6 +611,12 @@ class SimulationTaskManager:
             }
             with open(file_path, 'w') as outfile:
                 json.dump(default_settings, outfile, indent=4)
+
+        file_path = os.path.join(airsim_dir, 'materials.csv')
+        if not os.path.exists(file_path):
+            # Cosys-AirSim looks for this file during stencil annotation initialization.
+            with open(file_path, 'w') as outfile:
+                outfile.write("")
 
     def get_current_task_batch(self):
         return self.__current_task_batch

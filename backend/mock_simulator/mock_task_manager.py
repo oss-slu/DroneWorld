@@ -13,6 +13,14 @@ class MockTaskManager:
         self.state = True
         self.unreal_state = {"state": "idle (mock)"}
         self.__user_directory = os.path.join(os.path.expanduser('~'), "Documents", "AirSim")
+        self.__ensure_airsim_files()
+
+    def __ensure_airsim_files(self):
+        os.makedirs(self.__user_directory, exist_ok=True)
+        materials_path = os.path.join(self.__user_directory, "materials.csv")
+        if not os.path.exists(materials_path):
+            with open(materials_path, "w") as f:
+                f.write("")
 
     def createFakeReport(self, uuid):
             print("uploading report")
