@@ -194,17 +194,16 @@ class GeoUtil:
         api_key = os.getenv('GOOGLE_MAPS_API_KEY', 'google maps api key')
         url = f"https://maps.googleapis.com/maps/api/elevation/json?locations={lat}%2C{lng}&key={api_key}"
         response = requests.get(url).json()
-        
-        # Check if the request was successful
-        if response.get('status') != 'OK':
-            print(f"Error from API: {response.get('status')}")
-            print(f"API Response: {response}")
+
+        # Check if the request was successful without logging sensitive payloads.
+        status = response.get("status")
+        if status != "OK":
+            print(f"Error from elevation API (status={status})")
             return None
 
         # Check if 'results' is in the response and not empty
         if 'results' in response and response['results']:
             return response['results'][0]['elevation']
         else:
-            print(f"No elevation data found for location: {lat}, {lng}")
-            print(f"API Response: {response}")
+            print("No elevation data found from elevation API.")
             return None
