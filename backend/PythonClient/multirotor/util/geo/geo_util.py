@@ -195,10 +195,9 @@ class GeoUtil:
         url = f"https://maps.googleapis.com/maps/api/elevation/json?locations={lat}%2C{lng}&key={api_key}"
         response = requests.get(url).json()
 
-        # Check if the request was successful without logging sensitive payloads.
-        status = response.get("status")
-        if status != "OK":
-            print(f"Error from elevation API (status={status})")
+        # Check if the request was successful without logging response fields.
+        if response.get("status") != "OK":
+            print("Error from elevation API.")
             return None
 
         # Check if 'results' is in the response and not empty
