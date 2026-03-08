@@ -283,7 +283,7 @@ class SimulationTaskManager:
             monitors = {}
         monitor_name_param_list = []
         allow_battery_monitor = (
-            os.getenv("ENABLE_BATTERY_MONITOR", "false").strip().lower() == "true"
+            os.getenv("ENABLE_BATTERY_MONITOR", "true").strip().lower() == "true"
         )
         for monitor, config in monitors.items():
             if not isinstance(config, dict):
@@ -298,7 +298,7 @@ class SimulationTaskManager:
 
             if monitor == "battery_monitor" and not allow_battery_monitor:
                 print(
-                    "[INFO] battery_monitor is disabled by default. Set ENABLE_BATTERY_MONITOR=true to enable it."
+                    "[INFO] battery_monitor disabled via ENABLE_BATTERY_MONITOR=false."
                 )
                 continue
 
