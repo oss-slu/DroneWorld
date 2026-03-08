@@ -2,6 +2,7 @@
 import time
 
 from PythonClient import airsim
+from PythonClient.multirotor.client_factory import create_multirotor_client
 from PythonClient.multirotor.wind_control.openfoam_csv_reader import FoamCSVReader
 from PythonClient.multirotor.wind_control.openfoam_data_reader import FoamReader
 
@@ -17,7 +18,7 @@ class AirSimWindController:
         :param reader: str, "csv" or "foam", "csv" reads the data from csv files,
         "foam" reads from the openfoam data directly, abandoned, too slow.
         """
-        self.client = airsim.MultirotorClient()
+        self.client = create_multirotor_client()
         self.client.confirmConnection()
         foam_data_root = openfoam_data_root
         if foam_data_root is not None:

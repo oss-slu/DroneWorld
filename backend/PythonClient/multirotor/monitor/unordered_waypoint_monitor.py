@@ -18,8 +18,15 @@ class UnorderedWaypointMonitor(SingleDroneMissionMonitor):
         self.stop()
 
     def init_dict(self):
+        self.point_dict.clear()
         for p in self.mission.points:
-            self.point_dict[p] = False
+            self.point_dict[self.__point_key(p)] = False
+
+    @staticmethod
+    def __point_key(point):
+        if isinstance(point, (list, tuple)):
+            return tuple(point)
+        return point
 
     def update_dict(self):
         dt = 0.1
@@ -28,9 +35,14 @@ class UnorderedWaypointMonitor(SingleDroneMissionMonitor):
                 vehicle_name=self.target_drone).kinematics_estimated.position
             cur = (position.x_val, position.y_val, position.z_val)
             for p in self.mission.points:
-                if (self.get_distance_btw_points(cur, p)) <= self.deviation_threshold and not self.point_dict[p]:
-                    self.append_info_to_log(f"{self.target_drone};reached {p} within {self.deviation_threshold} meters")
-                    self.point_dict[p] = True
+                key = self.__point_key(p)
+                if (
+                    self.get_distance_btw_points(cur, p)
+                ) <= self.deviation_threshold and not self.point_dict[key]:
+                    self.append_info_to_log(
+                        f"{self.target_drone};reached {p} within {self.deviation_threshold} meters"
+                    )
+                    self.point_dict[key] = True
             sleep(dt)
 
     def stop(self):

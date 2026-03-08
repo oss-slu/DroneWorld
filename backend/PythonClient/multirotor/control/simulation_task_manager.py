@@ -7,13 +7,16 @@ import threading
 import traceback
 from datetime import datetime
 from queue import Queue
-from time import sleep
+from time import monotonic, sleep
 
 from dotenv import load_dotenv
-from msgpackrpc.error import TransportError
+from msgpackrpc.error import TimeoutError, TransportError
 from numpy import random
 
-from PythonClient import airsim
+from PythonClient.multirotor.client_factory import (
+    create_multirotor_client,
+    get_rpc_target,
+)
 from PythonClient.multirotor.socket.stream_manager import StreamManager
 from PythonClient.multirotor.util.geo.geo_util import GeoUtil
 
@@ -89,6 +92,9 @@ class SimulationTaskManager:
 
     def __update_settings(self, raw_request_json):
         self.unreal_off()
+        # Always rebuild these from scratch for each task update.
+        self.__drone_mission_pair_list.clear()
+        self.__monitor_list.clear()
         new_setting_dot_json = copy.deepcopy(self.__DEFAULT_EMPTY_SETTINGS_DOT_JSON)
         self.__handle_streaming_settings(raw_request_json)
         self.__populate_drone_and_mission_settings(new_setting_dot_json, raw_request_json)
@@ -112,47 +118,63 @@ class SimulationTaskManager:
             # hardcoded for user study
             for i in [0, 7, 14]:
                 x, y, z = self.__set_fuzzy_wind_vector(i)
-                setting_copy['environment']['Wind']['X'] = x
-                setting_copy['environment']['Wind']['Y'] = y
-                setting_copy['environment']['Wind']['Z'] = z
-                self.__report_subdir_string = current_queue_top[1] + os.sep + f"Fuzzy_Wind_{i}"
-                self.__update_settings(setting_copy)
+                setting_copy["environment"]["Wind"]["X"] = x
+                setting_copy["environment"]["Wind"]["Y"] = y
+                setting_copy["environment"]["Wind"]["Z"] = z
+                self.__report_subdir_string = (
+                    current_queue_top[1] + os.sep + f"Fuzzy_Wind_{i}"
+                )
                 try:
-                    self.__batch_exe_all(self.__drone_mission_pair_list, self.__monitor_list, fuzzy_test_dict)
+                    self.__update_settings(setting_copy)
+                    self.__batch_exe_all(
+                        self.__drone_mission_pair_list,
+                        self.__monitor_list,
+                        fuzzy_test_dict,
+                    )
                 except TransportError:
                     print("DroneWorld not running")
                     return
-                self.__drone_mission_pair_list.clear()
-                self.__monitor_list.clear()
+                finally:
+                    self.__drone_mission_pair_list.clear()
+                    self.__monitor_list.clear()
         elif fuzzy_test_dict["target"] == "Speed":
             for i in range(1, self.__FUZZY_TEST_MAX_SPEED, precision):
                 fuzzy_test_dict["value"] = i
-                self.__report_subdir_string = current_queue_top[1] + os.sep + f"Fuzzy_Speed_{i}"
-                self.__update_settings(setting_copy)
+                self.__report_subdir_string = (
+                    current_queue_top[1] + os.sep + f"Fuzzy_Speed_{i}"
+                )
                 try:
-                    self.__batch_exe_all(self.__drone_mission_pair_list, self.__monitor_list, fuzzy_test_dict)
+                    self.__update_settings(setting_copy)
+                    self.__batch_exe_all(
+                        self.__drone_mission_pair_list,
+                        self.__monitor_list,
+                        fuzzy_test_dict,
+                    )
                 except TransportError:
                     print("DroneWorld not running")
                     return
-                self.__drone_mission_pair_list.clear()
-                self.__monitor_list.clear()
+                finally:
+                    self.__drone_mission_pair_list.clear()
+                    self.__monitor_list.clear()
         else:
             print("Fuzzy test target not recognized")
         self.batch_number += 1
 
     def __run_regular_batch(self, current_queue_top):
-        self.__update_settings(current_queue_top[0])
-        print("next up: ", self.__drone_mission_pair_list, self.__monitor_list)
-        self.__report_subdir_string = current_queue_top[1]
-
         try:
-            self.__batch_exe_all(self.__drone_mission_pair_list, self.__monitor_list, False)
+            self.__update_settings(current_queue_top[0])
+            print("next up: ", self.__drone_mission_pair_list, self.__monitor_list)
+            self.__report_subdir_string = current_queue_top[1]
+            self.__batch_exe_all(
+                self.__drone_mission_pair_list, self.__monitor_list, False
+            )
+            self.batch_number += 1
         except TransportError:
             print("DroneWorld not running")
             return
-        self.batch_number += 1
-        self.__drone_mission_pair_list.clear()
-        self.__monitor_list.clear()
+        finally:
+            self.__drone_mission_pair_list.clear()
+            self.__monitor_list.clear()
 
     # uuid: %Y-%m-%d-%H-%M-%S
     def add_task(self, raw_request_json, uuid):
@@ -260,8 +282,33 @@ class SimulationTaskManager:
             print("Warning: monitors payload is not a dict, skipping monitor setup")
             monitors = {}
         monitor_name_param_list = []
-        for monitor, param in monitors.items():
-            monitor_name_param_list.append((monitor, param['param']))
+        allow_battery_monitor = (
+            os.getenv("ENABLE_BATTERY_MONITOR", "false").strip().lower() == "true"
+        )
+        for monitor, config in monitors.items():
+            if not isinstance(config, dict):
+                print(f"Warning: monitor '{monitor}' config is not a dict, skipping")
+                continue
+
+            is_enabled = config.get("enable", True)
+            if isinstance(is_enabled, str):
+                is_enabled = is_enabled.strip().lower() == "true"
+            if not bool(is_enabled):
+                continue
+
+            if monitor == "battery_monitor" and not allow_battery_monitor:
+                print(
+                    "[INFO] battery_monitor is disabled by default. Set ENABLE_BATTERY_MONITOR=true to enable it."
+                )
+                continue
+
+            params = config.get("param", [])
+            if params is None:
+                params = []
+            if not isinstance(params, list):
+                params = [params]
+
+            monitor_name_param_list.append((monitor, params))
         self.__monitor_list = monitor_name_param_list
 
     @staticmethod
@@ -378,7 +425,8 @@ class SimulationTaskManager:
         :param fuzzy_test_info: Dict of fuzzy test info, None otherwise
         :return: None
         """
-        airsim.MultirotorClient().reset()  # reset scene before each task
+        rpc_client = self.__wait_for_airsim_rpc()
+        rpc_client.reset()  # reset scene before each task
         mission_threads = []
         monitor_threads = []
         for drone_mission_pair in drone_mission_pair_list:
@@ -419,6 +467,46 @@ class SimulationTaskManager:
         print("All processes finished, server return to idle state")
         mission_threads.clear()
         monitor_threads.clear()
+
+    @staticmethod
+    def __get_rpc_wait_seconds():
+        raw_timeout = os.getenv("DRV_RPC_READY_TIMEOUT_SEC", "45")
+        raw_interval = os.getenv("DRV_RPC_READY_POLL_SEC", "1")
+        try:
+            timeout_sec = float(raw_timeout)
+        except (TypeError, ValueError):
+            timeout_sec = 45.0
+        try:
+            interval_sec = float(raw_interval)
+        except (TypeError, ValueError):
+            interval_sec = 1.0
+        return max(timeout_sec, 1.0), max(interval_sec, 0.1)
+
+    def __wait_for_airsim_rpc(self):
+        timeout_sec, interval_sec = self.__get_rpc_wait_seconds()
+        host, port = get_rpc_target()
+        deadline = monotonic() + timeout_sec
+        attempt = 0
+        last_error = None
+
+        while monotonic() < deadline:
+            attempt += 1
+            try:
+                client = create_multirotor_client(timeout_value=5)
+                if client.ping():
+                    print(
+                        f"[AirSim RPC ready] host={host} port={port} attempt={attempt}"
+                    )
+                    return client
+            except (TransportError, TimeoutError, OSError) as exc:
+                last_error = exc
+            except Exception as exc:  # Defensive catch so the retry loop survives API changes.
+                last_error = exc
+            sleep(interval_sec)
+
+        raise TransportError(
+            f"AirSim RPC not ready at {host}:{port} after {timeout_sec:.0f}s; last_error={last_error}"
+        )
 
     def __create_mission_thread(self, drone_mission_pair):
         """
@@ -494,7 +582,16 @@ class SimulationTaskManager:
 
     @staticmethod
     def __create_default_empty_settings_dot_json():
-        return dict(SettingsVersion=2.0, SimMode="Multirotor", ViewMode="SpringArmChase", Vehicles={})
+        _, rpc_port = get_rpc_target()
+        return dict(
+            SettingsVersion=2.0,
+            SimMode="Multirotor",
+            ViewMode="SpringArmChase",
+            EnableRpc=True,
+            ApiServerPort=rpc_port,
+            LocalHostIp="0.0.0.0",
+            Vehicles={},
+        )
 
     @staticmethod
     def __to_pascal_case(string):
@@ -583,12 +680,24 @@ class SimulationTaskManager:
         airsim_dir = os.path.join(os.path.expanduser('~'), "Documents", "AirSim")
         os.makedirs(airsim_dir, exist_ok=True)
 
-        file_path = os.path.join(airsim_dir, 'settings.json')
-        if not os.path.exists(file_path):
-            open(file_path, 'w').close()
+        file_path = os.path.join(airsim_dir, "settings.json")
+        should_seed_settings = not os.path.exists(file_path)
+        if not should_seed_settings:
+            try:
+                with open(file_path, "r") as infile:
+                    current_settings = json.load(infile)
+                should_seed_settings = not isinstance(current_settings, dict)
+            except (json.JSONDecodeError, OSError):
+                should_seed_settings = True
+
+        if should_seed_settings:
+            _, rpc_port = get_rpc_target()
             default_settings = {
                 "SettingsVersion": 2.0,
                 "SimMode": "Multirotor",
+                "EnableRpc": True,
+                "ApiServerPort": rpc_port,
+                "LocalHostIp": "0.0.0.0",
                 "Vehicles": {
                     "Drone1": {
                         "FlightController": "SimpleFlight",
@@ -600,6 +709,7 @@ class SimulationTaskManager:
             }
             with open(file_path, 'w') as outfile:
                 json.dump(default_settings, outfile, indent=4)
+            print(f"[OK] Seeded valid settings.json at {file_path}")
 
         file_path = os.path.join(airsim_dir, 'cesium.json')
         if not os.path.exists(file_path):

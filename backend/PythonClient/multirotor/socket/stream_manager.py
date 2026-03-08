@@ -1,4 +1,4 @@
-import PythonClient.airsim as airsim
+from PythonClient.multirotor.client_factory import create_multirotor_client
 from PythonClient.multirotor.socket.mission_streamer import MissionStreamer
 
 
@@ -8,7 +8,7 @@ class StreamManager:
     """
 
     def __init__(self):
-        self.client = airsim.MultirotorClient()
+        self.client = create_multirotor_client()
         self.streamers = []
 
     def get_stream(self, drone_name, camera_name):

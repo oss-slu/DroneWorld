@@ -6,9 +6,14 @@ import sys
 
 
 class VehicleClient:
+    _trip_stats_warned = False
+
     def __init__(self, ip="", port=41451, timeout_value=3600):
         if ip == "":
             ip = "127.0.0.1"
+        # Tracks which getTripStats RPC signature this server accepts.
+        # Values: unknown, with_vehicle, no_vehicle, unavailable.
+        self._trip_stats_rpc_mode = "unknown"
         self.client = msgpackrpc.Client(
             msgpackrpc.Address(ip, port),
             timeout=timeout_value,
@@ -1394,11 +1399,65 @@ class VehicleClient:
         Python API helper. If the RPC endpoint is unavailable, this returns a default
         `TripStats` instance instead of raising.
         """
-        try:
-            return TripStats.from_msgpack(self.client.call('getTripStats', vehicle_name))
-        except Exception as exc:
-            logging.warning("getTripStats RPC is unavailable (%s); returning default TripStats.", exc)
+        if self._trip_stats_rpc_mode == "with_vehicle":
+            try:
+                return TripStats.from_msgpack(
+                    self.client.call("getTripStats", vehicle_name)
+                )
+            except Exception:
+                self._trip_stats_rpc_mode = "unknown"
+
+        if self._trip_stats_rpc_mode == "no_vehicle":
+            try:
+                return TripStats.from_msgpack(self.client.call("getTripStats"))
+            except Exception:
+                self._trip_stats_rpc_mode = "unknown"
+
+        if self._trip_stats_rpc_mode == "unavailable":
             return TripStats()
+
+        # Discovery path: try with vehicle arg first (if provided), then fallback.
+        if vehicle_name != "":
+            try:
+                trip_stats = TripStats.from_msgpack(
+                    self.client.call("getTripStats", vehicle_name)
+                )
+                self._trip_stats_rpc_mode = "with_vehicle"
+                return trip_stats
+            except Exception:
+                try:
+                    trip_stats = TripStats.from_msgpack(self.client.call("getTripStats"))
+                    self._trip_stats_rpc_mode = "no_vehicle"
+                    return trip_stats
+                except Exception as exc:
+                    self._trip_stats_rpc_mode = "unavailable"
+                    self.__warn_trip_stats_unavailable_once(exc)
+                    return TripStats()
+
+        # No vehicle name provided, attempt no-arg signature first.
+        try:
+            trip_stats = TripStats.from_msgpack(self.client.call("getTripStats"))
+            self._trip_stats_rpc_mode = "no_vehicle"
+            return trip_stats
+        except Exception:
+            try:
+                trip_stats = TripStats.from_msgpack(
+                    self.client.call("getTripStats", "")
+                )
+                self._trip_stats_rpc_mode = "with_vehicle"
+                return trip_stats
+            except Exception as exc:
+                self._trip_stats_rpc_mode = "unavailable"
+                self.__warn_trip_stats_unavailable_once(exc)
+                return TripStats()
+
+    def __warn_trip_stats_unavailable_once(self, exc):
+        if not VehicleClient._trip_stats_warned:
+            logging.warning(
+                "getTripStats RPC is unavailable (%s); returning default TripStats.",
+                exc,
+            )
+            VehicleClient._trip_stats_warned = True
 
     def getDistanceSensorData(self, distance_sensor_name='', vehicle_name=''):
         """
