@@ -1636,7 +1636,7 @@ class VehicleClient:
         if color_rgba is None:
             color_rgba = [1.0, 0.0, 0.0, 1.0]
         self.client.call('simPlotArrows', points_start, points_end, color_rgba, thickness,
-                         arrow_size, duration,  is_persistent)
+                         arrow_size, duration, is_persistent)
 
     def simPlotStrings(self, strings, positions, scale=5, color_rgba=None, duration=-1.0):
         """
@@ -1870,7 +1870,7 @@ class MultirotorClient(VehicleClient, object):
             msgpackrpc.future.Future: A future object. Call .join() to wait for the method to finish.
         """
         return self.client.call_async('moveByVelocityZBodyFrame', vx, vy, z, duration, drivetrain,
-                                      yaw_mode,  vehicle_name)
+                                      yaw_mode, vehicle_name)
 
     def moveByAngleZAsync(self, pitch, roll, z, yaw, duration, vehicle_name=''):
         """
