@@ -374,6 +374,10 @@ STORAGE_EMULATOR_HOST=${BACKEND_HOST:-localhost}:${FAKE_GCS_PORT:-4443}
 # Optional: when true, backend loads a local debug settings.json override before writing AirSim settings
 JSON_DEBUG_MODE=false
 
+# Optional: controls whether backend runs battery_monitor when enabled in frontend payload
+# Default true; set false if your simulator build doesn't expose getTripStats reliably
+ENABLE_BATTERY_MONITOR=true
+
 ```
 
 ### JSON Debug Mode (settings override)
@@ -395,6 +399,14 @@ Behavior:
 - If `JSON_DEBUG_MODE=true` and a debug `settings.json` is found, backend uses that file as the settings payload.
 - If `JSON_DEBUG_MODE=true` but no debug `settings.json` exists, backend falls back to normal generated settings.
 - Default is `false`, so normal settings generation is unchanged unless you opt in.
+
+### Battery Monitor Toggle (`ENABLE_BATTERY_MONITOR`)
+
+- `ENABLE_BATTERY_MONITOR` controls whether backend instantiates `battery_monitor` entries from the frontend monitor payload.
+- Default is `true`.
+- When set to `true`, battery monitors run when enabled in the frontend configuration.
+- Set it to `false` if your simulator build does not support `getTripStats` RPC reliably.
+- Use `false` to avoid repeated battery-monitor warnings/failures on incompatible simulator builds.
 
 The contents of `./frontend/.env` should include the following variables:
 

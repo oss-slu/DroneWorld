@@ -16,13 +16,13 @@ class GenericMission(AirSimApplication):
     def __init__(self, target_drone="Default"):
         self.flight_time_in_seconds = None
         super().__init__()
-        self.target_drone = target_drone
+        self.target_drone = self.resolve_vehicle_name(target_drone)
         self.state = self.State.IDLE
         self.report_dir = os.path.join(os.path.expanduser('~'), "Documents",
                                        "AirSim") + os.sep + datetime.datetime.now().strftime("%Y_%m_%d_%H:%M:%S")
         self.objects = [self.client.simGetObjectPose(i) for i in self.all_drone_names]
         self.states = [self.client.getMultirotorState(i) for i in self.all_drone_names]
-        self.client.enableApiControl(True, vehicle_name=target_drone)
+        self.client.enableApiControl(True, vehicle_name=self.target_drone)
 
     def takeoff(self, drone_name):
         self.client.takeoffAsync(vehicle_name=drone_name).join()
