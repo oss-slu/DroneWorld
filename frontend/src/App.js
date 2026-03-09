@@ -23,8 +23,6 @@ function App() {
             <Route exact path='/simulation' element={<Wizard />} />
             <Route exact path='/dashboard' element={<FuzzyDashboard />} />
             <Route exact path='/reports' element={<ReportDashboard />} />
-            {/* Backwards compatibility for old deep links */}
-            <Route exact path='/report-dashboard' element={<ReportDashboard />} />
             <Route exact path='/' element={<LandingPage />} />
             <Route exact path='/aboutus' element={<AboutUs />} />
             <Route exact path='*' element={<NotFound />} />

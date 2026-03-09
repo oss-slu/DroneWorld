@@ -177,8 +177,7 @@ export default function ReportDashboard() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isReportsPage =
-    location.pathname.includes('/reports') || location.pathname.includes('/report-dashboard');
+  const isReportsPage = location.pathname.includes('/reports');
 
   useEffect(() => {
     const fetchData = async () => {
