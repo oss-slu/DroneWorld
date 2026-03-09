@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
 import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';
-import NotFoundImage from '../Assets/Images/NotFound.svg';
 
 const NotFoundContainer = styled.div`
   height: calc(100vh - 5.3em);
@@ -70,7 +69,7 @@ function NotFound() {
   return (
     <NotFoundContainer>
       <NotFoundImgContainer>
-        <img src={NotFoundImage} alt='' />
+        <img src='/images/NotFound.svg' alt='' />
       </NotFoundImgContainer>
       <NotFoundMessage>
         <NotFoundChild>

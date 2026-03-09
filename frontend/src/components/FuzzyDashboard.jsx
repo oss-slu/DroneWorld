@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Paper from '@mui/material/Paper';
@@ -30,14 +31,27 @@ const style = {
   p: 4,
 };
 
+const EMPTY_REPORT_DATA = {
+  CircularDeviationMonitor: [],
+  CollisionMonitor: [],
+  LandspaceMonitor: [],
+  UnorderedWaypointMonitor: [],
+  OrderedWaypointMonitor: [],
+  PointDeviationMonitor: [],
+  MinSepDistMonitor: [],
+  NoFlyZoneMonitor: [],
+  htmlFiles: [],
+};
+
 export default function FuzzyDashboard() {
   const navigate = useNavigate(); 
   const location = useLocation();
-  const resp = location.state.data
-  const deviation = location.state != null ? location.state.mainJson != null ? location.state.mainJson.monitors != null ?  
-      location.state.mainJson.monitors.circular_deviation_monitor != null ? location.state.mainJson.monitors.circular_deviation_monitor.param[0] : null : null : null : null
-  const horizontal = location.state != null ? location.state.mainJson != null ? location.state.mainJson.monitors != null ?  
-      location.state.mainJson.monitors.min_sep_dist_monitor != null ? location.state.mainJson.monitors.min_sep_dist_monitor.param[0] : null : null : null : null
+  const routeState = location.state ?? null;
+  const hasRouteData = Boolean(routeState?.data);
+  const resp = routeState?.data ?? EMPTY_REPORT_DATA;
+  const mainJsonMonitors = routeState?.mainJson?.monitors ?? {};
+  const deviation = mainJsonMonitors.circular_deviation_monitor?.param?.[0] ?? null;
+  const horizontal = mainJsonMonitors.min_sep_dist_monitor?.param?.[0] ?? null;
   const [CircularDeviationMonitor, setCircularDeviationMonitor] = React.useState([])
   const [CollisionMonitor, setCollisionMonitor] = React.useState([])
   const [LandspaceMonitor, setLandspaceMonitor] = React.useState([])
@@ -48,10 +62,11 @@ export default function FuzzyDashboard() {
   const [NoFlyZoneMonitor, setNoFlyZoneMonitor] = React.useState([])
   const [open, setOpen] = React.useState(false);
   const [selectedImage, setSelectedImage] = React.useState();
-  const violation = location.state.file.fail > 0;
-  const isFuzzyList = location.state.file.fuzzy;
+  const routeFile = routeState?.file ?? {};
+  const violation = (routeFile.fail ?? 0) > 0;
+  const isFuzzyList = Boolean(routeFile.fuzzy);
   const [fuzzyTest, setFuzzyTest] = React.useState([]);
-  const fileName = location.state.file.fileName;
+  const fileName = routeFile.fileName ?? 'Report';
 
   const names = [{name:0},{name:7},{name:14}]
 
@@ -65,6 +80,24 @@ export default function FuzzyDashboard() {
 
   const redirectToReportDashboard = () => {
     navigate('/reports')
+  }
+
+  if (!hasRouteData) {
+    return (
+      <Box sx={{ p: 4 }}>
+        <Paper elevation={3} sx={{ p: 3, maxWidth: 700, margin: '0 auto' }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
+            No Report Selected
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            Open a report from the Reports page to view monitor details.
+          </Typography>
+          <Button variant="contained" onClick={redirectToReportDashboard}>
+            Go to Reports
+          </Button>
+        </Paper>
+      </Box>
+    );
   }
 
   const returnContentsItem = (colorCode, keyValue, info, icon, fuzzyValue, severity_val) => {
@@ -99,7 +132,12 @@ export default function FuzzyDashboard() {
   }
 
   useEffect(() => {
+    if(!hasRouteData) {
+      return;
+    }
+
     if(isFuzzyList) {
+      setFuzzyTest([]);
       names.map(id=> {
         let unordered=[];
         let circular = [];
@@ -175,7 +213,7 @@ export default function FuzzyDashboard() {
       setPointDeviationMonitor(resp.PointDeviationMonitor)
       setUnorderedWaypointMonitor(resp.UnorderedWaypointMonitor)
     }
-  }, [isFuzzyList])
+  }, [hasRouteData, isFuzzyList, resp])
     
   return (
     <div>
