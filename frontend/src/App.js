@@ -5,7 +5,7 @@ import Home from './pages/Home';
 import Wizard from './pages/Wizard';
 import FuzzyDashboard from './components/FuzzyDashboard';
 import ReportDashboard from './components/ReportDashboard';
-import LandingPage from './LandingPage';
+import LandingPage from './pages/LandingPage';
 import AboutUs from './pages/AboutUs';
 import NavigationBar from './pages/NavigationBar';
 import Footer from './pages/Footer';

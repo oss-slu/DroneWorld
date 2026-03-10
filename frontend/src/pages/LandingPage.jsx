@@ -6,8 +6,8 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
-import ReportDashboard from './components/ReportDashboard';
-import Loading from './components/Loading';
+import ReportDashboard from '../components/ReportDashboard';
+import Loading from '../components/Loading';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -18,7 +18,7 @@ import LandscapeIcon from '@mui/icons-material/Landscape';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import GroupWorkIcon from '@mui/icons-material/GroupWork';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
-import { BASE_URL } from './utils/const';
+import { BASE_URL } from '../utils/const';
 
 const useStyles = makeStyles((theme) => ({
   landingPage: {
