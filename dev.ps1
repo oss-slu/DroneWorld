@@ -117,6 +117,8 @@ function Show-Usage {
     Write-Host "  full-rebuild - Rebuild and start full stack (frontend, backend, simulator)"
     Write-Host "  dev         - Start development services only (frontend, backend)"
     Write-Host "  dev-rebuild - Rebuild and start development services (frontend, backend)"
+    Write-Host "  dev-rebuild-frontend - Rebuild frontend image, then start frontend in dev compose"
+    Write-Host "  dev-rebuild-backend - Rebuild backend image, then start backend in dev compose"
     Write-Host "  frontend    - Start frontend only"
     Write-Host "  backend     - Start backend only"
     Write-Host "  simulator   - Start simulator only"
@@ -131,6 +133,8 @@ function Show-Usage {
     Write-Host "  .\dev.ps1 token        # Set GitHub token (needed before 'full' or 'simulator')"
     Write-Host "  .\dev.ps1 dev          # Quick start for development"
     Write-Host "  .\dev.ps1 dev-rebuild  # Rebuild frontend/backend images, then start dev services"
+    Write-Host "  .\dev.ps1 dev-rebuild-frontend # Rebuild only frontend image for faster UI iteration"
+    Write-Host "  .\dev.ps1 dev-rebuild-backend  # Rebuild only backend image for faster API iteration"
     Write-Host "  .\dev.ps1 full         # Start everything including simulator"
     Write-Host "  .\dev.ps1 full-rebuild # Rebuild all images, then start full stack"
     Write-Host ""
@@ -177,6 +181,16 @@ switch ($Command) {
         docker-compose -f docker-compose.dev.yaml down
         docker-compose -f docker-compose.dev.yaml build frontend backend
         docker-compose -f docker-compose.dev.yaml up
+    }
+    "dev-rebuild-frontend" {
+        Write-Host " Rebuilding frontend image and starting frontend in development compose..." -ForegroundColor Green
+        docker-compose -f docker-compose.dev.yaml build frontend
+        docker-compose -f docker-compose.dev.yaml up frontend
+    }
+    "dev-rebuild-backend" {
+        Write-Host " Rebuilding backend image and starting backend in development compose..." -ForegroundColor Green
+        docker-compose -f docker-compose.dev.yaml build backend
+        docker-compose -f docker-compose.dev.yaml up backend
     }
     "frontend" {
         Write-Host "  Starting frontend only..." -ForegroundColor Green

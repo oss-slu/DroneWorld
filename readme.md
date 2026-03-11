@@ -65,9 +65,13 @@ The simulator (`drv-unreal`) requires a GitHub Personal Access Token to build. I
 
 # Development mode (frontend + backend only)
 ./dev.sh dev
+./dev.sh dev-rebuild
+./dev.sh dev-rebuild-frontend
+./dev.sh dev-rebuild-backend
 
 # Full stack (includes simulator)
 ./dev.sh full
+./dev.sh full-rebuild
 
 # View logs
 ./dev.sh logs
@@ -85,6 +89,8 @@ The simulator (`drv-unreal`) requires a GitHub Personal Access Token to build. I
 # Development mode (frontend + backend only)
 .\dev.ps1 dev
 .\dev.ps1 dev-rebuild
+.\dev.ps1 dev-rebuild-frontend
+.\dev.ps1 dev-rebuild-backend
 
 # Full stack (includes simulator)
 .\dev.ps1 full
@@ -98,6 +104,7 @@ The simulator (`drv-unreal`) requires a GitHub Personal Access Token to build. I
 ```
 
 `dev-rebuild` rebuilds frontend/backend images before starting dev mode.  
+`dev-rebuild-frontend` and `dev-rebuild-backend` rebuild only one dev image for faster iteration.  
 `full-rebuild` rebuilds all images (including simulator) before starting full mode.
 
 Run `./dev.sh help` or `.\dev.ps1 help` to see all available commands.
@@ -136,7 +143,7 @@ Run without the simulation engine for faster development:
 .\dev.ps1 dev           # Windows
 
 # Or directly:
-docker-compose -f docker-compose.dev.yml up
+docker-compose -f docker-compose.dev.yaml up
 ```
 
 **Services started (ports come from root `.env`):**
@@ -178,7 +185,7 @@ docker-compose up drv-unreal
 **Using docker-compose directly:**
 
 ```bash
-docker-compose -f docker-compose.dev.yml logs -f frontend backend
+docker-compose -f docker-compose.dev.yaml logs -f frontend backend
 ```
 
 ### Stopping Development Services
@@ -193,7 +200,7 @@ docker-compose -f docker-compose.dev.yml logs -f frontend backend
 **Using docker-compose directly:**
 
 ```bash
-docker-compose -f docker-compose.dev.yml down
+docker-compose -f docker-compose.dev.yaml down
 ```
 
 ### Configuration

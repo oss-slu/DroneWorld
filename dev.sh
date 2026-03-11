@@ -96,7 +96,11 @@ print_usage() {
     echo "Commands:"
     echo "  token       - Set GITHUB_TOKEN for building simulator (required for 'full' and 'simulator')"
     echo "  full        - Start all services (frontend, backend, simulator)"
+    echo "  full-rebuild - Rebuild and start full stack (frontend, backend, simulator)"
     echo "  dev         - Start development services only (frontend, backend)"
+    echo "  dev-rebuild - Rebuild and start development services (frontend, backend)"
+    echo "  dev-rebuild-frontend - Rebuild frontend image, then start frontend in dev compose"
+    echo "  dev-rebuild-backend - Rebuild backend image, then start backend in dev compose"
     echo "  frontend    - Start frontend only"
     echo "  backend     - Start backend only"
     echo "  simulator   - Start simulator only"
@@ -110,7 +114,11 @@ print_usage() {
     echo "Examples:"
     echo "  ./dev.sh token        # Set GitHub token (needed before 'full' or 'simulator')"
     echo "  ./dev.sh dev          # Quick start for development"
+    echo "  ./dev.sh dev-rebuild  # Rebuild frontend/backend images, then start dev services"
+    echo "  ./dev.sh dev-rebuild-frontend # Rebuild only frontend image"
+    echo "  ./dev.sh dev-rebuild-backend  # Rebuild only backend image"
     echo "  ./dev.sh full         # Start everything including simulator"
+    echo "  ./dev.sh full-rebuild # Rebuild all images, then start full stack"
 }
 
 case "$1" in
@@ -129,9 +137,39 @@ case "$1" in
         echo "🚀 Starting full stack (frontend + backend + simulator)..."
         "${DOCKER_COMPOSE[@]}" --profile gcs up
         ;;
+    full-rebuild)
+        if ! check_token; then
+            echo ""
+            read -p "Continue without token? The simulator will fail to build. (y/N): " -n 1 -r
+            echo ""
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                exit 1
+            fi
+        fi
+        echo "🚀 Rebuilding and starting full stack (frontend + backend + simulator)..."
+        "${DOCKER_COMPOSE[@]}" --profile gcs down
+        "${DOCKER_COMPOSE[@]}" --profile gcs build
+        "${DOCKER_COMPOSE[@]}" --profile gcs up
+        ;;
     dev)
         echo "🔧 Starting development services (frontend + backend only)..."
         "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml up
+        ;;
+    dev-rebuild)
+        echo "🔧 Rebuilding and starting development services (frontend + backend only)..."
+        "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml down
+        "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml build frontend backend
+        "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml up
+        ;;
+    dev-rebuild-frontend)
+        echo "⚛️  Rebuilding frontend image and starting frontend in development compose..."
+        "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml build frontend
+        "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml up frontend
+        ;;
+    dev-rebuild-backend)
+        echo "🐍 Rebuilding backend image and starting backend in development compose..."
+        "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml build backend
+        "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml up backend
         ;;
     frontend)
         echo "⚛️  Starting frontend only..."
