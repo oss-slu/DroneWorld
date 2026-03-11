@@ -16,6 +16,7 @@
     "cesium": "^1.126.0",
     "craco-cesium": "^1.2.0",
     "dayjs": "^1.11.7",
+    "html-webpack-plugin": "^5.6.6",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
