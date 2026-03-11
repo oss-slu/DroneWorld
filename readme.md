@@ -106,6 +106,7 @@ The simulator (`drv-unreal`) requires a GitHub Personal Access Token to build. I
 `dev-rebuild` rebuilds frontend/backend images before starting dev mode (and renews anonymous volumes so mounted `node_modules` stays in sync with rebuilt images).  
 `dev-rebuild-frontend` and `dev-rebuild-backend` rebuild only one dev image for faster iteration.  
 `full-rebuild` rebuilds all images (including simulator) before starting full mode.
+By default, rebuild commands also verify frontend lockfile consistency and regenerate `frontend/package-lock.json` if needed (using `node:20` in Docker). Set `AUTO_SYNC_FRONTEND_LOCKFILE=false` in `frontend/.env` to opt out.
 
 Run `./dev.sh help` or `.\dev.ps1 help` to see all available commands.
 
@@ -408,6 +409,8 @@ The contents of `./frontend/.env` should include the following variables:
 ```sh
 REACT_APP_DEMO_USER_EMAIL='name@domain.tld'
 REACT_APP_CESIUM_ION_ACCESS_TOKEN='yaddayaddayadda'
+# Optional (default true): set false to disable auto lockfile sync during rebuild commands
+AUTO_SYNC_FRONTEND_LOCKFILE=true
 ```
 
 ### Local Storage (no cloud setup)
