@@ -78,7 +78,7 @@ function ReportSection({ title, reports, onPreview, onDownload }) {
     <Box sx={{ mt: 3 }}>
       <Stack direction='row' spacing={1} alignItems='center' sx={{ mb: 1 }}>
         <AssessmentOutlinedIcon fontSize='small' sx={{ color: '#0f172a' }} />
-        <Typography variant='h5' fontWeight={700}>
+        <Typography variant='h5' fontWeight={700} sx={{ color: '#0f172a' }}>
           {title}
         </Typography>
       </Stack>

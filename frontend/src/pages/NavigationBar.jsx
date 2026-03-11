@@ -102,6 +102,11 @@ function NavigationBar() {
               </Link>
           </li>
           <li className={classes.navListItem}>
+              <Link to="/stream" className = {classes.navLink} style={{ textDecoration: location.pathname === "/stream" ? "underline" : "none" }}>
+                Stream
+              </Link>
+          </li>
+          <li className={classes.navListItem}>
               <Link to="/aboutus" className = {classes.navLink} style={{ textDecoration: location.pathname === "/aboutus" ? "underline" : "none" }}>
                 About Us
               </Link>

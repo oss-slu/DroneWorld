@@ -116,24 +116,20 @@ const Home = () => {
 
   return (
     <React.Fragment>
-      <Typography style={{ width: 1000 }}>
-        <Grid
-          spacing={5}
-          direction='row'
-          style={{ marginTop: '15px', paddingTop: '15px', paddingLeft: '290px' }}
-        >
-          <Box border={1} borderColor={statusStyle.color} p={2} borderRadius={2} width={200} mb={5}>
+      <Grid container spacing={2} justifyContent='center' sx={{ mt: 2, mb: 3 }}>
+        <Grid item>
+          <Box border={1} borderColor={statusStyle.color} p={2} borderRadius={2} minWidth={220}>
             <Typography>
               Backend Status: <span style={statusStyle}>{backendInfo.backendStatus}</span>
             </Typography>
           </Box>
-          <div style={{ position: 'relative' }}>
-            <div style={{ position: 'absolute', left: 280, top: -80 }}>
-              <Typography>Queued Tasks: {backendInfo.numQueuedTasks}</Typography>
-            </div>
-          </div>
         </Grid>
-      </Typography>
+        <Grid item>
+          <Box border={1} borderColor='grey.400' p={2} borderRadius={2} minWidth={220}>
+            <Typography>Queued Tasks: {backendInfo.numQueuedTasks}</Typography>
+          </Box>
+        </Grid>
+      </Grid>
       <Box
         sx={{
           display: 'flex',
