@@ -9,21 +9,6 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip';
 
-
-//const defaultGps = {
-  //  EphTimeConstant: 0.9,
-    //EpvTimeConstant: 0.9,
-  //  EphInitial: 25, 
-   // EpvInitial: 25,
- //   EphFinal: 0.1,
-  //  EpvFinal: 0.1, 
-  //  EphMin3d: 3,
-//    EphMin2d: 4,
- //   UpdateLatency: 0.2,
- //   UpdateFrequency: 50,
- //   StartupDelay: 1  
- // };
-
 export default function GPS (sensor) {
     const[gps, setGps] = React.useState(sensor.gPSObj || {}) 
     
@@ -32,23 +17,9 @@ export default function GPS (sensor) {
         sensor.updateJson(gps, sensor.name)  
           }, [gps]); 
 
-    //React.useEffect(() => {
-      //      setGps({
-        //      ...gps, 
-          //    ...defaultGps
-       //     });
-        //  }, []); 
-
     const closeModal = () => {
         sensor.closeModal(gps, sensor.name)
     }
-
-    //const handleChangeSwitch = (val) => {
-     //   setGps(prevState => ({
-       //         ...prevState,
-        //        Enabled: val.target.checked
-       // }))
-    //} 
       
     const tooltips = {
         EphTimeConstant: "Tooltip text...",
@@ -69,8 +40,6 @@ export default function GPS (sensor) {
     const handleReset = () => {  
         setGps(sensor.gPSObj);
       };
-    
-   // });  
 
     return(
         <div>  
@@ -177,36 +146,6 @@ export default function GPS (sensor) {
                           
             
                         
-                        {/* <Grid item xs={3}>
-                            <TextField id="Key" onChange={handleChange} label="Name" variant="standard" value={gps.Key}/>
-                        </Grid> */}
-                        {/* <Grid item xs={3}>
-                            <TextField id="EphTimeConstant" onChange={handleChange} label="EphTimeConstant" variant="standard" value={gps.EphTimeConstant}/>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <TextField id="EpvTimeConstant" onChange={handleChange} label="EpvTimeConstant" variant="standard" value={gps.EpvTimeConstant}/>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <TextField id="EphInitial" onChange={handleChange} label="EphInitial" variant="standard" value={gps.EphInitial}/>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <TextField id="EpvInitial" onChange={handleChange} label="EpvInitial" variant="standard" value={gps.EpvInitial}/>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <TextField id="EphFinal" onChange={handleChange} label="EphFinal" variant="standard" value={gps.EphFinal}/>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <TextField id="EpvFinal" onChange={handleChange} label="EpvFinal" variant="standard" value={gps.EpvFinal}/>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <TextField id="EphMin3d" onChange={handleChange} label="EphMin3d" variant="standard" value={gps.EphMin3d}/>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <TextField id="EphMin2d" onChange={handleChange} label="EphMin2d" variant="standard" value={gps.EphMin2d}/>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <TextField id="UpdateLatency" onChange={handleChange} label="UpdateLatency" variant="standard" value={gps.UpdateLatency}/>
-                        </Grid> */} 
                          <Grid container xs={18} spacing={12} justifyContent="flex-end" >
                        
 
@@ -242,12 +181,6 @@ export default function GPS (sensor) {
                       </Grid> 
 
                 
-                        
-                        {/* <Grid item xs={3}>
-                            <TextField id="StartupDelay" onChange={handleChange} label="StartupDelay" variant="standard" value={gps.StartupDelay}/>
-                        </Grid> */}
-                
-                    
                     <Grid container direction="row" justifyContent="flex-end" alignItems="center" style={{paddingTop:'15px', marginTop:'15px'}}>
                         <Grid item xs={3}><Button onClick={() =>  handleReset()} style={{paddingLeft:'25px', margin: '5px'}}> Reset to Default </Button></Grid>
                         <Grid item xs={9}><Button variant="outlined" onClick={closeModal} style={{float:'right'}}>Ok</Button> &nbsp;&nbsp;&nbsp;</Grid>

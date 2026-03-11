@@ -2,6 +2,7 @@
 /* eslint-disable react/prop-types */
 
 import React from 'react';
+import '@testing-library/jest-dom';
 import dayjs from 'dayjs';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import EnvironmentConfiguration from '../components/EnvironmentConfiguration';

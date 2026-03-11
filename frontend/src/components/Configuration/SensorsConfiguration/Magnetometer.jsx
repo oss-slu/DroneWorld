@@ -8,19 +8,10 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Tooltip from '@mui/material/Tooltip'; 
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert'; 
 
 
 export default function Magnetometer (sensor) {
     const [magnetometer, setMagnetometer]  = React.useState(sensor.magnetometerObj || {})
-
-    //const handleChangeSwitch = (val) => {
-     //   setMagnetometer(prevState => ({
-         //       ...prevState,
-       //         Enabled: val.target.checked
-     //   }))
-   // }
 
     React.useEffect(() => {
         sensor.updateJson(magnetometer, sensor.name)
@@ -43,29 +34,9 @@ export default function Magnetometer (sensor) {
     const handleReset = () => {
         setMagnetometer(sensor.magnetometerObj);
       };
-      const [snackBarState, setSnackBarState] = React.useState({
-        open: true,
-    });
-
-    const handleSnackBarVisibility = (val) => {
-        setSnackBarState(prevState => ({
-            ...prevState,
-            open: val
-        }))
-    }
 
     return(
         <div>
-            {/* <Snackbar open={snackBarState.open} 
-        anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right'
-        }} 
-        autoHideDuration={6000} onClose={e => handleSnackBarVisibility(false)}>
-        <Alert onClose={e => handleSnackBarVisibility(false)} severity="info" sx={{ width: '100%' }}>
-             {"Magnetometer Changes is under Developement !"}
-        </Alert>
-    </Snackbar> */}
             <Box>
                 <Typography variant="h6" component="h2">
                     {magnetometer.Key || ""}

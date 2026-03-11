@@ -251,10 +251,6 @@ export class EnvironmentModel {
     return {
       name: this._name,
       description: this._description,
-      // "enable_fuzzy": this._enableFuzzy,
-      // "time_of_day_fuzzy": this._timeOfDayFuzzy,
-      // "position_fuzzy": this._positionFuzzy,
-      // "wind_fuzzy": this._windFuzzy,
       wind: this._Wind?.map((obj) => obj.toJSONString()),
       origin: origin,
       time_of_day: this._TimeOfDay,

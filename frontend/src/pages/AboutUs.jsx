@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Box, Container, Grid, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   pageContainer: {
     minHeight: '100vh',
     backgroundColor: '#1e40af',

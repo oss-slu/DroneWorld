@@ -18,3 +18,10 @@ Thumbs.db
 
 # Secrets
 .env
+
+# Dev files
+cypress/
+.eslintrc.json
+.prettierrc
+craco.config.js
+cypress.config.js

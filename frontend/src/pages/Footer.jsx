@@ -1,5 +1,3 @@
-import { Link } from 'react-router-dom';
-
 const commonButtonStyle = {
   textDecoration: 'none',
   padding: '8px 16px',

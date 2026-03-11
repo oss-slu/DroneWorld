@@ -1,5 +1,12 @@
 // Cypress Test for E2E Frontend Flow
 describe('DroneWorld Application Flow', () => {
+  it('should handle direct /dashboard access without route state', () => {
+    cy.visit('/dashboard');
+    cy.contains('No Report Selected').should('be.visible');
+    cy.contains('button', 'Go to Reports').click();
+    cy.url().should('include', '/reports');
+  });
+
   it('should complete the full scenario configuration flow', () => {
     const backendUrl = Cypress.env('BACKEND_URL');
     const finalBackendUrl = backendUrl || 'http://localhost:5000';
@@ -20,6 +27,7 @@ describe('DroneWorld Application Flow', () => {
     cy.intercept('GET', `${finalBackendUrl}/list-reports`).as('listReports');
     cy.intercept('GET', `${finalBackendUrl}/currentRunning`).as('getBackendStatus');
     cy.intercept('POST', `${finalBackendUrl}/addTask`).as('addTask');
+    cy.intercept('POST', `${finalBackendUrl}/list-folder-contents/*`).as('listFolderContents');
     
     // Step 1: Visit the landing page
     cy.visit('/');
@@ -109,5 +117,25 @@ describe('DroneWorld Application Flow', () => {
     cy.contains('[role="tooltip"]', 'Download report (.zip)').should('be.visible');
     cy.get('@downloadButton').click();
     cy.get('@windowOpen').should('have.been.called');
+
+    // Step 11: Preview the newest batch report and verify dashboard navigation/rendering
+    cy.get('@latestBatchTitle')
+      .closest('.MuiCard-root')
+      .within(() => {
+        cy.contains('button', 'Preview').should('be.visible').click();
+      });
+
+    cy.wait('@listFolderContents').then(({ response }) => {
+      expect(response, 'list-folder-contents response').to.exist;
+      expect(response.statusCode).to.eq(200);
+    });
+
+    cy.url().should('include', '/dashboard');
+    cy.contains(/Detailed Report/, { timeout: 10000 }).should('be.visible');
+    cy.contains('Interactable HTMLs').should('be.visible');
+
+    // Step 12: Use dashboard Back action and verify return to reports
+    cy.contains('Back').should('be.visible').click();
+    cy.url().should('include', '/reports');
   });
 });

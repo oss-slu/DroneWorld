@@ -10,9 +10,8 @@ export const tabEnums = {
     tabEnums.DRONES,
   ];
   
-  export const steps = [
+export const steps = [
     'Environment Configuration',
     'sUAS Configuration',
-    //'Test Configuration'
   ];
   

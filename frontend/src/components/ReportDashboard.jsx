@@ -78,7 +78,7 @@ function ReportSection({ title, reports, onPreview, onDownload }) {
     <Box sx={{ mt: 3 }}>
       <Stack direction='row' spacing={1} alignItems='center' sx={{ mb: 1 }}>
         <AssessmentOutlinedIcon fontSize='small' sx={{ color: '#0f172a' }} />
-        <Typography variant='h5' fontWeight={700}>
+        <Typography variant='h5' fontWeight={700} sx={{ color: '#0f172a' }}>
           {title}
         </Typography>
       </Stack>
@@ -92,7 +92,7 @@ function ReportSection({ title, reports, onPreview, onDownload }) {
             const total = (report.pass || 0) + (report.fail || 0);
             const passPercent = total ? Math.round((report.pass / total) * 100) : 0;
 
-            const [batchDate, ...rest] = (report.filename || '').split('_');
+            const [, ...rest] = (report.filename || '').split('_');
             const batchName = rest.join(' ') || 'Batch';
 
             return (
@@ -177,8 +177,7 @@ export default function ReportDashboard() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isReportsPage =
-    location.pathname.includes('/reports') || location.pathname.includes('/report-dashboard');
+  const isReportsPage = location.pathname.includes('/reports');
 
   useEffect(() => {
     const fetchData = async () => {

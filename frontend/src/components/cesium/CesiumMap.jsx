@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Viewer, CameraFlyTo, Cesium3DTileset, Entity } from 'resium';
+import { Viewer, CameraFlyTo, Cesium3DTileset } from 'resium';
 import {
   Cartesian3,
   IonResource,
@@ -12,7 +12,6 @@ import {
 import PropTypes from 'prop-types';
 import DrawSadeZone from './DrawSadeZone';
 import DroneDragAndDrop from './DroneDragAndDrop';
-// import RadiusDragAndDrop from './RegionDragAndDrop';
 import TimeLineSetterCesiumComponent from './TimeLineSetterCesiumComponent';
 import { useMainJson } from '../../contexts/MainJsonContext';
 import { originTypes } from '../../constants/env';
@@ -20,7 +19,7 @@ import { EnvironmentModel } from '../../model/EnvironmentModel';
 
 const CesiumMap = ({ activeConfigStep }) => {
   const DEFAULT_CAMERA_HEIGHT = 5000;
-  const { mainJson, envJson, setEnvJson, registerSetCameraByPosition } = useMainJson();
+  const { envJson, setEnvJson, registerSetCameraByPosition } = useMainJson();
   console.log('envJson:', envJson);
   console.log('Origin:', envJson.Origin);
   const viewerRef = useRef(null);
@@ -38,7 +37,6 @@ const CesiumMap = ({ activeConfigStep }) => {
       pitch: -Math.PI / 2,
     },
   });
-  const OSMBuildingsAssetId = 96188;
   const google3DTilesAssetId = 2275207;
 
   Ion.defaultAccessToken = process.env.REACT_APP_CESIUM_ION_ACCESS_TOKEN;
@@ -209,12 +207,6 @@ const CesiumMap = ({ activeConfigStep }) => {
         viewerRef={viewerRef}
         setCameraByPosition={setCameraByPosition}
       />
-
-      {/* <RadiusDragAndDrop
-        viewerReady={viewerReady}
-        viewerRef={viewerRef}
-        setCameraByPosition={setCameraByPosition}
-      /> */}
 
       <DrawSadeZone
         viewerReady={viewerReady}

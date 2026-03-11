@@ -1,12 +1,10 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Entity } from 'resium';
 import {
   Cartesian3,
   Math as CesiumMath,
   Cartographic,
   Cartesian2,
-  JulianDate,
-  Ellipsoid,
   Color,
   HeightReference,
   DistanceDisplayCondition,
@@ -15,13 +13,10 @@ import {
 } from 'cesium';
 import PropTypes from 'prop-types';
 import { useMainJson } from '../../contexts/MainJsonContext';
-import { SimulationConfigurationModel } from '../../model/SimulationConfigurationModel';
-import dayjs from 'dayjs';
-import { EnvironmentModel } from '../../model/EnvironmentModel';
 import { imageUrls } from '../../utils/const';
 
 const DroneDragAndDrop = ({ viewerReady, viewerRef, setCameraByPosition }) => {
-  const { syncDroneLocation, mainJson, setMainJson, envJson, setEnvJson } = useMainJson();
+  const { syncDroneLocation, mainJson, envJson } = useMainJson();
   const [labelVisible, setLabelVisible] = useState(false);
 
   const checkCameraHeight = () => {

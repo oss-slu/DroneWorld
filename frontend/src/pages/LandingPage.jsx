@@ -4,10 +4,9 @@ import { Link } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
-import ReportDashboard from './components/ReportDashboard';
-import Loading from './components/Loading';
+import ReportDashboard from '../components/ReportDashboard';
+import Loading from '../components/Loading';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -18,9 +17,9 @@ import LandscapeIcon from '@mui/icons-material/Landscape';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import GroupWorkIcon from '@mui/icons-material/GroupWork';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
-import { BASE_URL } from './utils/const';
+import { BASE_URL } from '../utils/const';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   landingPage: {
     fontFamily: 'Roboto, sans-serif',
     color: '#fff',
@@ -34,7 +33,6 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '1.5rem',
-    //backgroundColor: '#0000CD',
     fontFamily: 'Arial, sans-serif',
     width: '100%',
   },
@@ -45,10 +43,7 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 'bold',
     fontFamily: 'Arial, sans-serif',
   },
-  mainContent: {
-    // padding: '1rem',
-    // marginTop: '3rem',
-  },
+  mainContent: {},
   buttonContainer: {
     position: 'absolute',
     top: '6rem',
@@ -98,23 +93,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const modalStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 800,
-  height: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  padding: '4',
-};
-
 export default function LandingPage() {
   const classes = useStyles();
   const [filesPresent, setFilesPresent] = useState(false);
-  const [open, setOpen] = useState(false);
   const [isLoading, setIsloading] = useState(false);
 
   useEffect(() => {
@@ -147,7 +128,7 @@ export default function LandingPage() {
           width: '100%',
           bgcolor: 'transparent',
           background:
-            'linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%)', // blue -> darker blue
+            'linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%)',
           color: '#fff',
           py: { xs: 8, md: 12 },
         }}
@@ -207,7 +188,7 @@ export default function LandingPage() {
 
             <Button
               component={Link}
-              to="" // change later leave blank for now
+              to=""
               variant="outlined"
               size="large"
               endIcon={<ArrowForwardIcon />}
@@ -279,7 +260,7 @@ export default function LandingPage() {
                         borderRadius: 2,
                         display: 'grid',
                         placeItems: 'center',
-                        bgcolor: '#ede9fe', // light purple
+                        bgcolor: '#ede9fe',
                       }}
                     >
                       <LandscapeIcon sx={{ color: '#7c3aed' }} />
@@ -315,7 +296,7 @@ export default function LandingPage() {
                         borderRadius: 2,
                         display: 'grid',
                         placeItems: 'center',
-                        bgcolor: '#dcfce7', // light green
+                        bgcolor: '#dcfce7',
                       }}
                     >
                       <ShowChartIcon sx={{ color: '#16a34a' }} />
@@ -351,7 +332,7 @@ export default function LandingPage() {
                         borderRadius: 2,
                         display: 'grid',
                         placeItems: 'center',
-                        bgcolor: '#f3e8ff', // purple-ish
+                        bgcolor: '#f3e8ff',
                       }}
                     >
                       <GroupWorkIcon sx={{ color: '#8b5cf6' }} />
@@ -387,7 +368,7 @@ export default function LandingPage() {
                         borderRadius: 2,
                         display: 'grid',
                         placeItems: 'center',
-                        bgcolor: '#ffedd5', // light orange
+                        bgcolor: '#ffedd5',
                       }}
                     >
                       <InsertChartOutlinedIcon sx={{ color: '#f97316' }} />
@@ -428,7 +409,7 @@ export default function LandingPage() {
                 <Typography
                   sx={{
                     fontWeight: 800,
-                    color: '#1d4ed8', // blue emphasis
+                    color: '#1d4ed8',
                     fontSize: { xs: 22, md: 28 },
                   }}
                 >
@@ -454,7 +435,7 @@ export default function LandingPage() {
                   </Button>
                   <Button
                     component={Link}
-                    to="https://oss-slu.github.io/projects/droneworld/about" // update if your docs route differs
+                    to="https://oss-slu.github.io/projects/droneworld/about"
                     variant="outlined"
                     sx={{
                       borderColor: '#cbd5e1',
@@ -483,7 +464,7 @@ export default function LandingPage() {
             <div onClick={handleAccordionToggle}>
               <h2 className={classes.reportDashboardTitle}>
                 <Link to='/reports' className={classes.reportDashboardTitle}>
-                  <div style={{ textAlign: 'center' }}>{/* Content here */}</div>
+                  <div style={{ textAlign: 'center' }}></div>
                 </Link>
               </h2>
               <ReportDashboard />

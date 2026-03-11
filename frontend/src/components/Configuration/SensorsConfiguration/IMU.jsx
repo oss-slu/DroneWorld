@@ -21,13 +21,6 @@ export default function IMU(sensor) {
     sensor.closeModal(imu, sensor.name);
   };
 
-  const handleChangeSwitch = (val) => {
-    setImu((prevState) => ({
-      ...prevState,
-      Enabled: val.target.checked,
-    }));
-  };
-
   const handleChange = (event) => {
     const { id, value } = event.target;
     const parsedValue = event.target.type === 'number' ? parseFloat(value) : value;

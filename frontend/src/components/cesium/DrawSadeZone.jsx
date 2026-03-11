@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Entity } from 'resium';
 import {
   ScreenSpaceEventType,
@@ -7,11 +7,9 @@ import {
   Rectangle,
   KeyboardEventModifier,
   ScreenSpaceEventHandler,
-  Ellipsoid,
   Math as CesiumMath,
   Cartesian3,
   Cartesian2,
-  HeightReference,
   VerticalOrigin,
   DistanceDisplayCondition,
 } from 'cesium';

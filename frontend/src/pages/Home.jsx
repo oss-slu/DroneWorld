@@ -2,7 +2,6 @@ import styled from '@emotion/styled';
 import {
   Box,
   Button,
-  TextField,
   Modal,
   Typography,
   Grid,
@@ -23,11 +22,6 @@ const StyledButton = styled(Button)`
   height: 50px;
 `;
 
-const StyledText = styled.p`
-  font-weight: bold;
-  font-size: 20px;
-`;
-
 const StyledLink = styled(Link)`
   text-decoration: none;
   display: flex;
@@ -35,11 +29,6 @@ const StyledLink = styled(Link)`
   justify-content: center;
   height: 50px !important;
   width: 300px !important;
-`;
-
-const StyledTextField = styled(TextField)`
-  width: 800px;
-  height: 200px;
 `;
 
 const Home = () => {
@@ -127,24 +116,20 @@ const Home = () => {
 
   return (
     <React.Fragment>
-      <Typography style={{ width: 1000 }}>
-        <Grid
-          spacing={5}
-          direction='row'
-          style={{ marginTop: '15px', paddingTop: '15px', paddingLeft: '290px' }}
-        >
-          <Box border={1} borderColor={statusStyle.color} p={2} borderRadius={2} width={200} mb={5}>
+      <Grid container spacing={2} justifyContent='center' sx={{ mt: 2, mb: 3 }}>
+        <Grid item>
+          <Box border={1} borderColor={statusStyle.color} p={2} borderRadius={2} minWidth={220}>
             <Typography>
               Backend Status: <span style={statusStyle}>{backendInfo.backendStatus}</span>
             </Typography>
           </Box>
-          <div style={{ position: 'relative' }}>
-            <div style={{ position: 'absolute', left: 280, top: -80 }}>
-              <Typography>Queued Tasks: {backendInfo.numQueuedTasks}</Typography>
-            </div>
-          </div>
         </Grid>
-      </Typography>
+        <Grid item>
+          <Box border={1} borderColor='grey.400' p={2} borderRadius={2} minWidth={220}>
+            <Typography>Queued Tasks: {backendInfo.numQueuedTasks}</Typography>
+          </Box>
+        </Grid>
+      </Grid>
       <Box
         sx={{
           display: 'flex',
@@ -196,11 +181,6 @@ const Home = () => {
           </StyledButton>
         </StyledLink>
 
-        {/*Remove this code when implementing the header About us. Widen the component. Add a close button.*/}
-        {/* Button to test Modal*/}
-        {/* <Button onClick={() => setOpen(true)} style={{ marginTop: 20, marginBottom: 20 }}>About Us (Move this to Nav Bar later)</Button> */}
-
-        {/* Modal Component */}
         <Modal
           open={open}
           onClose={() => setOpen(false)}
@@ -208,7 +188,6 @@ const Home = () => {
           aria-describedby='modal-modal-description'
         >
           <Box sx={modalStyle}>
-            {/* Close Button */}
             <Button
               onClick={() => setOpen(false)}
               style={{ position: 'absolute', top: 16, right: 16 }}
@@ -217,7 +196,6 @@ const Home = () => {
             </Button>
 
             <Typography id='modal-modal-title' variant='h6' component='h2'>
-              {/* Title Content */}
             </Typography>
 
             <Typography id='modal-modal-description' sx={{ mt: 2 }}>

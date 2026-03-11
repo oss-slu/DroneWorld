@@ -40,7 +40,7 @@ export default function DroneConfiguration(droneData) {
   const { mainJson, setMainJson } = useMainJson();
   const { name = "", id = "", droneObject = {}, resetName = () => {}, droneJson = () => {} } = droneData || {};
   
-  const [selectedLoc, setSelectedLoc] = React.useState('GeoLocation');
+  const [selectedLoc] = React.useState('GeoLocation');
   const [selectedModel, setSelectedModel] = React.useState('');
   const [selectedDroneType, setselectedDroneType] = React.useState(droneTypes[1].value);
   const [snackBarState, setSnackBarState] = React.useState({ open: false });
@@ -68,7 +68,6 @@ export default function DroneConfiguration(droneData) {
         param: []
       }
     };
-    //return { ...defaults, ...(droneData?.getDroneBasedOnIndex?.(id) || {}), ...droneObject };
     const mergedDrone = { ...defaults, ...(droneData?.getDroneBasedOnIndex?.(id) || {}), ...droneObject };
     if (mergedDrone.MissionValue == null) {
       mergedDrone.MissionValue = mergedDrone.Mission?.name ?? defaults.Mission.name;
@@ -133,8 +132,6 @@ export default function DroneConfiguration(droneData) {
 
 
   const handleMissionChange = (event) => {
-    //setDrone(prevState => ({
-    //  ...prevState,
     const missionName = event.target.value;
     setDrone(prevState => {
       const updatedDrone = {
@@ -157,8 +154,6 @@ export default function DroneConfiguration(droneData) {
       ...currentDrone,
       MissionValue: missionName,
       Mission: {
-        //...prevState.Mission,
-        //name: event.target.value
         ...(currentDrone.Mission || {}),
         name: missionName,
         param: Array.isArray(currentDrone?.Mission?.param) ? currentDrone.Mission.param : []

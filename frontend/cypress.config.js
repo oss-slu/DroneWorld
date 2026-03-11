@@ -17,7 +17,7 @@ module.exports = defineConfig({
     env: {
       BACKEND_URL: backendUrl,
     },
-    setupNodeEvents(on, config) {
+    setupNodeEvents(on) {
       on('task', {
         verifyLocalMockReportFromTimestamp({ uiTimestamp }) {
           const match = (uiTimestamp || '').match(
