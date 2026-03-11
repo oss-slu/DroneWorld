@@ -164,7 +164,6 @@ export default function HorizontalLinearStepper(data) {
     const lat = origin.Latitude ?? origin.latitude;
     const lon = origin.Longitude ?? origin.longitude;
     const height = origin.Height ?? origin.height ?? 203;
-    //const altitude = origin.Altitude ?? origin.altitude;
 
     const environmentToSend = {
       UseGeo: useGeo,

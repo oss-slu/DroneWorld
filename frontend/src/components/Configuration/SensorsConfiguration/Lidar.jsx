@@ -26,8 +26,6 @@ export default function Lidar (sensor) {
             VerticalFOVLower: -25,
             HorizontalFOVStart: -20,
             HorizontalFOVEnd: 20,
-            // DrawDebugPoints: true,
-            // DataFrame: "SensorLocalFrame",
             Key: "Lidar"
     })
 
@@ -105,12 +103,6 @@ export default function Lidar (sensor) {
                         <Grid item xs={3}>
                             <TextField id="HorizontalFOVEnd"  onChange={handleChange} label="Horizontal FOV End" variant="standard" value={lidar.HorizontalFOVEnd} disabled={!lidar.Enabled}/>
                         </Grid>
-                        {/* <Grid item xs={3}>
-                            <TextField id="DrawDebugPoints"  onChange={handleChange} label="DrawDebugPoints" variant="standard" value={lidar.DrawDebugPoints} disabled={!lidar.Enabled}/>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <TextField id="DataFrame"  onChange={handleChange} label="DataFrame" variant="standard" value={lidar.DataFrame} disabled={!lidar.Enabled}/>
-                        </Grid> */}
                     </Grid>
                     <Grid container direction="row" justifyContent="flex-end" alignItems="center" style={{paddingTop:'15px', marginTop:'15px'}}>
                         <Button variant="outlined" onClick={closeModal}>Ok</Button> &nbsp;&nbsp;&nbsp;

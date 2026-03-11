@@ -20,7 +20,6 @@ export const MainJsonProvider = ({ children }) => {
   const setMainJson = (input) => {
     envJson.time = timeRef.current;
     envJson.TimeOfDay = timeOfDayRef.current;
-    // input.environment = envJson;
     setMainJsonSetter(SimulationConfigurationModel.getReactStateBasedUpdate(input));
   };
 

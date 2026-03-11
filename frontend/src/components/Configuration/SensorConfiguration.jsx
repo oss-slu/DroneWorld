@@ -4,7 +4,6 @@ import Modal from '@mui/material/Modal';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
-import Lidar from './SensorsConfiguration/Lidar';
 import Barometer from './SensorsConfiguration/Barometer';
 import IMU from './SensorsConfiguration/IMU';
 import GPS from './SensorsConfiguration/GPS';
@@ -13,14 +12,11 @@ import Magnetometer from './SensorsConfiguration/Magnetometer';
 import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
 import DeviceThermostatOutlinedIcon from '@mui/icons-material/DeviceThermostatOutlined';
 import GpsFixedOutlinedIcon from '@mui/icons-material/GpsFixedOutlined';
-import RadarOutlinedIcon from '@mui/icons-material/RadarOutlined';
 import DeveloperBoardOutlinedIcon from '@mui/icons-material/DeveloperBoardOutlined';
 import ExploreOutlinedIcon from '@mui/icons-material/ExploreOutlined';
 import Fab from '@mui/material/Fab';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import BottomNavigation from '@mui/material/BottomNavigation';
-import RouteIcon from '@mui/icons-material/Route';
-import Distance from './SensorsConfiguration/Distance';
 
 const style = {
   position: 'absolute',
@@ -62,7 +58,6 @@ export default function SensorConfiguration(param) {
             AccelBiasStability: 36,
             Key: 'IMU',
           },
-          // Lidar: null,
           Magnetometer: {
             SensorType: 4,
             Enabled: true,
@@ -90,7 +85,6 @@ export default function SensorConfiguration(param) {
             UpdateFrequency: 50,
             Key: 'GPS',
           },
-          // Distance:null
         },
   );
   const [open, setOpen] = React.useState(false);
@@ -132,12 +126,6 @@ export default function SensorConfiguration(param) {
   }, [sensor]);
 
   const configBtns = [
-    // {
-    //     name:'Lidar',
-    //     id:1,
-    //     icon:<RadarOutlinedIcon/>,
-    //     comp:<Lidar closeModal={handleClose} name="Lidar" lidarObj={sensor.Lidar}/>
-    // },
     {
       name: 'Camera',
       id: 2,
@@ -186,12 +174,6 @@ export default function SensorConfiguration(param) {
         <GPS closeModal={handleClose} name='GPS' gPSObj={sensor.GPS} updateJson={updateSensorOjb} />
       ),
     },
-    // {
-    //     name:'Distance',
-    //     id:7,
-    //     icon:<RouteIcon/>,
-    //     comp:<Distance closeModal={handleClose} name="Distance"/>
-    // }
   ];
 
   return (

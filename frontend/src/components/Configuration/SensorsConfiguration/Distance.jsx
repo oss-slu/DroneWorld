@@ -21,7 +21,6 @@ export default function Distance (sensor) {
         Yaw: 0,
         Pitch: 0,
         Roll: 0,
-        // DrawDebugPoints: false,
         Key:"Distance"
     })
 
@@ -76,9 +75,6 @@ export default function Distance (sensor) {
                         <Grid item xs={3}>
                             <TextField id="Roll"  onChange={handleChange} label="Roll" variant="standard" value={distance.Roll} />
                         </Grid>
-                        {/* <Grid item xs={3}>
-                            <TextField id="DrawDebugPoints"  onChange={handleChange} label="DrawDebugPoints" variant="standard" value={distance.DrawDebugPoints} />
-                        </Grid> */}
                     </Grid>
                     <Grid container direction="row" justifyContent="flex-end" alignItems="center" style={{paddingTop:'15px', marginTop:'15px'}}>
                         <Button variant="outlined" onClick={closeModal}>Ok</Button> &nbsp;&nbsp;&nbsp;

@@ -34,7 +34,6 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '1.5rem',
-    //backgroundColor: '#0000CD',
     fontFamily: 'Arial, sans-serif',
     width: '100%',
   },
@@ -45,10 +44,7 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 'bold',
     fontFamily: 'Arial, sans-serif',
   },
-  mainContent: {
-    // padding: '1rem',
-    // marginTop: '3rem',
-  },
+  mainContent: {},
   buttonContainer: {
     position: 'absolute',
     top: '6rem',
@@ -164,7 +160,7 @@ export default function LandingPage() {
           width: '100%',
           bgcolor: 'transparent',
           background:
-            'linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%)', // blue -> darker blue
+            'linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%)',
           color: '#fff',
           py: { xs: 8, md: 12 },
         }}
@@ -224,7 +220,7 @@ export default function LandingPage() {
 
             <Button
               component={Link}
-              to="" // change later leave blank for now
+              to=""
               variant="outlined"
               size="large"
               endIcon={<ArrowForwardIcon />}
@@ -296,7 +292,7 @@ export default function LandingPage() {
                         borderRadius: 2,
                         display: 'grid',
                         placeItems: 'center',
-                        bgcolor: '#ede9fe', // light purple
+                        bgcolor: '#ede9fe',
                       }}
                     >
                       <LandscapeIcon sx={{ color: '#7c3aed' }} />
@@ -332,7 +328,7 @@ export default function LandingPage() {
                         borderRadius: 2,
                         display: 'grid',
                         placeItems: 'center',
-                        bgcolor: '#dcfce7', // light green
+                        bgcolor: '#dcfce7',
                       }}
                     >
                       <ShowChartIcon sx={{ color: '#16a34a' }} />
@@ -368,7 +364,7 @@ export default function LandingPage() {
                         borderRadius: 2,
                         display: 'grid',
                         placeItems: 'center',
-                        bgcolor: '#f3e8ff', // purple-ish
+                        bgcolor: '#f3e8ff',
                       }}
                     >
                       <GroupWorkIcon sx={{ color: '#8b5cf6' }} />
@@ -404,7 +400,7 @@ export default function LandingPage() {
                         borderRadius: 2,
                         display: 'grid',
                         placeItems: 'center',
-                        bgcolor: '#ffedd5', // light orange
+                        bgcolor: '#ffedd5',
                       }}
                     >
                       <InsertChartOutlinedIcon sx={{ color: '#f97316' }} />
@@ -445,7 +441,7 @@ export default function LandingPage() {
                 <Typography
                   sx={{
                     fontWeight: 800,
-                    color: '#1d4ed8', // blue emphasis
+                    color: '#1d4ed8',
                     fontSize: { xs: 22, md: 28 },
                   }}
                 >
@@ -471,7 +467,7 @@ export default function LandingPage() {
                   </Button>
                   <Button
                     component={Link}
-                    to="https://oss-slu.github.io/projects/droneworld/about" // update if your docs route differs
+                    to="https://oss-slu.github.io/projects/droneworld/about"
                     variant="outlined"
                     sx={{
                       borderColor: '#cbd5e1',
@@ -500,7 +496,7 @@ export default function LandingPage() {
             <div onClick={handleAccordionToggle}>
               <h2 className={classes.reportDashboardTitle}>
                 <Link to='/reports' className={classes.reportDashboardTitle}>
-                  <div style={{ textAlign: 'center' }}>{/* Content here */}</div>
+                  <div style={{ textAlign: 'center' }}></div>
                 </Link>
               </h2>
               <ReportDashboard />

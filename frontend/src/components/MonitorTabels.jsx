@@ -42,9 +42,6 @@ export default function MonitorTabels (colData) {
 
     const [rows, setRows] = React.useState([
         [0,0,0],
-        // [1,1,1],
-        // [1,1,1],
-        // [1,1,1]
     ])
       
     const classes = useStyles();

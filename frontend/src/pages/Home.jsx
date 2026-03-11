@@ -196,11 +196,6 @@ const Home = () => {
           </StyledButton>
         </StyledLink>
 
-        {/*Remove this code when implementing the header About us. Widen the component. Add a close button.*/}
-        {/* Button to test Modal*/}
-        {/* <Button onClick={() => setOpen(true)} style={{ marginTop: 20, marginBottom: 20 }}>About Us (Move this to Nav Bar later)</Button> */}
-
-        {/* Modal Component */}
         <Modal
           open={open}
           onClose={() => setOpen(false)}
@@ -208,7 +203,6 @@ const Home = () => {
           aria-describedby='modal-modal-description'
         >
           <Box sx={modalStyle}>
-            {/* Close Button */}
             <Button
               onClick={() => setOpen(false)}
               style={{ position: 'absolute', top: 16, right: 16 }}
@@ -217,7 +211,6 @@ const Home = () => {
             </Button>
 
             <Typography id='modal-modal-title' variant='h6' component='h2'>
-              {/* Title Content */}
             </Typography>
 
             <Typography id='modal-modal-description' sx={{ mt: 2 }}>

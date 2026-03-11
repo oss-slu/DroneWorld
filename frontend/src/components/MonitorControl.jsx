@@ -62,28 +62,7 @@ export default function MonitorControl (monJson) {
         no_fly_zone_monitor: {
             enable:false,
             param:[
-                [
-                //     [
-                //         [1, -10, 0],
-                //         [1, 10, 0],
-                //         [5, -10, 0],
-                //         [5, 10, 0],
-                //         [1, -10, -999],
-                //         [1, 10, -999],
-                //         [5, -10, -999],
-                //         [5, 10, -999],
-                //     ],
-                //     [
-                //         [-1, -10, 0],
-                //         [-1, 10, 0],
-                //         [-5, -10, 0],
-                //         [-5, 10, 0],
-                //         [-1, -10, -999],
-                //         [-1, 10, -999],
-                //         [-5, -10, -999],
-                //         [-5, 10, -999],
-                //     ]
-                ]
+                []
             ]
         },
         drift_monitor:{
@@ -104,8 +83,6 @@ export default function MonitorControl (monJson) {
         Wind: {
             Direction: "NE",
             Velocity: 1,
-            //Type: "None",
-            //WindOrigin: "None",
         },
         Origin: {
             Latitude: 41.980381,
@@ -119,7 +96,6 @@ export default function MonitorControl (monJson) {
     const environmentJson = (event) => {
         monJson.monitorJson(event, "environment");
     }    
-    //new added
     React.useEffect(() => {
         environmentJson(envConf)
     }, [envConf])
@@ -160,18 +136,6 @@ export default function MonitorControl (monJson) {
             }
         }));
     };
-
-
-    // const  handleLandspaceChange= (val) => {
-    //     setMonitor(prevState => ({
-    //         ...prevState,
-    //         landspace_monitor: {
-    //             ...monitor.landspace_monitor,
-    //             param: val.target.type === "number" ? parseInt(val.target.value, 10) : [val.target.value]
-    //         }
-    //     }))
-    // }
-
     const  handleWayPointThreshChange= (val) => {
         setMonitor(prevState => ({
             ...prevState,
@@ -245,19 +209,6 @@ export default function MonitorControl (monJson) {
         }))
     }
 
-    const handleNoFlyPointsChange= (val) => {
-        // TODO: input is a list of list just like no_fly_zone_monitor param 1
-        // setMonitor(prevState => ({
-        //     ...prevState,
-        //     no_fly_zone_monitor: {
-        //         ...monitor.no_fly_zone_monitor,
-        //         param:[
-        //            val.target.value
-        //         ]
-        //     }
-        // }))
-    }
-
     const handleChange = (even, newValue) => {
         setValue(newValue);
         if(newValue =='1') {
@@ -278,22 +229,6 @@ export default function MonitorControl (monJson) {
     React.useEffect(() => {
         monJson.monitorJson(monitor, monJson.id);
     }, [monitor])
-
-
-
-    const globalMonitors = [
-        // {
-        //     name: "Min Sep Dist Monitor",
-        //     value: '10',
-        //     description: "Enabling the distance monitoring feature will continuously monitor the horizontal distance between all drones during the mission. If any drone fails to maintain a minimum separation distance, the system will report it to you",
-        //     btns:
-        //     <div>
-        //         <TextField id="standard-basic" label="Horizontal (meter)" variant="standard" onChange={handleMinHorizontalSepChange} defaultValue={1} value={monitor.min_sep_dist_monitor.param[0] }></TextField>
-        //         <TextField id="standard-basic" label="Lateral (meter)" variant="standard" onChange={handleMinLateralSepChange} defaultValue={1} value={monitor.min_sep_dist_monitor.param[1]}></TextField>
-        //     </div>
-        // }
-    ]
-
     const handleChangeSwitch = (val, id) => {
         setMonitor(prevState => ({
             ...prevState,
@@ -402,14 +337,10 @@ export default function MonitorControl (monJson) {
         {
             name: "Collision",
             value: '1.1',
-            // description: "Drones shall avoid collisions with other drones and the environment",
             description: "Test if a drone collides with other drones or the environment",
             btns: null,
             images: null,
             colorText:monitor.collision_monitor.enable == true ? 'green': null,
-            // <div>
-            //     <img src="/images/collision.png" width="70%"/>
-            // </div>,
             enableBtn:
                 <Grid container direction="row">
                         <strong style={{paddingTop:'7px'}}>Status</strong>&nbsp;&nbsp;&nbsp;
@@ -426,30 +357,9 @@ export default function MonitorControl (monJson) {
             description: "Test whether the drones land at safe landing locations",
             btns: null,
             colorText:monitor.landspace_monitor.enable == true ? 'green': null,
-                // <React.Fragment>{monitor.landspace_monitor.enable === true ?
-                //     <Grid item xs={8}>
-                //         <Tooltip title={"Minimum distance between the drone and the safe landing spot"}>
-                //             <TextField label="Threshold (meter)" type="number" step="0.1" variant="standard" onChange={setLandspaceThreshold} value={monitor.landspace_monitor.param[0]}/>
-                //         </Tooltip>
-                //     </Grid>:null}
-                // </React.Fragment>
-
-
-            // bodyText:
-            //     <Box sx={{ width: '100%' }} style={{paddingTop:20}}>
-            //         <Typography component="div" variant="h6" >
-            //         Default to the drone original positions
-            //     </Typography>
-            //     <Typography component="div" variant="h6">
-            //         User input implementation in progress
-            //     </Typography>
-            // </Box>,
             images: null,
-            // <div>
-            //     <img src="/images/landspace.png" width="70%"/>
-            // </div>,
             enableBtn:
-            
+             
             <Grid container direction="row">
                 <strong style={{paddingTop:'7px'}}>Status</strong>&nbsp;&nbsp;&nbsp;
                 <FormGroup>
@@ -462,22 +372,6 @@ export default function MonitorControl (monJson) {
             <MonitorTabels hideAltitude="true" errorMessage="false" jsonVal={setLandspaceParameters} /></>:null}</React.Fragment>,
             isMultipleTable: false
         },
-        // {
-        //     name: "Circular Deviation Monitor",
-        //     value: '2.1',
-        //     description: "Single drone monitor, monitors the circular path total distance vs. planned distance for any drone with 'Circle' missions, and produces a graph showing the path",
-        //     btns: null,
-        //     images:
-        //     <div>
-        //         <img src="/images/circular_and_point_deviation.png" width="70%"/>
-        //     </div>,
-        //     enableBtn:
-        //     <Grid item xs={12}>
-        //         <FormGroup>
-        //             <FormControlLabel control={<Switch checked={monitor.circular_deviation_monitor.enable} onChange={(e) => handleChangeSwitch(e, "circular_deviation_monitor")} inputProps={{ 'aria-label': 'controlled' }} />} label={monitor.circular_deviation_monitor.enable ? "Enabled" : "Disabled"} />
-        //         </FormGroup>
-        //     </Grid>
-        // },
         {
             name: "Drift",
             value: '2.1',
@@ -503,9 +397,6 @@ export default function MonitorControl (monJson) {
                 </Grid> 
                 : null}</React.Fragment>,
             images: null,
-            // <div>
-            //     <img src="/images/circular_and_point_deviation.png" width="70%"/>
-            // </div>,
             enableBtn:
                 <Grid container direction="row"><strong style={{paddingTop:'7px'}}>Status</strong>&nbsp;&nbsp;&nbsp;
                 
@@ -522,25 +413,9 @@ export default function MonitorControl (monJson) {
             value: '2.6',
             description: "Test whether the drones avoid entering no fly zones",
             colorText:monitor.no_fly_zone_monitor.enable == true ? 'green': null,
-            btns:null
-            // <React.Fragment>{monitor.no_fly_zone_monitor.enable == true ?
-              
-            //     </Grid>:null}</React.Fragment>
-                ,
-            bodyText:null
-                // <Box sx={{ width: '100%' }} style={{paddingTop:20}}>
-                //     <Typography component="div" variant="h6" >
-                //         Default to two 10*5 area in front and behind the origin
-                //     </Typography>
-                //     <Typography component="div" variant="h6" >
-                //         User input implementation in progress
-                //     </Typography>
-                // </Box>
-                ,
+            btns:null,
+            bodyText:null,
             images:null,
-                // <div>
-                //     <img src="/images/no_fly_zone.png" width="70%"/>
-                // </div>,
             enableBtn:
                 <Grid container direction="row">
                     <strong style={{paddingTop:'7px'}}>Status</strong>&nbsp;&nbsp;&nbsp;
@@ -552,13 +427,6 @@ export default function MonitorControl (monJson) {
                 <React.Fragment>{monitor.no_fly_zone_monitor.enable == true ? 
                    
                             <><Grid item xs={12}><strong>Configure no-fly zones : Ferature Development in Progress </strong></Grid>
-                        {/* <ButtonGroup size="small" aria-label="small outlined button group" style={{paddingTop:20}}>
-                            <Button onClick={handleIncrement}>AddZone</Button>
-                        </ButtonGroup>     */}
-
-                        {/* Show an image of a map */}
-
-
                         <img src="../images/dummy_map_configurator.png"></img>
                     <Alert severity="info">Note : We are excited to announce that we are currently developing a new feature that will allow users to create 3D polygons on the map to define one or more no fly zones. This feature will give users greater control over where their drones can and cannot fly, helping to ensure safer and more responsible drone operation.           </Alert>
                     
@@ -568,10 +436,7 @@ export default function MonitorControl (monJson) {
 
                         
                     </div></>:null}</React.Fragment>,
-                // TODO : Implement Multiple tables correctly later
-            // isMultipleTable: monitor.no_fly_zone_monitor.enable == true ? true : false,
             isMultipleTable: false,
-            // tableData:<MonitorTabels hideAltitude="false" jsonVal={setNoFlyParameters}/>
         },
         {
             name: "Separation",
@@ -588,17 +453,8 @@ export default function MonitorControl (monJson) {
                 <TextField id="standard-basic" label="Minimum Horizontal Separation (meters)" type="number" step="0.1" variant="standard" style = {{width:250}} onChange={handleMinHorizontalSepChange} value={monitor.min_sep_dist_monitor.param[0] }></TextField>
                 </Grid>
                 </Tooltip>
-
-                {/* <TODO>Hidden from the UI later. Revisit later after propoerly implementing it on the backend</TODO> */}
-
-                {/* <Tooltip title="Enter Minumum Lateral separation distance in Meters" placement='bottom'>
-                <Grid item xs={6}>
-                <TextField id="standard-basic" label="Minimum Lateral Separation (meters)" type="number" step="0.1" variant="standard" style = {{width:250}} onChange={handleMinLateralSepChange} value={monitor.min_sep_dist_monitor.param[1]}></TextField>
-                </Grid>
-                </Tooltip> */}
             </React.Fragment>:null}</React.Fragment>,
             images: null,
-            // <img src="/images/min_separation_distance.png" width="70%"/>,
             enableBtn:
                 <Grid container direction="row">
                     <strong style={{paddingTop:'7px'}}>Status</strong>&nbsp;&nbsp;&nbsp;
@@ -619,13 +475,11 @@ export default function MonitorControl (monJson) {
                 <Grid item xs={12}>
                     <Grid item xs={12} style={{paddingBottom:20}}><strong>Configure the current battery capacity </strong></Grid>
                     <FormGroup>
-                        {/* Input for current battery capacity */}
                         <Tooltip title="Input the current battery capacity of the drone as % (0-100)" placement='bottom'>
                             <Grid item xs={6} style={{marginBottom: '20px'}}>
                                 <TextField id="battery-capacity" label="Battery Capacity (%)" type="number" step="0.1" variant="standard" style={{width: '190px'}} inputProps={{min:0, max:100}} onChange={(val) => handleBatteryMonitor(val, 0)} value={monitor.battery_monitor.param[0]}></TextField>
                             </Grid>
                         </Tooltip>
-                        {/* Input for target failure battery percentage */}
                         <Tooltip title="Input the target failure battery percentage for testing" placement='bottom'>
                             <Grid item xs={6}>
                                 <TextField id="target-failure" label="Target Failure Percentage (%)" type="number" step="0.1" variant="standard" style={{width: '190px'}} inputProps={{min:0, max:100}} onChange={(val) => handleBatteryMonitor(val, 1)} value={monitor.battery_monitor.param[1]}></TextField>
@@ -716,7 +570,6 @@ export default function MonitorControl (monJson) {
     return(
         <div>
             <Box sx={{ width: '100%', border: '1px solid grey', padding: 5, paddingTop: 2, maxHeight: '400px', overflow:'scroll'}}>
-                {/* <Container style={{overflow: 'scroll', height:'80%'}} > */}
                     <Box sx={{ width: '100%', typography: 'body1' }}>
                         <TabContext value={value}>
                             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -726,7 +579,6 @@ export default function MonitorControl (monJson) {
                                     variant="scrollable"
                                     scrollButtons="auto"
                                 >
-                                    {/* <Tab label="Global Monitors" value="1" /> */}
                                     <Tab label="Test Properties" value="2" />
                                     <Tab label= "Fuzzy Test Configuration" value ="Fuzzy" />
                                 </Tabs>
@@ -754,26 +606,15 @@ export default function MonitorControl (monJson) {
                                                         <Container maxWidth="md">
                                                             <Typography>
                                                                 <Grid container spacing={2} direction="row" style={{fontSize:"20px"}} >
-                                                                   {/* <Grid item xs={12}> <strong>{sing.description}</strong></Grid> */}
                                                                    <Grid item xs={12}><strong>Description: </strong>{sing.description}</Grid>
                                                                 </Grid>
                                                                 <Grid container direction="row">
-                                                                    {/* <strong>Status:</strong> */}
                                                                     {sing.enableBtn}
-                                                                   {/* Status:  {sing.enableBtn} */}
                                                                 </Grid>
                                                                 <br/>
                                                                 <Grid container spacing={2} direction="row">
                                                                     {sing.btns}
                                                                 </Grid>
-                                                                {/* <Grid container spacing={2} direction="row">
-                                                                    <Grid item xs={12}>
-                                                                        {sing.bodyText}
-                                                                    </Grid>
-                                                                </Grid> */}
-                                                                {/* <Grid container spacing={2} direction="row" alignContent="center" justifyContent="center" style={{padding:'35px'}}>
-                                                                    
-                                                                </Grid> */}
                                                                 <Grid item xs={12}>
                                                                     {sing.mutlipleBtn}
                                                                 </Grid>
@@ -810,7 +651,6 @@ export default function MonitorControl (monJson) {
                             </TabPanel>
                         </TabContext>
                     </Box>
-                {/* </Container> */}
             </Box>
         </div>
     )

@@ -77,7 +77,6 @@ export class SimulationConfigurationModel {
     let data = {};
     data['environment'] = this._environment.toJSONString();
     data['drones'] = this._drones?.map((droneObj) => droneObj.toJSONString());
-    // data["monitors"] = this._monitors.toJSONString();
     return data;
   }
 }
