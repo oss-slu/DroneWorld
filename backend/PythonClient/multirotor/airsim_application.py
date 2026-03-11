@@ -5,6 +5,7 @@ import time
 from abc import abstractmethod
 
 from PythonClient import airsim
+from PythonClient.multirotor.client_factory import create_multirotor_client
 from PythonClient.multirotor.storage.storage_config import get_storage_service
 
 class AirSimApplication:
@@ -16,7 +17,7 @@ class AirSimApplication:
         self.circular_mission_names = {"FlyInCircle"}
         self.polygon_mission_names = {"FlyToPoints", "FlyToPointsGeo"}
         self.point_mission_names = {"FlyStraight"}
-        self.client = airsim.MultirotorClient()
+        self.client = create_multirotor_client()
         # self.client.confirmConnection()
         self.setting_file = self.load_airsim_setting()
         self.drone_number = len(self.setting_file['Vehicles'])  # only support name format of Drone1, Drone2...
@@ -45,6 +46,56 @@ class AirSimApplication:
         with open(os.path.join(os.path.expanduser('~'), "Documents", "AirSim") + os.sep + 'cesium.json', 'r') as f:
             cesium_json = json.load(f)
         return cesium_json
+
+    @staticmethod
+    def _normalize_vehicle_name(name):
+        if name is None:
+            return ""
+        return "".join(ch for ch in str(name).lower() if ch.isalnum())
+
+    def resolve_vehicle_name(self, requested_name):
+        requested = str(requested_name or "")
+        requested_normalized = self._normalize_vehicle_name(requested)
+
+        configured_names = []
+        vehicles = self.setting_file.get("Vehicles", {})
+        if isinstance(vehicles, dict):
+            configured_names.extend(vehicles.keys())
+        configured_names.extend(self.all_drone_names)
+        configured_names = list(dict.fromkeys(configured_names))
+
+        if requested in configured_names:
+            return requested
+
+        if requested_normalized:
+            for candidate in configured_names:
+                if self._normalize_vehicle_name(candidate) == requested_normalized:
+                    print(f"[AirSim vehicle] resolved '{requested}' -> '{candidate}'")
+                    return candidate
+
+        rpc_names = []
+        try:
+            rpc_names = self.client.listVehicles() or []
+        except Exception:
+            rpc_names = []
+
+        if requested in rpc_names:
+            return requested
+
+        if requested_normalized:
+            for candidate in rpc_names:
+                if self._normalize_vehicle_name(candidate) == requested_normalized:
+                    print(f"[AirSim vehicle] resolved '{requested}' -> '{candidate}'")
+                    return candidate
+
+        all_candidates = list(dict.fromkeys(configured_names + list(rpc_names)))
+        if len(all_candidates) == 1 and requested != all_candidates[0]:
+            print(
+                f"[AirSim vehicle] single candidate fallback '{requested}' -> '{all_candidates[0]}'"
+            )
+            return all_candidates[0]
+
+        return requested
 
     def set_log_dir(self, dir_name):
         self.log_subdir = dir_name

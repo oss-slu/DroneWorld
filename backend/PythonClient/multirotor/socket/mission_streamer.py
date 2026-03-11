@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import PythonClient.airsim as airsim
+from PythonClient.multirotor.client_factory import create_multirotor_client
 
 
 class MissionStreamer:
@@ -15,7 +16,7 @@ class MissionStreamer:
         self.DECODE_EXTENSION = '.jpg'
         self.mission = mission
         self.target_drone = mission.target_drone
-        self.client = airsim.MultirotorClient()  # initialize a new client to prevent mission lag
+        self.client = create_multirotor_client()  # initialize a new client to prevent mission lag
 
     def frame_generator(self):
         while self.mission.state != "end":

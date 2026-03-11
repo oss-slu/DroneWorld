@@ -71,7 +71,7 @@ services:
       - "-nullrhi"
       - "-nosound"
       - "-unattended"
-      - "-Port=${SIM_INTERNAL_PORT}"
+      - "-Port=${SIM_INTERNAL_PORT:-3000}"
     environment:
       - DISPLAY=${DISPLAY:-:0}
     volumes:

@@ -1,6 +1,4 @@
-from __future__ import print_function
-import msgpackrpc #install as admin: pip install msgpack-rpc-python
-import numpy as np #pip install numpy
+import numpy as np
 import math
 
 class MsgpackMixin:
@@ -14,9 +12,19 @@ class MsgpackMixin:
     @classmethod
     def from_msgpack(cls, encoded):
         obj = cls()
-        #obj.__dict__ = {k.decode('utf-8'): (from_msgpack(v.__class__, v) if hasattr(v, "__dict__") else v) for k, v in encoded.items()}
-        obj.__dict__ = { k : (v if not isinstance(v, dict) else getattr(getattr(obj, k).__class__, "from_msgpack")(v)) for k, v in encoded.items()}
-        #return cls(**msgpack.unpack(encoded))
+        # ww = encoded.items()
+        # obj.__dict__ = {k.decode('utf-8'): (from_msgpack(v.__class__, v) if hasattr(v, "__dict__") else v) for k, v in encoded.items()}
+        if isinstance(encoded, dict):
+            for k, v in encoded.items():
+                if (isinstance(v, dict) and hasattr(getattr(obj, k).__class__, 'from_msgpack')):
+                    obj.__dict__[k] = getattr(getattr(obj, k).__class__, 'from_msgpack')(v)
+                else:
+                    obj.__dict__[k] = v
+        else:
+            obj = encoded
+
+        # obj.__dict__ = { k : (v if not isinstance(v, dict) else getattr(getattr(obj, k).__class__, "from_msgpack")(v)) for k, v in encoded.items()}
+        # return cls(**msgpack.unpack(encoded))
         return obj
 
 class _ImageType(type):
@@ -41,15 +49,22 @@ class _ImageType(type):
         return 8
     def OpticalFlowVis(cls):
         return 9
+    def Lighting(cls):
+        return 10
+    def Annotation(cls):
+        return 11
+
 
     def __getattr__(self, key):
         if key == 'DepthPlanner':
-            print('\033[31m'+"DepthPlanner has been (correctly) renamed to DepthPlanar. Please use ImageType.DepthPlanar instead."+'\033[0m')
-            raise AttributeError
+            print('\033[31m'+"DepthPlanner is deprecated. Please use ImageType.DepthPlanar instead."+'\033[0m')
+            return self.DepthPlanar
+        raise AttributeError(f"type object 'ImageType' has no attribute '{key}'")
 
 class ImageType(metaclass=_ImageType):
     Scene = 0
     DepthPlanar = 1
+    DepthPlanner = DepthPlanar
     DepthPerspective = 2
     DepthVis = 3
     DisparityNormalized = 4
@@ -58,6 +73,8 @@ class ImageType(metaclass=_ImageType):
     Infrared = 7
     OpticalFlow = 8
     OpticalFlowVis = 9
+    Lighting = 10
+    Annotation = 11
 
 class DrivetrainType:
     MaxDegreeOfFreedom = 0
@@ -70,6 +87,7 @@ class LandedState:
 class WeatherParameter:
     Rain = 0
     Roadwetness = 1
+    RoadWetness = Roadwetness
     Snow = 2
     RoadSnow = 3
     MapleLeaf = 4
@@ -91,7 +109,7 @@ class Vector3r(MsgpackMixin):
     y_val = 0.0
     z_val = 0.0
 
-    def __init__(self, x_val = 0.0, y_val = 0.0, z_val = 0.0):
+    def __init__(self, x_val=0.0, y_val=0.0, z_val=0.0):
         self.x_val = x_val
         self.y_val = y_val
         self.z_val = z_val
@@ -218,7 +236,7 @@ class Quaternionr(MsgpackMixin):
             else:
                 raise ValueError('length of the other Quaternionr must be 1')
         else:
-            raise TypeError('unsupported operand type(s) for \'rotate\': %s and %s' % ( str(type(self)), str(type(other))) )
+            raise TypeError('unsupported operand type(s) for \'rotate\': %s and %s' % ( str(type(self)), str(type(other))) )        
 
     def conjugate(self):
         return Quaternionr(-self.x_val, -self.y_val, -self.z_val, self.w_val)
@@ -227,13 +245,16 @@ class Quaternionr(MsgpackMixin):
         return self.conjugate()
 
     def inverse(self):
-        return self.star() / self.dot(self)
+        return self.from_numpy_array(self.star().to_numpy_array() / self.dot(self))
 
     def sgn(self):
-        return self/self.get_length()
+        return self / self.get_length()
 
     def get_length(self):
         return ( self.x_val**2 + self.y_val**2 + self.z_val**2 + self.w_val**2 )**0.5
+
+    def from_numpy_array(self, array):
+        return Quaternionr(array[0], array[1], array[2], array[3])
 
     def to_numpy_array(self):
         return np.array([self.x_val, self.y_val, self.z_val, self.w_val], dtype=np.float32)
@@ -260,6 +281,15 @@ class Pose(MsgpackMixin):
 
     def __iter__(self):
         return iter((self.position, self.orientation))
+
+class Twist(MsgpackMixin):
+    linear = Vector3r()
+    angular = Vector3r()
+
+    def __init__(self, linear_val=Vector3r(), angular_val=Vector3r()):
+        self.linear = linear_val
+        self.angular = angular_val
+
 
 class CollisionInfo(MsgpackMixin):
     has_collided = False
@@ -313,14 +343,15 @@ class ImageRequest(MsgpackMixin):
     image_type = ImageType.Scene
     pixels_as_float = False
     compress = False
+    annotation_name = ""
 
-    def __init__(self, camera_name, image_type, pixels_as_float = False, compress = True):
+    def __init__(self, camera_name, image_type, pixels_as_float = False, compress = True, annotation_name = ""):
         # todo: in future remove str(), it's only for compatibility to pre v1.2
         self.camera_name = str(camera_name)
         self.image_type = image_type
         self.pixels_as_float = pixels_as_float
         self.compress = compress
-
+        self.annotation_name = annotation_name
 
 class ImageResponse(MsgpackMixin):
     image_data_uint8 = np.uint8(0)
@@ -334,6 +365,7 @@ class ImageResponse(MsgpackMixin):
     width = 0
     height = 0
     image_type = ImageType.Scene
+    annotation_name = ""
 
 class CarControls(MsgpackMixin):
     throttle = 0.0
@@ -381,6 +413,10 @@ class EnvironmentState(MsgpackMixin):
     temperature = 0.0
     air_density = 0.0
 
+class ComputerVisionState(MsgpackMixin):
+    kinematics_estimated = KinematicsState()
+    timestamp = np.uint64(0)
+
 class CarState(MsgpackMixin):
     speed = 0.0
     gear = 0
@@ -391,13 +427,6 @@ class CarState(MsgpackMixin):
     kinematics_estimated = KinematicsState()
     timestamp = np.uint64(0)
 
-class TripStats(MsgpackMixin):
-    voltage = 0.0
-    energy_consume = 0.0
-    flight_time = 2.0
-    distance_traveled = 0.0
-    collision_count = 0
-    
 class MultirotorState(MsgpackMixin):
     collision = CollisionInfo()
     kinematics_estimated = KinematicsState()
@@ -408,6 +437,18 @@ class MultirotorState(MsgpackMixin):
     ready = False
     ready_message = ""
     can_arm = False
+
+
+class TripStats(MsgpackMixin):
+    # Keep compatibility with projects that still use VehicleClient.getTripStats().
+    state_of_charge = 100.0
+    voltage = 0.0
+    current = 0.0
+    energy_consumed = 0.0
+    distance_traveled = 0.0
+    flight_time = 0.0
+    collision_count = 0
+
 
 class RotorStates(MsgpackMixin):
     timestamp = np.uint64(0)
@@ -425,7 +466,75 @@ class LidarData(MsgpackMixin):
     point_cloud = 0.0
     time_stamp = np.uint64(0)
     pose = Pose()
-    segmentation = 0
+    groundtruth = ''
+
+
+class GPULidarData(MsgpackMixin):
+    point_cloud = 0.0
+    time_stamp = np.uint64(0)
+    pose = Pose()
+
+
+class EchoData(MsgpackMixin):
+    point_cloud = 0.0
+    time_stamp = np.uint64(0)
+    pose = Pose()
+    groundtruth = ''
+    passive_beacons_point_cloud = 0.0
+    passive_beacons_groundtruth = ''
+
+
+class UwbSensorData(MsgpackMixin):
+    time_stamp = np.uint64(0)
+    pose = Pose()
+    beaconsActiveID = []
+    beaconsActiveRssi = []
+    beaconsActivePosX = []
+    beaconsActivePosY = []
+    beaconsActivePosZ = []
+
+
+class UwbData(MsgpackMixin):
+    time_stamp = []
+    mur_achorId = []
+    mur_anchorX = []
+    mur_anchorY = []
+    mur_anchorZ = []
+    mur_anchor_valid_range = []
+    mur_anchor_distance = []
+    mur_anchor_rssi = []
+    mura_tagId = []
+    mura_tagX = []
+    mura_tagY = []
+    mura_tagZ = []
+    mura_ranges = []
+
+
+class WifiSensorData(MsgpackMixin):
+    time_stamp = np.uint64(0)
+    pose = Pose()
+    beaconsActiveID = []
+    beaconsActiveRssi = []
+    beaconsActivePosX = []
+    beaconsActivePosY = []
+    beaconsActivePosZ = []
+
+
+class WifiData(MsgpackMixin):
+    time_stamp = []
+    wr_achorId = []
+    wr_anchorX = []
+    wr_anchorY = []
+    wr_anchorZ = []
+    wr_anchor_valid_range = []
+    wr_anchor_distance = []
+    wr_anchor_rssi = []
+    wra_tagId = []
+    wra_tagX = []
+    wra_tagY = []
+    wra_tagZ = []
+    wra_ranges = []
+
 
 class ImuData(MsgpackMixin):
     time_stamp = np.uint64(0)
@@ -484,7 +593,7 @@ class DetectionInfo(MsgpackMixin):
     box2D = Box2D()
     box3D = Box3D()
     relative_pose = Pose()
-    
+
 class PIDGains():
     """
     Struct to store values of PID gains. Used to transmit controller gain values while instantiating
