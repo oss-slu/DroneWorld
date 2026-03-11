@@ -9,7 +9,6 @@ import styled from '@emotion/styled';
 import MissionConfiguration from './Configuration/MissionConfiguration';
 import EnvironmentConfiguration from './EnvironmentConfiguration';
 import MonitorControl from './MonitorControl';
-import Home from '../pages/Home';
 import { useNavigate } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
 import Tooltip from '@mui/material/Tooltip';
@@ -30,6 +29,8 @@ export default function HorizontalLinearStepper(data) {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [submitError, setSubmitError] = React.useState('');
   const [mainJson, setJson, activeScreen] = React.useState({
     Drones: null,
     environment: null,
@@ -63,18 +64,25 @@ export default function HorizontalLinearStepper(data) {
     }));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    if (activeStep === steps.length - 1) {
+      setSubmitError('');
+      setIsSubmitting(true);
+      const submitted = await addTask();
+      setIsSubmitting(false);
+      if (submitted) {
+        navigate('/reports');
+      }
+      return;
+    }
+
     let newSkipped = skipped;
     if (isStepSkipped(activeStep)) {
       newSkipped = new Set(newSkipped.values());
       newSkipped.delete(activeStep);
     }
-    // if(activeStep == 0) {
-    //   setMainJson();
-    // }
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
     setSkipped(newSkipped);
-    addTask();
   };
 
   const handleBack = () => {
@@ -177,12 +185,12 @@ export default function HorizontalLinearStepper(data) {
   //meat and potatoes, this function actually makes the call
   //the other end is simulation_server.py line 139
   async function addTask() {
-    if (activeStep !== steps.length - 1) return;
-
     const dronesToSend = getDronesForPayload(mainJson);
     if (dronesToSend.length === 0) {
-      console.warn('No drones configured; not submitting.');
-      return;
+      const message = 'No drones configured. Please complete Mission Configuration.';
+      console.warn(message);
+      setSubmitError(message);
+      return false;
     }
 
     const environmentToSend = getEnvironmentForPayload(mainJson.environment);
@@ -192,8 +200,10 @@ export default function HorizontalLinearStepper(data) {
         (environmentToSend.Origin.Latitude == null ||
         environmentToSend.Origin.Longitude == null))
     ) {
-      console.warn('Environment incomplete; not submitting.');
-      return;
+      const message = 'Environment is incomplete. Please review Environment Configuration.';
+      console.warn(message);
+      setSubmitError(message);
+      return false;
     }
 
     const payload = {
@@ -215,12 +225,18 @@ export default function HorizontalLinearStepper(data) {
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${bodyText}`);
 
       let data;
-      try { data = JSON.parse(bodyText); } catch { data = { raw: bodyText }; }
-      console.log('Task queued:', data); 
+      try {
+        data = JSON.parse(bodyText);
+      } catch {
+        data = { raw: bodyText };
+      }
+      console.log('Task queued:', data);
+      return true;
 
     } catch (err) {
       console.error('Submit failed:', err);
-
+      setSubmitError(`Submit failed: ${err.message}`);
+      return false;
     }
   }
 
@@ -292,17 +308,12 @@ export default function HorizontalLinearStepper(data) {
       </Stepper>
       {activeStep === steps.length ? (
         <React.Fragment>
-          Redirect to dashboard //TODO
-          {/* <Typography sx={{ mt: 2, mb: 1 }}>finish</Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-            <Box sx={{ flex: '1 1 auto' }} />
-            <Button onClick={handleReset}>Reset</Button>
-          </Box> */}
+          <Typography sx={{ mt: 2, mb: 1 }}>
+            Submitting configuration. Redirecting to reports...
+          </Typography>
         </React.Fragment>
       ) : (
         <React.Fragment>
-          {/* <Typography sx={{ mt: 2, mb: 1 }}  variant="h4" component="h4">Requirement</Typography>
-          <Typography sx={{ mt: 2, mb: 1 }}  variant="h6" component="h4">{data.desc}</Typography> */}
           <Box
             sx={{
               display: 'flex',
@@ -313,20 +324,25 @@ export default function HorizontalLinearStepper(data) {
                 return compo.id === activeStep + 1 ? compo.comp : '';
               })}
               <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                <StyledButton
-                  color='inherit'
-                  disabled={activeStep === 0}
-                  onClick={handleBack}
-                  sx={{ mr: 1 }}
-                  variant='outlined'
-                >
-                  Back
+                  <StyledButton
+                    color='inherit'
+                    disabled={activeStep === 0 || isSubmitting}
+                    onClick={handleBack}
+                    sx={{ mr: 1 }}
+                    variant='outlined'
+                  >
+                    Back
                 </StyledButton>
                 <Box sx={{ flex: '1 1 auto' }} />
-                <StyledButton variant='outlined' onClick={handleNext}>
-                  {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                <StyledButton variant='outlined' onClick={handleNext} disabled={isSubmitting}>
+                  {activeStep === steps.length - 1
+                    ? (isSubmitting ? 'Submitting...' : 'Finish')
+                    : 'Next'}
                 </StyledButton>
               </Box>
+              {submitError && (
+                <Typography sx={{ mt: 1, color: 'error.main' }}>{submitError}</Typography>
+              )}
             </Box>
 
             <Box sx={{ width: '55%', overflow: 'hidden', ml: 5 }}>
