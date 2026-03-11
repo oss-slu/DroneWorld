@@ -103,7 +103,7 @@ The simulator (`drv-unreal`) requires a GitHub Personal Access Token to build. I
 .\dev.ps1 stop
 ```
 
-`dev-rebuild` rebuilds frontend/backend images before starting dev mode.  
+`dev-rebuild` rebuilds frontend/backend images before starting dev mode (and renews anonymous volumes so mounted `node_modules` stays in sync with rebuilt images).  
 `dev-rebuild-frontend` and `dev-rebuild-backend` rebuild only one dev image for faster iteration.  
 `full-rebuild` rebuilds all images (including simulator) before starting full mode.
 

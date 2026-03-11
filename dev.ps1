@@ -180,12 +180,12 @@ switch ($Command) {
         Write-Host " Rebuilding and starting development services (frontend + backend only)..." -ForegroundColor Green
         docker-compose -f docker-compose.dev.yaml down
         docker-compose -f docker-compose.dev.yaml build frontend backend
-        docker-compose -f docker-compose.dev.yaml up
+        docker-compose -f docker-compose.dev.yaml up --renew-anon-volumes
     }
     "dev-rebuild-frontend" {
         Write-Host " Rebuilding frontend image and starting frontend in development compose..." -ForegroundColor Green
         docker-compose -f docker-compose.dev.yaml build frontend
-        docker-compose -f docker-compose.dev.yaml up frontend
+        docker-compose -f docker-compose.dev.yaml up --force-recreate --renew-anon-volumes frontend
     }
     "dev-rebuild-backend" {
         Write-Host " Rebuilding backend image and starting backend in development compose..." -ForegroundColor Green

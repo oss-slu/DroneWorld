@@ -159,12 +159,12 @@ case "$1" in
         echo "🔧 Rebuilding and starting development services (frontend + backend only)..."
         "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml down
         "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml build frontend backend
-        "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml up
+        "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml up --renew-anon-volumes
         ;;
     dev-rebuild-frontend)
         echo "⚛️  Rebuilding frontend image and starting frontend in development compose..."
         "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml build frontend
-        "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml up frontend
+        "${DOCKER_COMPOSE[@]}" -f docker-compose.dev.yaml up --force-recreate --renew-anon-volumes frontend
         ;;
     dev-rebuild-backend)
         echo "🐍 Rebuilding backend image and starting backend in development compose..."

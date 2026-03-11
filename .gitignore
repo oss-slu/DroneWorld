@@ -43,9 +43,6 @@ frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
 
-# Ignore frontend package-lock.json
-frontend/package-lock.json
-
 # Ignore Windows system file
 desktop.ini
 
