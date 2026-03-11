@@ -1,5 +1,4 @@
 import { EnvironmentModel } from './EnvironmentModel';
-import { MonitorModel } from './MonitorModel';
 import dayjs from 'dayjs';
 
 export class SimulationConfigurationModel {
@@ -13,23 +12,14 @@ export class SimulationConfigurationModel {
     this._environment.UseGeo = true;
     this._environment.time = dayjs(currentDate);
     this._drones = new Array();
-    this._monitors = new MonitorModel();
   }
 
   get environment() {
     return this._environment;
   }
 
-  get monitors() {
-    return this._monitors;
-  }
-
   set environment(value) {
     this._environment = value;
-  }
-
-  set monitors(value) {
-    this._monitors = value;
   }
 
   set drones(value) {
@@ -65,7 +55,6 @@ export class SimulationConfigurationModel {
   static getReactStateBasedUpdate(instance) {
     let model = new SimulationConfigurationModel();
     model.environment = instance.environment;
-    model.monitors = instance.monitors;
     const drones = instance.getAllDrones();
     for (let i = 0; i < drones.length; i++) {
       model.addNewDrone(drones[i]);
