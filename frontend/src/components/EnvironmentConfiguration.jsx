@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField'
-import Container from '@mui/material/Container'
 import Stack from '@mui/material/Stack';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -11,22 +10,12 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import dayjs from 'dayjs';
 import Tooltip from '@mui/material/Tooltip';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
-import FormHelperText from '@mui/material/FormHelperText';
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
-import DialogTitle from '@mui/material/DialogTitle';
-import Checkbox from '@mui/material/Checkbox';
 import { DeleteOutline } from '@mui/icons-material';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
@@ -75,7 +64,7 @@ const buildEnvironmentModel = (conf, baseModel) => {
 
 export default function EnvironmentConfiguration (env) {  
     console.log('EnvironmentConfiguration props', env);
-    const [backendInfo, setBackendInfo] = useState({ 
+    const [backendInfo] = useState({ 
         numQueuedTasks: 0,
         backendStatus: 'idle'
     });  
@@ -83,20 +72,6 @@ export default function EnvironmentConfiguration (env) {
         lat: 41.980381,
         lng: -87.934524
       });  
-      const getStatusStyle = () => {
-        switch (backendInfo.backendStatus) {
-          case 'idle':
-            return { color: 'green' }; // Green color and a checkmark icon
-          case 'running':
-            return { color: 'blue'}; // Blue color and a rotating arrow icon
-          case 'error':
-            return { color: 'red' }; // Red color and a cross icon
-          default:
-            return { color: 'gray' }; // Gray color and an information 
-        }
-      }; 
-      const statusStyle = getStatusStyle();
-
       const YOUR_API_KEY="AIzaSyAh_7ie16ikloOrjqURycdAan3INZ1qgiQ"
       const onMapClick = (e) => {
         setCurrentPosition({ lat: e.latLng.lat(), lng: e.latLng.lng() });
@@ -128,16 +103,6 @@ export default function EnvironmentConfiguration (env) {
         UseGeo: true,
         time:dayjs('2020-01-01 10:00')
     }); 
-    
-    const handleChangeSwitch = (val) => {
-        setEnvConf(prevState => ({
-                ...prevState,
-                enableFuzzy: val.target.checked
-        }))
-    }  
-    const environmentJson = (event) => {
-        env.environmentJson(event, env.id);
-    }    
     
     React.useEffect(() => {
         const model = buildEnvironmentModel(envConf, env.environmentJSON);
@@ -178,10 +143,6 @@ export default function EnvironmentConfiguration (env) {
     // Fluctuation Percentage
     const [fluctuationPercentage, setSelectedFluctuationValue] = React.useState(0.0);
 
-    // Check Box Status for Fuzzy Testing
-    const [windBoxStatus , setWindBox] = React.useState(true);
-    const [timeBoxStatus, setTimeBox] = React.useState(true);
-    const [positionBoxStatus, setPositionBox] = React.useState(true);
     const [fuzzyAlert, setFuzzyAlert] = React.useState(false);
 
     const Origin = [
@@ -237,37 +198,6 @@ export default function EnvironmentConfiguration (env) {
             }
         }))
     }
-    const handleCheckboxChange = (checkboxName) => {
-        setFuzzyAlert(true);
-        handleSnackBarVisibility(true);
-        // Used to determine the status of the checkbox
-        let newStatus;
-
-        // Calculate the number of checkboxes that are currently checked
-        const currentWindStatus = checkboxName === 'wind' ? !windBoxStatus : windBoxStatus;
-        const currentTimeStatus = checkboxName === 'time' ? !timeBoxStatus : timeBoxStatus;
-        const currentPositionStatus = checkboxName === 'position' ? !positionBoxStatus : positionBoxStatus;
-
-        // Count the number of checkboxes that are currently checked
-        const checkedCount = [currentWindStatus, currentTimeStatus, currentPositionStatus].filter(Boolean).length;
-
-        if (checkedCount >= 1 ) {
-            // allows toggling if there is more then one true value
-            newStatus = !eval(checkboxName + 'BoxStatus');
-        } else {
-            // Do not allow toggling when only one checkbox is checked
-            newStatus = eval(checkboxName + 'BoxStatus');
-        }
-
-        // Toggle the checkbox based on its name
-        if (checkboxName === 'wind') {
-        setWindBox(newStatus);
-        } else if (checkboxName === 'time') {
-            setTimeBox(newStatus);
-        } else if (checkboxName === 'position') {
-            setPositionBox(newStatus);
-    }};
-
   const handleWindTypeChange = (event) => {
     setFuzzyAlert(false);
     handleSnackBarVisibility(true);
@@ -340,45 +270,10 @@ export default function EnvironmentConfiguration (env) {
     }    
   //WIND SHEAR WINDOW FUNCTIONS
   const [windShears, setwindShears] = React.useState([]);
-
-  const addWindShear = (direction, velocity, fluctuation) => {
-    const newWindShear = {
-      windDirection: direction,
-      windVelocity: velocity,
-      fluctuationPercentage: fluctuation,
-    };
-    
-    // Update the windShears array with the new shear wind object
-    setwindShears([...windShears, newWindShear]);
-  };
   const deleteWindShear = (index) => {
     const updatedWindShears = [...windShears];
     updatedWindShears.splice(index, 1);
     setwindShears(updatedWindShears);
-  };
-
-  const [isAddWindShearOpen, setIsAddWindShearOpen] = React.useState(false);
-
-  // Temporary data saved in the window
-  const [windShearData, setWindShearData] = React.useState({
-    windDirection: "NE",
-    windVelocity: 0,
-    fluctuationPercentage: 0,
-  });
-
-  // Function to open the wind shear Window
-  const openAddWindShearWindow = () => {
-    setIsAddWindShearOpen(true);
-  };
-
-  // Function to close the wind shear Window
-  const closeAddWindShearWindow = () => {
-    setIsAddWindShearOpen(false);
-    setWindShearData({
-        windDirection: "",
-        windVelocity: 0,
-        fluctuationPercentage: 0,
-    });
   };
 const handleShearWindDirection = (e, index) => {
     const newArry = windShears.map((shear, i) => {
@@ -492,8 +387,8 @@ const handleSnackBarVisibility = (val) => {
             vertical: 'top',
             horizontal: 'right'
         }} 
-        autoHideDuration={6000} onClose={e => handleSnackBarVisibility(false)}>
-        <Alert onClose={e => handleSnackBarVisibility(false)} severity="info" sx={{ width: '100%' }}>
+        autoHideDuration={6000} onClose={() => handleSnackBarVisibility(false)}>
+        <Alert onClose={() => handleSnackBarVisibility(false)} severity="info" sx={{ width: '100%' }}>
              {fuzzyAlert ? "Fuzzy Testing Changes is under development !" : "Wind Type Changes is under Developement !"}
         </Alert>
     </Snackbar>

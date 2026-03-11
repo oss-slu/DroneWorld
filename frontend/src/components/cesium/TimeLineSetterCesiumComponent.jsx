@@ -1,20 +1,16 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { Entity } from 'resium';
-import { Cartesian3, Math as CesiumMath, Cartographic, Cartesian2, JulianDate } from 'cesium';
+import React, { useEffect } from 'react';
+import { JulianDate } from 'cesium';
 import PropTypes from 'prop-types';
 import { useMainJson } from '../../contexts/MainJsonContext';
-import { SimulationConfigurationModel } from '../../model/SimulationConfigurationModel';
 import dayjs from 'dayjs';
-import { EnvironmentModel } from '../../model/EnvironmentModel';
 
 const TimeLineSetterCesiumComponent = ({ viewerReady, viewerRef }) => {
-  const { mainJson, envJson, setEnvJson, viewerMaintainer, timeOfDayRef, timeRef } = useMainJson();
+  const { viewerMaintainer, timeOfDayRef, timeRef } = useMainJson();
 
   useEffect(() => {
     if (viewerReady) {
       const viewer = viewerRef.current.cesiumElement;
-      var clock = viewer.clock;
-      viewer.clock.onTick.addEventListener((clock) => {
+      viewer.clock.onTick.addEventListener(() => {
         let date;
         if (viewerMaintainer.current) {
           if (timeRef.current) {

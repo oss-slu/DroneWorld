@@ -40,7 +40,7 @@ export default function DroneConfiguration(droneData) {
   const { mainJson, setMainJson } = useMainJson();
   const { name = "", id = "", droneObject = {}, resetName = () => {}, droneJson = () => {} } = droneData || {};
   
-  const [selectedLoc, setSelectedLoc] = React.useState('GeoLocation');
+  const [selectedLoc] = React.useState('GeoLocation');
   const [selectedModel, setSelectedModel] = React.useState('');
   const [selectedDroneType, setselectedDroneType] = React.useState(droneTypes[1].value);
   const [snackBarState, setSnackBarState] = React.useState({ open: false });

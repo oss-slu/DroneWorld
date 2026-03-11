@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Entity } from 'resium';
 import {
   Cartesian3,
@@ -8,14 +8,10 @@ import {
   Cartesian2,
   HeightReference,
   JulianDate,
-  Ellipsoid,
-  LabelStyle,
   Color,
-  DistanceDisplayCondition,
 } from 'cesium';
 import PropTypes from 'prop-types';
 import { useMainJson } from '../../contexts/MainJsonContext';
-import { SimulationConfigurationModel } from '../../model/SimulationConfigurationModel';
 
 const RegionDragAndDrop = ({ viewerReady, viewerRef, setCameraByPosition }) => {
   const { syncRegionLocation, envJson } = useMainJson();
@@ -26,7 +22,7 @@ const RegionDragAndDrop = ({ viewerReady, viewerRef, setCameraByPosition }) => {
       const viewer = viewerRef.current.cesiumElement;
       const canvas = viewer.canvas;
 
-      viewer.animation.viewModel.timeFormatter = function (date, viewModel) {
+      viewer.animation.viewModel.timeFormatter = function (date) {
         date = JulianDate.toDate(date);
         let hours = date.getHours();
         let minutes = date.getMinutes();

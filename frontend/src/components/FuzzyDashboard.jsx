@@ -56,7 +56,7 @@ export default function FuzzyDashboard() {
   const [CollisionMonitor, setCollisionMonitor] = React.useState([])
   const [LandspaceMonitor, setLandspaceMonitor] = React.useState([])
   const [UnorderedWaypointMonitor, setUnorderedWaypointMonitor] = React.useState([])
-  const [OrderedWaypointMonitor, setOrderedWaypointMonitor] = React.useState([])
+  const [, setOrderedWaypointMonitor] = React.useState([])
   const [PointDeviationMonitor, setPointDeviationMonitor] = React.useState([])
   const [MinSepDistMonitor, setMinSepDistMonitor] = React.useState([])
   const [NoFlyZoneMonitor, setNoFlyZoneMonitor] = React.useState([])
@@ -104,13 +104,12 @@ export default function FuzzyDashboard() {
     for (const mapKey of Object.keys(info)) {
       console.log(mapKey);
       console.log(info[mapKey])
-      let fuzzyValueArray = fuzzyValue.split("_")
       return (
       <React.Fragment>
         <Grid container spacing={2} direction="row" style={{fontFamily:"sans-serif"}}>
           <h4>{mapKey}</h4>&nbsp;&nbsp;
           </Grid>
-        {info[mapKey].map((val, id) => {
+        {info[mapKey].map((val) => {
         return (
           <React.Fragment key={keyValue} >
           <List key={keyValue}>

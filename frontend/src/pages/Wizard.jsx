@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import HorizontalLinearStepper from '../components/HorizontalLinearStepper';
 
 const style = {
@@ -12,12 +12,7 @@ const style = {
   p: 4,
 };
 
-const requirementsArray = [
-  {}
-]
-
 const Wizard = () => {
-  const accordionList = [];
   const location = useLocation()
  console.log({location });
   return (

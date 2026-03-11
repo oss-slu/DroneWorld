@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import ReportDashboard from '../components/ReportDashboard';
 import Loading from '../components/Loading';
@@ -20,7 +19,7 @@ import GroupWorkIcon from '@mui/icons-material/GroupWork';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
 import { BASE_URL } from '../utils/const';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   landingPage: {
     fontFamily: 'Roboto, sans-serif',
     color: '#fff',
@@ -94,23 +93,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const modalStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 800,
-  height: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  padding: '4',
-};
-
 export default function LandingPage() {
   const classes = useStyles();
   const [filesPresent, setFilesPresent] = useState(false);
-  const [open, setOpen] = useState(false);
   const [isLoading, setIsloading] = useState(false);
 
   useEffect(() => {
@@ -146,7 +131,6 @@ export default function LandingPage() {
             <Box component='span'>
               <Button
                 className={classes.aboutLink}
-                onClick={() => setOpen(true)}
                 style={{ color: '#fff' }}
               ></Button>
             </Box>

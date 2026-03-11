@@ -118,10 +118,10 @@ export default function MonitorTabels (colData) {
                         </TableCell>
                     </TableRow>
                 ))}
-                    <TableRow  onMouseEnter={e => {
+                    <TableRow  onMouseEnter={() => {
                             setStyle({display: 'block', background: 'rgb(224 224 224)', width:"100%"});
                         }}
-                        onMouseLeave={e => {
+                        onMouseLeave={() => {
                             setStyle({display: 'block', background: 'rgb(224 224 224)', width:"100%"})
                         }}>
                         <TableCell component="th" scope="row" colSpan={4} onClick={addNewRow}>

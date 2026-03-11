@@ -1,7 +1,6 @@
 import * as React from 'react'
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import FormGroup from '@mui/material/FormGroup';
@@ -36,13 +35,6 @@ export default function Camera (sensor) {
 
     const closeModal = () => {
         sensor.closeModal(camera, sensor.name)
-    }
-
-    const handleChange = (val) => {
-        setCamera(prevState => ({
-            ...prevState,
-            [val.target.id]: val.target.value
-        }))
     }
 
     return (

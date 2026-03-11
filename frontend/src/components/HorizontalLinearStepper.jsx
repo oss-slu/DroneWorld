@@ -113,28 +113,27 @@ export default function HorizontalLinearStepper(data) {
     }
   }, [mainJson]);
 
+  const stripSensorKey = (sensor) => {
+    if (!sensor) return undefined;
+    const sanitizedSensor = { ...sensor };
+    delete sanitizedSensor.Key;
+    return sanitizedSensor;
+  };
+
   //Start Logic For Calling POST
 
   //This function goes in and gets the drone data from main JSON and formats it all pretty for the POST Call
   function getDronesForPayload(mainJson) {
     return Array.isArray(mainJson?.Drones)
       ? mainJson.Drones.map((d) => {
-          const { id, droneName, Sensors, Mission, MissionValue, ...rest } = d || {};
+          const { Sensors, Mission, MissionValue, ...rest } = d || {};
           const sanitizedSensors = Sensors
             ? {
                 ...Sensors,
-                Barometer: Sensors.Barometer
-                  ? (({ Key, ...b }) => b)(Sensors.Barometer)
-                  : undefined,
-                Magnetometer: Sensors.Magnetometer
-                  ? (({ Key, ...m }) => m)(Sensors.Magnetometer)
-                  : undefined,
-                IMU: Sensors.IMU
-                  ? (({ Key, ...i }) => i)(Sensors.IMU)
-                  : undefined,
-                GPS: Sensors.GPS
-                  ? (({ Key, ...g }) => g)(Sensors.GPS)
-                  : undefined,
+                Barometer: stripSensorKey(Sensors.Barometer),
+                Magnetometer: stripSensorKey(Sensors.Magnetometer),
+                IMU: stripSensorKey(Sensors.IMU),
+                GPS: stripSensorKey(Sensors.GPS),
               }
             : undefined;
           const missionName = Mission?.name ?? MissionValue ?? 'fly_to_points';
@@ -319,7 +318,7 @@ export default function HorizontalLinearStepper(data) {
             }}
           >
             <Box sx={{ width: '45%' }}>
-              {stepsComponent.map((compo, index) => {
+              {stepsComponent.map((compo) => {
                 return compo.id === activeStep + 1 ? compo.comp : '';
               })}
               <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>

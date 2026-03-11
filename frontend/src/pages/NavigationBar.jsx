@@ -5,14 +5,11 @@ import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
-import HomeIcon from '@mui/icons-material/Home';
-import Tooltip from '@mui/material/Tooltip';
 import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import BackendHealthTitle from '../components/BackendHealthTitle'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   nav: {
     display: 'flex',
     justifyContent: 'space-between',

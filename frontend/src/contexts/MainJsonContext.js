@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useRef, useEffect } from 'react';
+import React, { createContext, useState, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { SimulationConfigurationModel } from '../model/SimulationConfigurationModel';
 import { EnvironmentModel } from '../model/EnvironmentModel';

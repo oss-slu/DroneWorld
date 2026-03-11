@@ -2,7 +2,6 @@ import styled from '@emotion/styled';
 import {
   Box,
   Button,
-  TextField,
   Modal,
   Typography,
   Grid,
@@ -23,11 +22,6 @@ const StyledButton = styled(Button)`
   height: 50px;
 `;
 
-const StyledText = styled.p`
-  font-weight: bold;
-  font-size: 20px;
-`;
-
 const StyledLink = styled(Link)`
   text-decoration: none;
   display: flex;
@@ -35,11 +29,6 @@ const StyledLink = styled(Link)`
   justify-content: center;
   height: 50px !important;
   width: 300px !important;
-`;
-
-const StyledTextField = styled(TextField)`
-  width: 800px;
-  height: 200px;
 `;
 
 const Home = () => {

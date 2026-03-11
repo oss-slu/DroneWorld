@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Box from '@mui/material/Box'
-import Container from '@mui/material/Container';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
 import Accordion from '@mui/material/Accordion';
@@ -18,7 +17,7 @@ import { imageUrls } from '../../utils/const';
 import { useMainJson } from '../../contexts/MainJsonContext';
 import { SimulationConfigurationModel } from '../../model/SimulationConfigurationModel';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
     root: {
       width: '100%',
       padding: '5px'
@@ -27,7 +26,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function MissionConfiguration (mission) {
     const { mainJson, setMainJson } = useMainJson();
-    const [duplicateNameIndex, setDuplicateNameIndex] = React.useState(-1);
     const classes = useStyles();
     const [droneCount, setDroneCount] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones.length : 1);
     const [droneArray, setDroneArray] = React.useState(mission.mainJsonValue.Drones != null ? mission.mainJsonValue.Drones : [{
@@ -106,10 +104,6 @@ export default function MissionConfiguration (mission) {
         event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
       };
 
-    const popDrone = () =>{
-        droneArray.pop()
-    }
-
     const handleIncrement = () => {
         setDroneCount(droneCount +1)
         setDrone()
@@ -147,7 +141,7 @@ export default function MissionConfiguration (mission) {
     
     const setDroneName = (e, index) => {
         setDroneArray(objs => {
-            return objs.map((obj, i) => {
+            return objs.map((obj) => {
                 if(index === obj.id) {
                     obj = {
                         ...obj,

@@ -8,7 +8,6 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 
-const label = { inputProps: { 'aria-label': 'Size switch demo' } };
 export default function Lidar (sensor) {
     const [lidar, setLidar] = React.useState({
             SensorType: 6,

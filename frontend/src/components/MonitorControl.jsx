@@ -2,7 +2,6 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
-import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
@@ -18,17 +17,12 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
-import EnvironmentConfiguration from './EnvironmentConfiguration';
 import dayjs from 'dayjs';
 
 export default function MonitorControl (monJson) {
     const [value, setValue] = React.useState('2');
     const [verticalValue, setVerticalValue] = React.useState('1.1');
-    const [zoneCount, setZoneCount] = React.useState(1);
-
-    const handleIncrement = () => {
-        setZoneCount(zoneCount +1)
-    }
+    const [zoneCount] = React.useState(1);
     
     const [monitor, setMonitor] = React.useState(monJson.mainJsonValue.monitors != null ? monJson.mainJsonValue.monitors : {
         circular_deviation_monitor: {
@@ -124,48 +118,6 @@ export default function MonitorControl (monJson) {
         }));
     };
 
-    const handleMinLateralSepChange = (val) => {
-        setMonitor(prevState => ({
-            ...prevState,
-            min_sep_dist_monitor: {
-                ...monitor.min_sep_dist_monitor,
-                param: [
-                    parseFloat(monitor.min_sep_dist_monitor.param[0]), // Convert to number before keeping horizontal distance
-                    parseFloat(val.target.value) // Convert to number before setting lateral distance
-                ]
-            }
-        }));
-    };
-    const  handleWayPointThreshChange= (val) => {
-        setMonitor(prevState => ({
-            ...prevState,
-            unordered_waypoint_monitor: {
-                ...monitor.unordered_waypoint_monitor,
-                param: [
-                    parseFloat(val.target.value)
-                ]
-            }
-        }))
-        setMonitor(prevState => ({
-            ...prevState,
-            ordered_waypoint_monitor: {
-                ...monitor.ordered_waypoint_monitor,
-                param: [
-                    parseFloat(val.target.value)
-                ]
-            }
-        }))
-        setMonitor(prevState => ({
-            ...prevState,
-            drift_monitor: {
-                ...monitor.drift_monitor,
-                param: [
-                    parseFloat(val.target.value)
-                ]
-            }
-        }))
-    }
-
     const  handleDeviationPercent= (val) => {
         setMonitor(prevState => ({
             ...prevState,
@@ -187,28 +139,6 @@ export default function MonitorControl (monJson) {
         }))
     }
 
-    const  handleOrderedPtChange= (val) => {
-        setMonitor(prevState => ({
-            ...prevState,
-            ordered_waypoint_monitor: {
-                ...monitor.ordered_waypoint_monitor,
-                param:[ parseFloat(val.target.value)]
-            }
-        }))
-    }
-
-    const handleDriftThreshChange= (val) => {
-        setMonitor(prevState => ({
-            ...prevState,
-            drift_monitor: {
-                ...monitor.drift_monitor,
-                param: [
-                    parseFloat(val.target.value),
-                ]
-            }
-        }))
-    }
-
     const handleChange = (even, newValue) => {
         setValue(newValue);
         if(newValue =='1') {
@@ -222,10 +152,6 @@ export default function MonitorControl (monJson) {
         setVerticalValue(newValue);
     };
 
-    const monitorJson = (event) => {
-        monJson.monitorJson(event, monJson.id);
-    }
-
     React.useEffect(() => {
         monJson.monitorJson(monitor, monJson.id);
     }, [monitor])
@@ -237,27 +163,6 @@ export default function MonitorControl (monJson) {
                 enable:val.target.checked
             }
         }))
-    }
-
-    const setLandspaceZones = (parmData) => {
-        let newVal = []
-        parmData.map(dd => {
-            let mainArr = []
-            console.log(dd)
-            mainArr.push(dd[0])
-            mainArr.push(dd[1])
-            newVal.push(mainArr)
-        })
-        setMonitor(prevState => ({
-            ...prevState,
-            landspace_monitor: {
-            ...monitor.landspace_monitor,
-                        param: [
-                            parseFloat(monitor.landspace_monitor.param[0]),
-                            newVal
-                            ]
-                    }
-                }))
     }
 
     const setLandspaceParameters = (parmData) => {
@@ -278,42 +183,8 @@ export default function MonitorControl (monJson) {
         }))
     }
 
-    const setLandspaceThreshold = (val) => {
-        setMonitor(prevState => ({
-            ...prevState,
-            landspace_monitor: {
-            ...monitor.landspace_monitor,
-                        param: [
-                            parseFloat(val.target.value),
-                            monitor.landspace_monitor.param[1]
-                            ]
-
-                    }
-                }))
-    }
-
-    const handleZoneDelete = (index) => {
-        console.log('index----', index)
-        let newRows = [...monitor.no_fly_zone_monitor.param[0]]
-        console.log('newRows---', newRows)
-        let innerRows = [...newRows]
-        console.log('innerRows---', innerRows[index])
-        innerRows.splice(index,1)
-        newRows = [innerRows]
-        console.log('new rows after set', newRows)
-        setMonitor(prevState => ({
-            ...prevState,
-            no_fly_zone_monitor: {
-                    ...monitor.no_fly_zone_monitor,
-                    param: [newRows]
-            }
-        }))
-        setZoneCount(zoneCount-1)
-    }
-
     const setNoFlyParameters = (parmData, index) => {
         let newVal = []
-        let paramArray = []
         parmData.map(dd => {
             let mainArr = []
             console.log(dd)

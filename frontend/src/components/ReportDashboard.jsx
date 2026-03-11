@@ -92,7 +92,7 @@ function ReportSection({ title, reports, onPreview, onDownload }) {
             const total = (report.pass || 0) + (report.fail || 0);
             const passPercent = total ? Math.round((report.pass / total) * 100) : 0;
 
-            const [batchDate, ...rest] = (report.filename || '').split('_');
+            const [, ...rest] = (report.filename || '').split('_');
             const batchName = rest.join(' ') || 'Batch';
 
             return (
