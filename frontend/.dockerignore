@@ -1,14 +1,20 @@
 # Dependencies should be installed inside the image
 node_modules/
 
-# Ignore local logs
-npm-debug.log
-yarn-debug.log
+# Build and test artifacts
+build/
+coverage/
+.cache/
+cypress/videos/
+cypress/screenshots/
 
-# Ignore temporary files
+# Ignore local logs and temporary files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 *.log
-.cache
 *.tmp
+tmp/
 .DS_Store
 Thumbs.db
 
@@ -18,3 +24,4 @@ Thumbs.db
 
 # Secrets
 .env
+.env.*

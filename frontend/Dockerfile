@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7
 # Use an official Node.js runtime as a parent image
 FROM node:20
 
@@ -5,10 +6,10 @@ FROM node:20
 WORKDIR /app
 
 # Copy package.json and package-lock.json
-COPY package*.json ./
+COPY package.json package-lock.json ./
 
-# Install the necessary dependencies
-RUN npm install
+# Install deterministic dependencies; cache mount speeds repeated rebuilds
+RUN --mount=type=cache,target=/root/.npm npm ci
 
 # Copy the rest of the application code
 COPY . .

@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7
 # Use the official Python 3.10 image
 FROM python:3.10-slim
 
@@ -18,11 +19,12 @@ RUN apt-get update && apt-get install -y \
 # Set the working directory in the container
 WORKDIR /app
 
+# Copy dependency manifest and install first for better layer caching
+COPY requirements.txt ./
+RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
+
 # Copy the backend code into the container
 COPY . .
-
-# Install the Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
 
 # Configure port from build args to avoid hardcoding
 ARG BACKEND_PORT=5000
