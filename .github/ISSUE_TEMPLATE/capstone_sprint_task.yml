@@ -1,0 +1,154 @@
+name: Capstone Sprint Task
+description: Sprint-ready task template for capstone students working on DroneWorld
+title: "[CAPSTONE] "
+labels: ["needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to define a sprint task with clear scope, objective acceptance criteria, and practical implementation notes.
+
+  - type: textarea
+    id: intro
+    attributes:
+      label: Intro
+      description: One short paragraph of context for why this task exists right now. Alternatively, use user-story format ("As a ..., I want ..., so that ...").
+      placeholder: |
+        Once we have [current milestone], we need to implement [task] so users can [outcome].
+        OR
+        As a [type of user], I want [goal] so that [benefit].
+    validations:
+      required: true
+
+  - type: textarea
+    id: overview
+    attributes:
+      label: Overview (Given/When/Then)
+      description: Frame the expected behavior as a testable user/system scenario.
+      placeholder: |
+        Given that [initial context]
+        When [trigger/action]
+        Then [expected outcome]
+    validations:
+      required: true
+
+  - type: textarea
+    id: currently
+    attributes:
+      label: Currently
+      description: Describe the current state, gaps, blockers, or known broken behavior.
+      placeholder: |
+        - Current behavior:
+        - Known blockers:
+        - Existing related work:
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Provide full implementation context and expected approach.
+      placeholder: |
+        Describe what needs to be built/fixed/refactored and why.
+        Include references to existing files/services and any known constraints.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: task_type
+    attributes:
+      label: Task Type
+      description: Select the main nature of this capstone task.
+      options:
+        - Feature implementation
+        - Bug fix
+        - Refactor
+        - Testing/E2E
+        - Infrastructure/DevOps
+        - Documentation
+        - Research/Spike
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which part of DroneWorld is primarily affected?
+      options:
+        - Frontend (React UI)
+        - Backend (Flask API)
+        - Simulator (DRV-Unreal)
+        - Mock Simulator
+        - Docker/Deployment
+        - CI/CD
+        - Documentation
+        - Full Stack
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria (Essential)
+      description: List objective must-have outcomes. Write each criterion so it can be verified.
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+        - [ ] Criterion 3
+    validations:
+      required: true
+
+  - type: textarea
+    id: stretch_acceptance_criteria
+    attributes:
+      label: Stretch Acceptance Criteria (Optional)
+      description: Nice-to-have outcomes if essential scope is completed early.
+      placeholder: |
+        - [ ] Stretch criterion 1
+        - [ ] Stretch criterion 2
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Add constraints, caveats, implementation tips, and references.
+      placeholder: |
+        - Watch/read reference material before starting:
+        - Existing setup already in place:
+        - Technical considerations:
+        - Performance or compatibility constraints:
+
+  - type: textarea
+    id: next
+    attributes:
+      label: Next
+      description: Follow-up work after this task is complete.
+      placeholder: |
+        Once this is done, the next logical step is...
+
+  - type: textarea
+    id: resources
+    attributes:
+      label: Resources
+      description: Link docs, repos, Slack threads, architecture notes, related issues, and relevant files.
+      placeholder: |
+        - Related issue(s): #123
+        - Doc/spec:
+        - Video/thread:
+        - Relevant file(s):
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Author Checklist
+      options:
+        - label: I defined scope and expected outcome clearly.
+          required: true
+        - label: I provided objective essential acceptance criteria.
+          required: true
+        - label: I linked all relevant references and prior work.
+          required: true
+        - label: I listed follow-up work in the Next section (or marked none).
+          required: false
