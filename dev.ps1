@@ -107,6 +107,83 @@ function Set-Token {
     Write-Host " Token exported for current session" -ForegroundColor Green
 }
 
+function Get-FrontendEnvValue {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    if (-not (Test-Path "frontend/.env")) {
+        return $null
+    }
+
+    $line = Get-Content "frontend/.env" | Where-Object { $_ -match "^\s*$Name\s*=" } | Select-Object -Last 1
+    if (-not $line) {
+        return $null
+    }
+
+    $value = ($line -replace "^\s*$Name\s*=\s*", "").Trim()
+    if ($value.Length -ge 2) {
+        if (($value.StartsWith('"') -and $value.EndsWith('"')) -or ($value.StartsWith("'") -and $value.EndsWith("'"))) {
+            $value = $value.Substring(1, $value.Length - 2)
+        }
+    }
+
+    return $value
+}
+
+function Test-FrontendLockAutoSyncEnabled {
+    $value = $null
+
+    if (-not [string]::IsNullOrWhiteSpace($env:AUTO_SYNC_FRONTEND_LOCKFILE)) {
+        $value = $env:AUTO_SYNC_FRONTEND_LOCKFILE
+    }
+    else {
+        $value = Get-FrontendEnvValue -Name "AUTO_SYNC_FRONTEND_LOCKFILE"
+    }
+
+    if ([string]::IsNullOrWhiteSpace($value)) {
+        return $true
+    }
+
+    switch ($value.Trim().ToLowerInvariant()) {
+        "0" { return $false }
+        "false" { return $false }
+        "no" { return $false }
+        "off" { return $false }
+        default { return $true }
+    }
+}
+
+function Sync-FrontendLockfileIfNeeded {
+    if (-not (Test-FrontendLockAutoSyncEnabled)) {
+        Write-Host " Frontend lockfile auto-sync disabled (AUTO_SYNC_FRONTEND_LOCKFILE=false)." -ForegroundColor Yellow
+        return
+    }
+
+    if (-not (Test-Path "frontend/package.json")) {
+        return
+    }
+
+    $frontendPath = (Resolve-Path ".\frontend").Path
+    Write-Host " Checking frontend lockfile consistency (node:20/npm)..." -ForegroundColor Cyan
+
+    & docker run --rm -v "${frontendPath}:/app" -w /app node:20 npm ci --dry-run --ignore-scripts --no-audit --no-fund *> $null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host " Frontend lockfile is in sync." -ForegroundColor Green
+        return
+    }
+
+    Write-Host " Frontend lockfile out of sync. Regenerating package-lock.json..." -ForegroundColor Yellow
+    & docker run --rm -v "${frontendPath}:/app" -w /app node:20 npm install --package-lock-only --no-audit --no-fund
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host " Failed to regenerate frontend/package-lock.json." -ForegroundColor Red
+        exit 1
+    }
+
+    Write-Host " Updated frontend/package-lock.json using node:20/npm." -ForegroundColor Green
+}
+
 function Show-Usage {
     Write-Host ""
     Write-Host "Usage: .\dev.ps1 [command]" -ForegroundColor Cyan
@@ -117,6 +194,8 @@ function Show-Usage {
     Write-Host "  full-rebuild - Rebuild and start full stack (frontend, backend, simulator)"
     Write-Host "  dev         - Start development services only (frontend, backend)"
     Write-Host "  dev-rebuild - Rebuild and start development services (frontend, backend)"
+    Write-Host "  dev-rebuild-frontend - Rebuild frontend image, then start frontend in dev compose"
+    Write-Host "  dev-rebuild-backend - Rebuild backend image, then start backend in dev compose"
     Write-Host "  frontend    - Start frontend only"
     Write-Host "  backend     - Start backend only"
     Write-Host "  simulator   - Start simulator only"
@@ -131,8 +210,11 @@ function Show-Usage {
     Write-Host "  .\dev.ps1 token        # Set GitHub token (needed before 'full' or 'simulator')"
     Write-Host "  .\dev.ps1 dev          # Quick start for development"
     Write-Host "  .\dev.ps1 dev-rebuild  # Rebuild frontend/backend images, then start dev services"
+    Write-Host "  .\dev.ps1 dev-rebuild-frontend # Rebuild only frontend image for faster UI iteration"
+    Write-Host "  .\dev.ps1 dev-rebuild-backend  # Rebuild only backend image for faster API iteration"
     Write-Host "  .\dev.ps1 full         # Start everything including simulator"
     Write-Host "  .\dev.ps1 full-rebuild # Rebuild all images, then start full stack"
+    Write-Host "  frontend/.env: AUTO_SYNC_FRONTEND_LOCKFILE=false # Opt out of auto lockfile sync"
     Write-Host ""
     Write-Host "If you get an execution policy error, run this once:" -ForegroundColor Red
     Write-Host ""
@@ -164,6 +246,7 @@ switch ($Command) {
             }
         }
         Write-Host " Rebuilding and starting full stack (frontend + backend + simulator)..." -ForegroundColor Green
+        Sync-FrontendLockfileIfNeeded
         docker-compose down
         docker-compose build
         docker-compose up
@@ -174,9 +257,21 @@ switch ($Command) {
     }
     "dev-rebuild" {
         Write-Host " Rebuilding and starting development services (frontend + backend only)..." -ForegroundColor Green
+        Sync-FrontendLockfileIfNeeded
         docker-compose -f docker-compose.dev.yaml down
         docker-compose -f docker-compose.dev.yaml build frontend backend
-        docker-compose -f docker-compose.dev.yaml up
+        docker-compose -f docker-compose.dev.yaml up --renew-anon-volumes
+    }
+    "dev-rebuild-frontend" {
+        Write-Host " Rebuilding frontend image and starting frontend in development compose..." -ForegroundColor Green
+        Sync-FrontendLockfileIfNeeded
+        docker-compose -f docker-compose.dev.yaml build frontend
+        docker-compose -f docker-compose.dev.yaml up --force-recreate --renew-anon-volumes frontend
+    }
+    "dev-rebuild-backend" {
+        Write-Host " Rebuilding backend image and starting backend in development compose..." -ForegroundColor Green
+        docker-compose -f docker-compose.dev.yaml build backend
+        docker-compose -f docker-compose.dev.yaml up backend
     }
     "frontend" {
         Write-Host "  Starting frontend only..." -ForegroundColor Green

@@ -1,10 +1,19 @@
 # Ignore Python virtual environments and cache files
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
 .venv/
 venv/
+
+# Ignore build/test artifacts
+build/
+dist/
+*.egg-info/
+.coverage
+htmlcov/
 
 # Ignore local logs and temporary files
 *.log
@@ -16,7 +25,9 @@ tmp/
 Thumbs.db
 
 # Ignore Git repository
-.git
+.git/
+.gitignore
 
 # Secrets
 .env
+.env.*

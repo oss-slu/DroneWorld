@@ -65,9 +65,13 @@ The simulator (`drv-unreal`) requires a GitHub Personal Access Token to build. I
 
 # Development mode (frontend + backend only)
 ./dev.sh dev
+./dev.sh dev-rebuild
+./dev.sh dev-rebuild-frontend
+./dev.sh dev-rebuild-backend
 
 # Full stack (includes simulator)
 ./dev.sh full
+./dev.sh full-rebuild
 
 # View logs
 ./dev.sh logs
@@ -85,6 +89,8 @@ The simulator (`drv-unreal`) requires a GitHub Personal Access Token to build. I
 # Development mode (frontend + backend only)
 .\dev.ps1 dev
 .\dev.ps1 dev-rebuild
+.\dev.ps1 dev-rebuild-frontend
+.\dev.ps1 dev-rebuild-backend
 
 # Full stack (includes simulator)
 .\dev.ps1 full
@@ -97,8 +103,10 @@ The simulator (`drv-unreal`) requires a GitHub Personal Access Token to build. I
 .\dev.ps1 stop
 ```
 
-`dev-rebuild` rebuilds frontend/backend images before starting dev mode.  
+`dev-rebuild` rebuilds frontend/backend images before starting dev mode (and renews anonymous volumes so mounted `node_modules` stays in sync with rebuilt images).  
+`dev-rebuild-frontend` and `dev-rebuild-backend` rebuild only one dev image for faster iteration.  
 `full-rebuild` rebuilds all images (including simulator) before starting full mode.
+By default, rebuild commands also verify frontend lockfile consistency and regenerate `frontend/package-lock.json` if needed (using `node:20` in Docker). Set `AUTO_SYNC_FRONTEND_LOCKFILE=false` in `frontend/.env` to opt out.
 
 Run `./dev.sh help` or `.\dev.ps1 help` to see all available commands.
 
@@ -136,7 +144,7 @@ Run without the simulation engine for faster development:
 .\dev.ps1 dev           # Windows
 
 # Or directly:
-docker-compose -f docker-compose.dev.yml up
+docker-compose -f docker-compose.dev.yaml up
 ```
 
 **Services started (ports come from root `.env`):**
@@ -178,7 +186,7 @@ docker-compose up drv-unreal
 **Using docker-compose directly:**
 
 ```bash
-docker-compose -f docker-compose.dev.yml logs -f frontend backend
+docker-compose -f docker-compose.dev.yaml logs -f frontend backend
 ```
 
 ### Stopping Development Services
@@ -193,7 +201,7 @@ docker-compose -f docker-compose.dev.yml logs -f frontend backend
 **Using docker-compose directly:**
 
 ```bash
-docker-compose -f docker-compose.dev.yml down
+docker-compose -f docker-compose.dev.yaml down
 ```
 
 ### Configuration
@@ -401,6 +409,8 @@ The contents of `./frontend/.env` should include the following variables:
 ```sh
 REACT_APP_DEMO_USER_EMAIL='name@domain.tld'
 REACT_APP_CESIUM_ION_ACCESS_TOKEN='yaddayaddayadda'
+# Optional (default true): set false to disable auto lockfile sync during rebuild commands
+AUTO_SYNC_FRONTEND_LOCKFILE=true
 ```
 
 ### Local Storage (no cloud setup)
